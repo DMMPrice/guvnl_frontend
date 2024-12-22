@@ -1,24 +1,40 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import DemandCard from "./DemandCard";
+import { Progress } from "@/components/ui/progress";
 
 export default function Purchase() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { demand_list, exchangeData } = location.state || {
     demand_list: [],
     exchangeData: [],
   };
+
+  const [plantData, setPlantData] = useState(null);
   const [index, setIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log("Demand List:", demand_list);
-    console.log("Exchange Data:", exchangeData.exchange_data);
-    console.log("Start Date:", exchangeData.start_date);
-    console.log("End Date:", exchangeData.end_date);
-  }, [demand_list, exchangeData]);
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          "https://api.powercasting.online/procurement/plant"
+        );
+        const data = await response.json();
+        setPlantData(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleIndexChange = (e) => {
-    const value = parseInt(e.target.value, 10) - 1; // Subtract 1 to handle internally starting from 0
+    const value = parseInt(e.target.value, 10) - 1;
     if (value >= 0 && value < demand_list.length) {
       setIndex(value);
     }
@@ -28,18 +44,29 @@ export default function Purchase() {
     ? exchangeData.exchange_data
     : [exchangeData.exchange_data];
 
+  // Show loading state with Progress bar, centered on screen
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center w-full h-64">
+        <div className="w-64 p-4">
+          <Progress value={70} className="w-full" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 w-full">
       <h2 className="text-4xl font-bold mb-4 text-center">Procurement Data</h2>
 
       {/* Input Area */}
-      <div className="mb-4">
+      <div className="mb-4 flex justify-center items-center gap-2">
         <label htmlFor="index" className="mr-2">
           Enter Block No:
         </label>
         <select
           id="index"
-          value={index + 1} // Display value starting from 1
+          value={index + 1}
           onChange={handleIndexChange}
           className="border rounded p-2">
           {demand_list.map((_, idx) => (
@@ -48,6 +75,11 @@ export default function Purchase() {
             </option>
           ))}
         </select>
+        <button
+          onClick={() => navigate("/")}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
+          Home
+        </button>
       </div>
 
       {/* Cards Section */}
@@ -59,6 +91,9 @@ export default function Purchase() {
             actual={item["Demand(Actual)"]}
             predicted={item["Demand(Pred)"]}
             exchangeData={exchangeDataArray[idx]}
+            startDate={exchangeData.start_date}
+            endDate={exchangeData.end_date}
+            plantData={plantData}
           />
         ))}
       </div>

@@ -39,14 +39,17 @@ export default function Procurement() {
       }
 
       const [demandResponse, priceCapResponse] = await Promise.all([
-        fetch(`http://127.0.0.1:5000/procurement/demand?${params.toString()}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }),
         fetch(
-          `http://127.0.0.1:5000/procurement/exchange?start_date=${start_date}&end_date=${end_date}&cap_price=${exchangePriceCap}`,
+          `https://api.powercasting.online/procurement/demand?${params.toString()}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        ),
+        fetch(
+          `https://api.powercasting.online/procurement/exchange?start_date=${start_date}&end_date=${end_date}&cap_price=${exchangePriceCap}`,
           {
             method: "GET",
             headers: {
