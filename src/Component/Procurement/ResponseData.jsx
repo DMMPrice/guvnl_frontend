@@ -60,7 +60,7 @@ export default function ResponseData({ data, exchangeData }) {
         </div>
         <div className="bg-white shadow-md rounded-lg p-4">
           <h3 className="text-lg font-semibold">Total Demand</h3>
-          <p>{total_demand} KWh</p>
+          <p>{total_demand} KW</p>
         </div>
       </div>
 

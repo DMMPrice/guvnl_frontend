@@ -2,6 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import DemandCard from "./DemandCard";
 import { Progress } from "@/components/ui/progress";
+import * as XLSX from "xlsx";
+import { API_URL } from "../../config";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Button } from "@/components/ui/button";
 
 export default function Purchase() {
   const location = useLocation();
@@ -10,17 +21,15 @@ export default function Purchase() {
     demand_list: [],
     exchangeData: [],
   };
-
   const [plantData, setPlantData] = useState(null);
-  const [index, setIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 1;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          "https://api.powercasting.online/procurement/plant"
-        );
+        const response = await fetch(`${API_URL}/procurement/plant`);
         const data = await response.json();
         setPlantData(data);
         setIsLoading(false);
@@ -29,73 +38,137 @@ export default function Purchase() {
         setIsLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
-  const handleIndexChange = (e) => {
-    const value = parseInt(e.target.value, 10) - 1;
-    if (value >= 0 && value < demand_list.length) {
-      setIndex(value);
-    }
-  };
-
-  const exchangeDataArray = Array.isArray(exchangeData.exchange_data)
+  const exchangeDataArray = Array.isArray(exchangeData?.exchange_data)
     ? exchangeData.exchange_data
     : [exchangeData.exchange_data];
 
-  // Show loading state with Progress bar, centered on screen
+  const handleExportExcel = async () => {
+    const headers = [
+      "TimeStamp",
+      "Demand (Actual)",
+      "Demand (Pred)",
+      "Must Run Data",
+      "Other Run Data",
+      "IEX Cost",
+      "Total Generation",
+    ];
+
+    const data = demand_list.map((item) => [
+      item.TimeStamp,
+      item["Demand(Actual)"],
+      item["Demand(Pred)"],
+      // Add other data mappings here
+    ]);
+
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Procurement Data");
+    XLSX.writeFile(wb, "procurement_data.xlsx");
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center w-full h-64">
         <div className="w-64 p-4">
-          <Progress value={70} className="w-full" />
+          <Progress value={50} className="w-full" />
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="p-4 w-full">
-      <h2 className="text-4xl font-bold mb-4 text-center">Procurement Data</h2>
+  const totalPages = demand_list.length;
+  const currentItem = demand_list[currentPage - 1];
+  const currentExchangeData = exchangeDataArray[currentPage - 1];
 
-      {/* Input Area */}
-      <div className="mb-4 flex justify-center items-center gap-2">
-        <label htmlFor="index" className="mr-2">
-          Enter Block No:
-        </label>
-        <select
-          id="index"
-          value={index + 1}
-          onChange={handleIndexChange}
-          className="border rounded p-2">
-          {demand_list.map((_, idx) => (
-            <option key={idx} value={idx + 1}>
-              {idx + 1}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={() => navigate("/")}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
-          Home
-        </button>
+  return (
+    <div className="mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-4xl font-bold">Procurement Data</h2>
+        <Button onClick={handleExportExcel}>Export to Excel</Button>
       </div>
 
-      {/* Cards Section */}
       <div className="grid grid-cols-1 gap-4 mb-8">
-        {demand_list.slice(0, index + 1).map((item, idx) => (
+        <div className="flex justify-center mt-4">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                />
+              </PaginationItem>
+
+              {[...Array(totalPages)].map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(i + 1)}
+                    isActive={currentPage === i + 1}>
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+        {currentItem && (
           <DemandCard
-            key={idx}
-            timestamp={item.TimeStamp}
-            actual={item["Demand(Actual)"]}
-            predicted={item["Demand(Pred)"]}
-            exchangeData={exchangeDataArray[idx]}
+            key={currentPage}
+            index={currentPage}
+            timestamp={currentItem.TimeStamp}
+            actual={currentItem["Demand(Actual)"]}
+            predicted={currentItem["Demand(Pred)"]}
+            exchangeData={currentExchangeData}
             startDate={exchangeData.start_date}
             endDate={exchangeData.end_date}
             plantData={plantData}
           />
-        ))}
+        )}
+      </div>
+
+      <div className="flex justify-center mt-4">
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              />
+            </PaginationItem>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <PaginationItem key={i}>
+                <PaginationLink
+                  onClick={() => setCurrentPage(i + 1)}
+                  isActive={currentPage === i + 1}>
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            <PaginationItem>
+              <PaginationNext
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   );

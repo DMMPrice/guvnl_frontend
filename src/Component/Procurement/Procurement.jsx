@@ -2,6 +2,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { InputForm } from "./InputForm";
 import ResponseData from "./ResponseData";
+import { API_URL } from "../../config";
 
 export default function Procurement() {
   const [startDate, setStartDate] = useState(null);
@@ -39,17 +40,14 @@ export default function Procurement() {
       }
 
       const [demandResponse, priceCapResponse] = await Promise.all([
+        fetch(`${API_URL}procurement/demand?${params.toString()}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }),
         fetch(
-          `https://api.powercasting.online/procurement/demand?${params.toString()}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        ),
-        fetch(
-          `https://api.powercasting.online/procurement/exchange?start_date=${start_date}&end_date=${end_date}&cap_price=${exchangePriceCap}`,
+          `${API_URL}procurement/exchange?start_date=${start_date}&end_date=${end_date}&cap_price=${exchangePriceCap}`,
           {
             method: "GET",
             headers: {
