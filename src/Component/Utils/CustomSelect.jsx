@@ -18,7 +18,7 @@ export default function CustomSelect({
   triggerWidth = "w-full sm:w-32",
 }) {
   const handleChange = (val) => {
-    console.log(`CustomSelect [${label}] selected value:`, val); // Debug log
+    // console.log(`CustomSelect [${label}] selected value:`, val); // Debug log
     onValueChange(val);
   };
 

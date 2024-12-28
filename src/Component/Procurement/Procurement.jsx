@@ -9,9 +9,10 @@ export default function Procurement() {
   const [endDate, setEndDate] = useState(null);
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [responseData, setResponseData] = useState(null);
+  const [responseData, setResponseData] = useState([]);
   const [exchangePriceCapData, setExchangePriceCapData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async ({
     startDate,
@@ -21,52 +22,86 @@ export default function Procurement() {
     exchangePriceCap,
   }) => {
     setLoading(true);
+    setError(null);
+    setResponseData([]);
+
     try {
       const start_date =
         startDate && startTime
-          ? `${format(startDate, "yyyy-MM-dd")} ${startTime}:00`
+          ? format(startDate, "yyyy-MM-dd") + " " + startTime + ":00"
           : null;
       const end_date =
         endDate && endTime
-          ? `${format(endDate, "yyyy-MM-dd")} ${endTime}:00`
+          ? format(endDate, "yyyy-MM-dd") + " " + endTime + ":00"
           : null;
 
-      const params = new URLSearchParams();
-      if (start_date) {
-        params.append("start_date", start_date);
-      }
-      if (end_date) {
-        params.append("end_date", end_date);
-      }
+      if (start_date && end_date) {
+        const start = new Date(start_date);
+        const end = new Date(end_date);
+        const interval = 15 * 60 * 1000; // 15 minutes in milliseconds
+        const result = [];
 
-      const [demandResponse, priceCapResponse] = await Promise.all([
-        fetch(`${API_URL}procurement/demand?${params.toString()}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }),
-        fetch(
-          `${API_URL}procurement/exchange?start_date=${start_date}&end_date=${end_date}&cap_price=${exchangePriceCap}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
+        for (
+          let time = start;
+          time <= end;
+          time = new Date(time.getTime() + interval)
+        ) {
+          result.push({
+            start_time: format(time, "yyyy-MM-dd HH:mm:ss"),
+            cap_price: exchangePriceCap,
+          });
+        }
+
+        console.log("Generated timestamps:", result);
+
+        const responses = [];
+
+        for (const item of result) {
+          const { start_time, cap_price } = item;
+          const formattedDate = start_time
+            .replace(/["']/g, "")
+            .replace(" ", "%20");
+          const apiUrl = `${API_URL}plant/?start_date=${formattedDate}&price_cap=${cap_price}`;
+
+          try {
+            console.log("Requesting URL:", apiUrl);
+
+            const response = await fetch(apiUrl, {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(
+                `HTTP error! status: ${response.status} - ${response.statusText}`
+              );
+            }
+
+            const data = await response.json();
+            responses.push({
+              timestamp: start_time,
+              data: data,
+            });
+
+            console.log(`Response for ${start_time}:`, data);
+          } catch (apiError) {
+            console.error("API Error:", {
+              message: apiError.message,
+              url: apiUrl,
+              timestamp: start_time,
+            });
+            setError(apiError.message);
           }
-        ),
-      ]);
+        }
 
-      const demandData = await demandResponse.json();
-      const priceCapData = await priceCapResponse.json();
-
-      setResponseData(demandData); // Save demand response data to state
-      setExchangePriceCapData(priceCapData); // Save price cap response data to state
-
-      console.log(demandData);
-      console.log(priceCapData);
+        setResponseData(responses);
+      }
     } catch (error) {
       console.error("Error:", error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -85,6 +120,7 @@ export default function Procurement() {
         setEndTime={setEndTime}
         handleSubmit={handleSubmit}
       />
+      {error && <div className="text-red-500 mt-4">Error: {error}</div>}
       {loading ? (
         <div className="flex justify-center items-center mt-4">
           <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>

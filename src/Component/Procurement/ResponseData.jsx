@@ -13,22 +13,25 @@ export default function ResponseData({ data, exchangeData }) {
   const [rowsToShow, setRowsToShow] = useState(10);
   const navigate = useNavigate();
 
-  if (!data) {
+  if (!data || !Array.isArray(data) || data.length === 0) {
     return <div>Enter start and end date to get the data</div>;
   }
 
-  const { demand_list, end_date, start_date, total_blocks, total_demand } =
-    data;
-
   const handleDownload = (format) => {
-    const worksheet = XLSX.utils.json_to_sheet(demand_list);
+    const flattenedData = data.map(({ timestamp, data }) => ({
+      TimeStamp: timestamp,
+      "Actual Demand": data["Demand(Actual)"],
+      "Predicted Demand": data["Demand(Pred)"],
+      "IEX Predicted Price": data.IEX_Data?.Pred_Price,
+      "IEX Predicted Quantity": data.IEX_Data?.Qty_Pred,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(flattenedData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Demand Data");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Plant Data");
 
     if (format === "xlsx") {
-      XLSX.writeFile(workbook, "demand_data.xlsx");
-    } else if (format === "csv") {
-      XLSX.writeFile(workbook, "demand_data.csv", { bookType: "csv" });
+      XLSX.writeFile(workbook, "plant_data.xlsx");
     }
   };
 
@@ -36,35 +39,11 @@ export default function ResponseData({ data, exchangeData }) {
     setRowsToShow(Number(value));
   };
 
-  const handleNavigate = () => {
-    navigate("/procurement", { state: { demand_list, exchangeData } });
-  };
-
   return (
     <div className="p-4 w-full">
-      <h2 className="text-4xl font-bold mb-4 text-center">Demand Data</h2>
+      <h2 className="text-4xl font-bold mb-4 text-center">Plant Data</h2>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white shadow-md rounded-lg p-4">
-          <h3 className="text-lg font-semibold">Start Date</h3>
-          <p>{start_date}</p>
-        </div>
-        <div className="bg-white shadow-md rounded-lg p-4">
-          <h3 className="text-lg font-semibold">End Date</h3>
-          <p>{end_date}</p>
-        </div>
-        <div className="bg-white shadow-md rounded-lg p-4">
-          <h3 className="text-lg font-semibold">Total Blocks</h3>
-          <p>{total_blocks}</p>
-        </div>
-        <div className="bg-white shadow-md rounded-lg p-4">
-          <h3 className="text-lg font-semibold">Total Demand</h3>
-          <p>{total_demand} KW</p>
-        </div>
-      </div>
-
-      {/* Row Selection and Download Buttons */}
+      {/* Row Selection and Download Button */}
       <div className="flex justify-between items-center mb-4">
         <div>
           <label htmlFor="rows" className="mr-2">
@@ -77,45 +56,53 @@ export default function ResponseData({ data, exchangeData }) {
             <SelectContent>
               <SelectItem value="10">10</SelectItem>
               <SelectItem value="50">50</SelectItem>
-              <SelectItem value={String(demand_list.length)}>All</SelectItem>
+              <SelectItem value={String(data.length)}>All</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={handleNavigate}
-            className="bg-blue-500 text-white px-4 py-2 rounded">
-            Power Procurement
-          </button>
-          <button
-            onClick={() => handleDownload("xlsx")}
-            className="bg-blue-500 text-white px-4 py-2 rounded">
-            Download as Excel
-          </button>
-          <button
-            onClick={() => handleDownload("csv")}
-            className="bg-green-500 text-white px-4 py-2 rounded">
-            Download as CSV
-          </button>
-        </div>
+        <button
+          onClick={() => handleDownload("xlsx")}
+          className="bg-blue-500 text-white px-4 py-2 rounded">
+          Download as Excel
+        </button>
       </div>
 
-      {/* Demand List Table */}
+      {/* Data Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white shadow-md rounded-lg">
           <thead>
             <tr>
               <th className="py-2 px-4 border-b">TimeStamp</th>
-              <th className="py-2 px-4 border-b">Demand (Actual)</th>
-              <th className="py-2 px-4 border-b">Demand (Pred)</th>
+              <th className="py-2 px-4 border-b">Actual Demand</th>
+              <th className="py-2 px-4 border-b">Predicted Demand</th>
+              <th className="py-2 px-4 border-b">IEX Pred Price</th>
+              <th className="py-2 px-4 border-b">IEX Pred Quantity</th>
+              <th className="py-2 px-4 border-b">Must Run Plants</th>
+              <th className="py-2 px-4 border-b">Remaining Plants</th>
             </tr>
           </thead>
           <tbody>
-            {demand_list.slice(0, rowsToShow).map((item, index) => (
+            {data.slice(0, rowsToShow).map((item, index) => (
               <tr key={index}>
-                <td className="py-2 px-4 border-b">{item.TimeStamp}</td>
-                <td className="py-2 px-4 border-b">{item["Demand(Actual)"]}</td>
-                <td className="py-2 px-4 border-b">{item["Demand(Pred)"]}</td>
+                <td className="py-2 px-4 border-b">{item.timestamp}</td>
+                <td className="py-2 px-4 border-b">
+                  {item.data["Demand(Actual)"]}
+                </td>
+                <td className="py-2 px-4 border-b">
+                  {item.data["Demand(Pred)"]}
+                </td>
+                <td className="py-2 px-4 border-b">
+                  {item.data.IEX_Data?.Pred_Price}
+                </td>
+                <td className="py-2 px-4 border-b">
+                  {item.data.IEX_Data?.Qty_Pred}
+                </td>
+                <td className="py-2 px-4 border-b">
+                  {item.data.Must_Run?.length || 0} plants
+                </td>
+                <td className="py-2 px-4 border-b">
+                  {item.data.Remaining_Plants?.name || "N/A"}
+                </td>
               </tr>
             ))}
           </tbody>

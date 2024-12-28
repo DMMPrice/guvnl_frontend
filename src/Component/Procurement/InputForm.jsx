@@ -30,7 +30,7 @@ export function InputForm({
   handleSubmit,
 }) {
   const [showModal, setShowModal] = useState(false);
-  const [exchangePriceCap, setExchangePriceCap] = useState("");
+  const [exchangePriceCap, setExchangePriceCap] = useState(null);
 
   // Generate time options in 15-minute intervals
   const timeOptions = [];
@@ -53,7 +53,7 @@ export function InputForm({
     setEndDate(null);
     setStartTime("");
     setEndTime("");
-    setExchangePriceCap("");
+    setExchangePriceCap(null);
     console.log("Form cleared");
   };
 
@@ -121,8 +121,8 @@ export function InputForm({
           <div className="flex flex-col w-full sm:w-auto">
             <Label className="mb-2">Exchange Price Cap</Label>
             <Select
-              value={exchangePriceCap}
-              onValueChange={setExchangePriceCap}>
+              value={exchangePriceCap !== null ? String(exchangePriceCap) : ""}
+              onValueChange={(value) => setExchangePriceCap(Number(value))}>
               <SelectTrigger className="w-full sm:w-32">
                 <SelectValue placeholder="Select Price" />
               </SelectTrigger>
