@@ -1,174 +1,105 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import CustomSelect from "../Utils/CustomSelect";
-import CustomDatePicker from "../Utils/CustomDatePicker";
+import React, { useState } from "react";
+import BasicDateTimePicker from "../Utils/DateTimePicker";
+import InputField from "../Utils/InputField";
 
-export function InputForm({
-  startDate,
-  setStartDate,
-  endDate,
-  setEndDate,
-  startTime,
-  setStartTime,
-  endTime,
-  setEndTime,
-  handleSubmit,
-}) {
-  const [showModal, setShowModal] = useState(false);
-  const [exchangePriceCap, setExchangePriceCap] = useState(null);
+const InputForm = ({ onResponseData }) => {
+  const [startTimestamp, setStartTimestamp] = useState(null);
+  const [endTimestamp, setEndTimestamp] = useState(null);
+  const [numberInput, setNumberInput] = useState("");
 
-  // Generate time options in 15-minute intervals
-  const timeOptions = [];
-  for (let hour = 0; hour < 24; hour++) {
-    for (let minute = 0; minute < 60; minute += 15) {
-      const h = String(hour).padStart(2, "0");
-      const m = String(minute).padStart(2, "0");
-      timeOptions.push(`${h}:${m}`);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const intervals = generateTimeIntervalsIST(startTimestamp, endTimestamp);
+    if (!intervals.length) {
+      return;
     }
-  }
 
-  // Generate price cap options from 1 to 50
-  const priceCapOptions = [];
-  for (let i = 1; i <= 50; i++) {
-    priceCapOptions.push(i);
-  }
+    const requests = intervals.map((interval) => {
+      const formattedStartDate = interval.replace("T", " ") + ":00";
+      return fetch(
+        `http://127.0.0.1:5000/plant/?start_date=${encodeURIComponent(
+          formattedStartDate
+        )}&price_cap=${encodeURIComponent(numberInput)}`,
+        { method: "GET" }
+      )
+        .then((response) => response.json())
+        .catch(() => null);
+    });
 
-  const handleClear = () => {
-    setStartDate(null);
-    setEndDate(null);
-    setStartTime("");
-    setEndTime("");
-    setExchangePriceCap(null);
-    console.log("Form cleared");
+    Promise.all(requests)
+      .then((resultsArray) => {
+        console.log("All responses:", resultsArray);
+        if (onResponseData) {
+          onResponseData(resultsArray);
+        }
+      })
+      .catch((err) => console.error("Error with interval requests:", err));
   };
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    if (!startDate || !endDate || !startTime || !endTime || !exchangePriceCap) {
-      setShowModal(true);
-    } else {
-      handleSubmit({
-        startDate,
-        endDate,
-        startTime,
-        endTime,
-        exchangePriceCap,
-      });
-      console.log("Form submitted with values:", {
-        startDate,
-        endDate,
-        startTime,
-        endTime,
-        exchangePriceCap,
-      });
+  const handleClear = () => {
+    setStartTimestamp(null);
+    setEndTimestamp(null);
+    setNumberInput("");
+  };
+
+  const generateTimeIntervalsIST = (start, end) => {
+    const intervals = [];
+    let current = new Date(start);
+    const endDate = new Date(end);
+    const subtractOffset = 6.5 * 60 * 60000 - 12 * 60 * 60000;
+
+    while (current <= endDate) {
+      const adjusted = new Date(current.getTime() - subtractOffset);
+      intervals.push(adjusted.toISOString().slice(0, 16));
+      current = new Date(current.getTime() + 15 * 60000);
     }
+
+    return intervals;
   };
 
   return (
-    <div className="p-4 w-full">
-      <form onSubmit={handleFormSubmit} className="w-full">
-        <div className="flex flex-wrap items-end gap-4 w-full">
-          {/* Start Date Picker */}
-          <CustomDatePicker
-            label="Start Date"
-            selectedDate={startDate}
-            onSelect={setStartDate}
-            placeholder="Pick a date"
+    <div className="mx-8">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col md:flex-row md:items-end md:space-x-4 space-y-4 md:space-y-0">
+        <div className="flex-1">
+          <BasicDateTimePicker
+            label="Start Timestamp"
+            value={startTimestamp}
+            onChange={setStartTimestamp}
           />
-
-          {/* Start Time Select */}
-          <CustomSelect
-            label="Start Time"
-            value={startTime}
-            onValueChange={setStartTime}
-            options={timeOptions}
-            placeholder="Select time"
+        </div>
+        <div className="flex-1">
+          <BasicDateTimePicker
+            label="End Timestamp"
+            value={endTimestamp}
+            onChange={setEndTimestamp}
           />
-
-          {/* End Date Picker */}
-          <CustomDatePicker
-            label="End Date"
-            selectedDate={endDate}
-            onSelect={setEndDate}
-            placeholder="Pick a date"
+        </div>
+        <div className="flex-1">
+          <InputField
+            label="Number Input"
+            type="number"
+            value={numberInput}
+            onChange={(e) => setNumberInput(e.target.value)}
           />
-
-          {/* End Time Select */}
-          <CustomSelect
-            label="End Time"
-            value={endTime}
-            onValueChange={setEndTime}
-            options={timeOptions}
-            placeholder="Select time"
-          />
-
-          {/* Exchange Price Cap Select */}
-          <div className="flex flex-col w-full sm:w-auto">
-            <Label className="mb-2">Exchange Price Cap</Label>
-            <Select
-              value={exchangePriceCap !== null ? String(exchangePriceCap) : ""}
-              onValueChange={(value) => setExchangePriceCap(Number(value))}>
-              <SelectTrigger className="w-full sm:w-32">
-                <SelectValue placeholder="Select Price" />
-              </SelectTrigger>
-              <SelectContent>
-                {priceCapOptions.map((price) => (
-                  <SelectItem key={price} value={String(price)}>
-                    {price}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Submit Button */}
-          <div className="flex flex-col w-full sm:w-auto">
-            <Button type="submit" className="mt-6 w-full sm:w-auto">
-              Submit
-            </Button>
-          </div>
-
-          {/* Clear Button */}
-          <div className="flex flex-col w-full sm:w-auto">
-            <Button
-              type="button"
-              onClick={handleClear}
-              className="mt-6 w-full sm:w-auto">
-              Clear
-            </Button>
-          </div>
+        </div>
+        <div className="flex space-x-4">
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 w-full md:w-auto">
+            Submit
+          </button>
+          <button
+            type="button"
+            onClick={handleClear}
+            className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 w-full md:w-auto">
+            Clear
+          </button>
         </div>
       </form>
-
-      {/* Modal */}
-      {showModal && (
-        <Dialog open={showModal} onOpenChange={setShowModal}>
-          <DialogContent>
-            <DialogTitle>Missing Information</DialogTitle>
-            <DialogDescription>
-              Please enter all required values before submitting the form.
-            </DialogDescription>
-            <DialogClose asChild>
-              <Button onClick={() => setShowModal(false)}>Close</Button>
-            </DialogClose>
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
-}
+};
+
+export default InputForm;

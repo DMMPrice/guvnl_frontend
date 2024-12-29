@@ -18,8 +18,6 @@ function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/purchase" element={<Procurement />} />
-        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-        {/* <Route path="/procurement" element={<Purchase />} /> */}
         <Route path="*" element={<h1>404: Page Not Found</h1>} />
       </Routes>
       <Footer />
