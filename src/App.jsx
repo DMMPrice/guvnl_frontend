@@ -11,6 +11,8 @@ import NavBar from "./Component/NavBar/NavBar";
 import Footer from "./Component/Footer/Footer";
 import Dashboard from "./Component/Home/Dashboard";
 import Plants from "./Component/Plants/main";
+import Consumers from "./Component/Consumers/main";
+import SingleDemand from "./Component/Demand/main";
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/purchase" element={<Procurement />} />
         <Route path="/plants" element={<Plants />} />
+        <Route path="/consumers" element={<Consumers />} />
+        <Route path="/demand" element={<SingleDemand />} />
         <Route path="*" element={<h1>404: Page Not Found</h1>} />
       </Routes>
       <Footer />

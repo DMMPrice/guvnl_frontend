@@ -13,7 +13,7 @@ import {
 export default function CommonTable({ title, caption, columns, data, footer }) {
   return (
     <>
-      {title && <h3 className="text-lg font-semibold mt-6 mb-4">{title}</h3>}
+      {title && <h3 className="text-xl font-semibold mt-6 mb-4">{title}</h3>}
       <div className="overflow-x-auto">
         <Table className="min-w-full bg-white">
           {caption && <TableCaption>{caption}</TableCaption>}
