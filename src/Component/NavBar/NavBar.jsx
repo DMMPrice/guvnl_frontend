@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "@/assets/logo.svg";
 import "./NavBar.css";
+import path from "path";
 
 export default function NavBar() {
   // State and refs
@@ -10,7 +11,9 @@ export default function NavBar() {
   // Navigation links
   const navigation = [
     { title: "Procurement", path: "/purchase" },
-    { title: "Edit Data", path: "/edit-data" },
+    { title: "Plant List", path: "/plants" },
+    { title: "Banking Data", path: "/banking" },
+    { title: "Consumers List", path: "/consumers" },
     { title: "Demand", path: "/demand" },
   ];
 
