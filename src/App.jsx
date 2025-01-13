@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import "./App.css";
 import "@radix-ui/themes/styles.css";
-import Procurement from "./Component/Procurement/Procurement";
+import Procurement from "./Component/Procurement/main";
 import NavBar from "./Component/NavBar/NavBar";
 import Footer from "./Component/Footer/Footer";
 import Dashboard from "./Component/Home/Dashboard";
