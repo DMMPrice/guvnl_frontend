@@ -5,18 +5,13 @@ import DemandLineChart from "./DemandLineChart";
 import { Loader2 } from "lucide-react";
 
 export default function Dashboard() {
-  const [demandData, setDemandData] = useState(null);
+  const [demandData, setDemandData] = useState(null); // Data for the line chart
+  const [dashboardStats, setDashboardStats] = useState(null); // Data for the dashboard cards
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const dashboardStats = {
-    totalDemand: "3,427,202 MW",
-    totalSupply: "3,389,382 MW",
-    averagePrice: "₹3.9/unit",
-    totalPlants: "75",
-  };
-
   useEffect(() => {
+    // Fetch demand line chart data
     const fetchDemandData = async () => {
       try {
         const response = await fetch(`${API_URL}demand/all`);
@@ -24,17 +19,37 @@ export default function Dashboard() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        // console.log("Demand Data:", data);
         setDemandData(data);
       } catch (error) {
-        // console.error("Error fetching demand data:", error);
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchDemandData();
+    // Fetch dashboard overview stats
+    const fetchDashboardStats = async () => {
+      try {
+        const response = await fetch(`${API_URL}demand/dashboard`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        // Format the API response for display
+        setDashboardStats({
+          totalDemand: `${(data.demand_actual / 1e6).toFixed(2)} MW`, // Convert from kWh to MW
+          totalSupply: `${(data.demand_predicted / 1e6).toFixed(2)} MW`,
+          averagePrice: `₹${data.avg_price.toFixed(2)}/unit`,
+          totalPlants: data.plant_count.toString(),
+        });
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+
+    fetchDemandData(); // Fetch demand data for the chart
+    fetchDashboardStats(); // Fetch dashboard overview stats
   }, []);
 
   const getDailyAggregates = () => {
@@ -91,7 +106,7 @@ export default function Dashboard() {
         Dashboard Overview
       </h1>
 
-      <DashboardCards stats={dashboardStats} />
+      {dashboardStats && <DashboardCards stats={dashboardStats} />}
       <DemandLineChart dailyData={dailyData} chartConfig={chartConfig} />
     </div>
   );

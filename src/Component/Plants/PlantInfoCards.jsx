@@ -1,51 +1,55 @@
 import React from "react";
 import InfoCard from "../Utils/InfoCard";
+import { FaIndustry } from "react-icons/fa";
+import { MdDateRange } from "react-icons/md";
+import { PiNuclearPlantFill } from "react-icons/pi";
 
-export default function PlantInfoCards({ mustRunCount, otherCount }) {
+function PlantInfoCards({ mustRunCount, otherCount }) {
+  const total = mustRunCount + otherCount;
   return (
-    <div className="grid grid-cols-2 gap-4 mb-4 mx-10">
+    <div className="flex justify-center space-x-10 mt-1">
       <InfoCard
-        header="Must Run Count"
+        header="Must Run Plants"
         value={mustRunCount}
-        icon={
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-            />
-          </svg>
-        }
-        iconBgColor="bg-green-100"
-        iconColor="text-green-600"
+        icon={<PiNuclearPlantFill size={24} />}
+        bgColor="bg-green-100"
+        textColor="text-green-800"
+        iconBgColor="bg-green-300"
+        iconColor="text-green-900"
+        className="w-72" // Increased width
       />
       <InfoCard
-        header="Other Plants Count"
+        header="Other Plants"
         value={otherCount}
-        icon={
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-            />
-          </svg>
-        }
-        iconBgColor="bg-yellow-100"
-        iconColor="text-yellow-600"
+        icon={<FaIndustry size={24} />}
+        bgColor="bg-blue-100"
+        textColor="text-blue-800"
+        iconBgColor="bg-blue-300"
+        iconColor="text-blue-900"
+        className="w-72" // Increased width
+      />
+      <InfoCard
+        header="Total Plants"
+        value={total}
+        icon={<PiNuclearPlantFill size={24} />}
+        bgColor="bg-yellow-100"
+        textColor="text-yellow-800"
+        iconBgColor="bg-yellow-300"
+        iconColor="text-yellow-900"
+        className="w-72" // Increased width
+      />
+      <InfoCard
+        header="Updated Since"
+        value={"2023"}
+        icon={<MdDateRange size={24} />}
+        bgColor="bg-red-100"
+        textColor="text-white-800"
+        iconBgColor="bg-red-300"
+        iconColor="text-red-900"
+        className="w-72" // Increased width
       />
     </div>
   );
 }
+
+export default PlantInfoCards;

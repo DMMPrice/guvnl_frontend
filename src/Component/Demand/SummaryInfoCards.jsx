@@ -26,31 +26,31 @@ export default function SummaryInfoCards({ data }) {
       />
       <InfoCard
         header="Other Plants Total Cost"
-        value={`₹${data.Remaining_Plants_Total_Cost}`}
+        value={`₹${data.Remaining_Plants_Total_Cost.toFixed(2)}`}
         icon={<DollarSign className="h-6 w-6" />}
         className="fade-in"
       />
       <InfoCard
         header="Must Run Total Cost"
-        value={`₹${data.Must_Run_Total_Cost}`}
+        value={`₹${data.Must_Run_Total_Cost.toFixed(2)}`}
         icon={<DollarSign className="h-6 w-6" />}
         className="fade-in"
       />
       <InfoCard
         header="Last Plant Price"
-        value={`₹${data.Last_Price}`}
+        value={`₹${data.Last_Price.toFixed(2)}`}
         icon={<TrendingUp className="h-6 w-6" />}
         className="fade-in"
       />
       <InfoCard
         header="IEX Price"
-        value={`₹${data.IEX_Cost}`}
+        value={`₹${data.IEX_Cost.toFixed(2)}`}
         icon={<BarChart2 className="h-6 w-6" />}
         className="fade-in"
       />
       <InfoCard
         header="Cost Per Block"
-        value={`₹${data.Cost_Per_Block}`}
+        value={`₹${data.Cost_Per_Block.toFixed(2)}`}
         icon={<PieChart className="h-6 w-6" />}
         className="fade-in"
       />
@@ -63,7 +63,7 @@ export default function SummaryInfoCards({ data }) {
       />
       <InfoCard
         header="Demand (Predicted)"
-        value={data["Demand(Pred)"]}
+        value={data["Demand(Pred)"].toFixed(3)}
         icon={<Activity className="h-6 w-6" />}
         className="fade-in"
       />

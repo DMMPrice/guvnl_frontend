@@ -3,110 +3,90 @@ import CommonTable from "../Utils/CommonTable";
 import CustomDatePicker from "../Utils/CustomDatePicker";
 import CustomSelect from "../Utils/CustomSelect";
 import SummaryInfoCards from "./SummaryInfoCards";
+import PieChartCard from "../Utils/PieChartCard"; // <-- Import your PieChartCard
 import { Loader2 } from "lucide-react";
 import { format, addDays, subDays, addMinutes, subMinutes } from "date-fns";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export default function SingleDemand() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [startTime, setStartTime] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
+  // **Must Run Plants Columns**
+  const mustRunColumns = [
+    { header: "Plant Code", accessor: "plant_code" },
+    {
+      header: "Variable Cost (₹/MWh)",
+      accessor: "Variable_Cost",
+      render: (row) => row.Variable_Cost.toFixed(2),
+    },
+    {
+      header: "Generated Energy (MWh)",
+      accessor: "generated_energy",
+      render: (row) => row.generated_energy.toFixed(3),
+    },
+    {
+      header: "Net Cost (₹)",
+      accessor: "net_cost",
+      render: (row) => row.net_cost.toFixed(2),
+    },
+  ];
+
+  const remainingColumns = [
+    { header: "Plant Code", accessor: "plant_code" },
+    { header: "PLF", accessor: "plf", render: (row) => row.plf.toFixed(2) },
+    { header: "PAF", accessor: "paf", render: (row) => row.paf.toFixed(2) },
+    {
+      header: "Variable Cost (₹/KWh)",
+      accessor: "Variable_Cost",
+      render: (row) => row.Variable_Cost.toFixed(2),
+    },
+    {
+      header: "Generated Energy (KWh)",
+      accessor: "generated_energy",
+      render: (row) => row.generated_energy.toFixed(3),
+    },
+    {
+      header: "Net Cost (₹)",
+      accessor: "net_cost",
+      render: (row) => row.net_cost.toFixed(2),
+    },
+  ];
+
+  // Time options and event handlers
   const timeOptions = Array.from({ length: 96 }, (_, i) => {
     const hours = String(Math.floor(i / 4)).padStart(2, "0");
     const minutes = String((i % 4) * 15).padStart(2, "0");
     return `${hours}:${minutes}`;
   });
 
-  const mustRunColumns = [
-    { header: "Plant Code", key: "plant_code" },
-    {
-      header: "Rated Capacity (MW)",
-      key: "Rated_Capacity",
-      className: "text-right",
-      render: (row) => row.Rated_Capacity?.toFixed(2),
-    },
-    {
-      header: "Generated Energy (KWh)",
-      key: "generated_energy",
-      className: "text-right",
-      render: (row) => row.generated_energy?.toFixed(2),
-    },
-    {
-      header: "Variable Cost (₹/kWh)",
-      key: "Variable_Cost",
-      className: "text-right",
-      render: (row) => row.Variable_Cost?.toFixed(2),
-    },
-    {
-      header: "Net Cost (₹)",
-      key: "net_cost",
-      className: "text-right",
-      render: (row) =>
-        row.net_cost?.toLocaleString("en-IN", { maximumFractionDigits: 2 }),
-    },
-  ];
-
-  const remainingColumns = [
-    { header: "Plant Code", key: "plant_code" },
-    {
-      header: "Rated Capacity (MW)",
-      key: "rated_capacity",
-      className: "text-right",
-      render: (row) => row.rated_capacity?.toFixed(2),
-    },
-    {
-      header: "Generation (KWh)",
-      key: "generated_energy",
-      className: "text-right",
-      render: (row) => row.generated_energy?.toFixed(2),
-    },
-    {
-      header: "PLF",
-      key: "plf",
-      className: "text-right",
-      render: (row) => (row.plf * 100)?.toFixed(2) + "%",
-    },
-    {
-      header: "Variable Cost (₹/kWh)",
-      key: "Variable_Cost",
-      className: "text-right",
-      render: (row) => row.Variable_Cost?.toFixed(2),
-    },
-    {
-      header: "Net Cost (₹)",
-      key: "net_cost",
-      className: "text-right",
-      render: (row) =>
-        row.net_cost?.toLocaleString("en-IN", { maximumFractionDigits: 2 }),
-    },
-  ];
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!startDate || !startTime) {
-      alert("Please select both date and time");
+      setShowModal(true);
       return;
     }
 
     setLoading(true);
     try {
-      // Increase the day by one
       const adjustedDate = addDays(startDate, 1);
       const dateTimeString = `${format(
         adjustedDate,
         "yyyy-MM-dd"
       )} ${startTime}:00`;
-
-      // Manually adjust to IST by adding 5 hours and 30 minutes
       const dateTime = new Date(dateTimeString);
-      const istDateTime = addMinutes(dateTime, 330); // 330 minutes = 5 hours 30 minutes
-      const formattedZonedDate = format(istDateTime, "yyyy-MM-dd HH:mm:ssXXX");
-
-      // Subtract 5 hours and 30 minutes and one day
-      const finalDateTime = subMinutes(subDays(istDateTime, 1), 330);
+      const istDateTime = addMinutes(dateTime, 330);
       const finalFormattedDate = format(
-        finalDateTime,
+        subMinutes(subDays(istDateTime, 1), 330),
         "yyyy-MM-dd HH:mm:ssXXX"
       );
 
@@ -125,54 +105,135 @@ export default function SingleDemand() {
     }
   };
 
+  const handleClear = () => {
+    setStartDate(null);
+    setStartTime("");
+  };
+
+  // --- Prepare data for ALL plants pie charts ---
+  let allPlantsEnergyData = [];
+  let allPlantsCostData = [];
+
+  if (data.Must_Run && data.Remaining_Plants) {
+    // Combine must-run and remaining into one array
+    const allPlants = [...data.Must_Run, ...data.Remaining_Plants];
+
+    // Map each plant to { name, value } format for energy with 3 decimal places
+    allPlantsEnergyData = allPlants.map((plant) => ({
+      name: plant.plant_code || "Unknown",
+      value: parseFloat((plant.generated_energy || 0).toFixed(3)), // Energy formatted to 3 decimal places
+    }));
+
+    // Map each plant to { name, value } format for cost with 2 decimal places
+    allPlantsCostData = allPlants.map((plant) => ({
+      name: plant.plant_code || "Unknown",
+      value: parseFloat((plant.net_cost || 0).toFixed(2)), // Cost formatted to 2 decimal places
+    }));
+  }
+
   return (
     <div className="p-4 m-4">
+      {/* FORM */}
       <form onSubmit={handleSubmit} className="mb-6 p-4 border rounded">
-        <div className="flex flex-col md:flex-row md:space-x-4">
-          <div className="flex flex-col mb-4 md:mb-0">
+        <div className="flex flex-col md:flex-row md:space-x-4 items-center">
+          {/* Start Date Picker */}
+          <div className="flex flex-col w-full md:w-1/3">
             <label className="mb-2 font-semibold">Start Date:</label>
             <CustomDatePicker
               selected={startDate}
               onChange={(date) => setStartDate(date)}
               placeholder="Select start date"
+              className="h-12"
             />
           </div>
-          <div className="flex flex-col">
+
+          {/* Start Time Dropdown */}
+          <div className="flex flex-col w-full md:w-1/3">
             <label className="mb-2 font-semibold">Start Time:</label>
             <CustomSelect
               options={timeOptions}
               value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
+              onChange={setStartTime}
               placeholder="Select start time"
             />
           </div>
-          <div className="flex items-end">
+
+          {/* Submit & Clear Buttons */}
+          <div className="flex w-full md:w-1/3 justify-center mt-4 md:mt-0 space-x-4">
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400">
+              className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:bg-gray-400">
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
                 "Submit"
               )}
             </button>
+            <button
+              type="button"
+              onClick={handleClear}
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+              Clear
+            </button>
           </div>
         </div>
       </form>
 
-      {data.Must_Run && (
+      {/* MODAL for incomplete form */}
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-red-500">Incomplete Form</DialogTitle>
+          </DialogHeader>
+          <div className="text-gray-600">
+            Please select both a start date and a start time before submitting.
+          </div>
+          <DialogFooter className="flex justify-center">
+            <button
+              onClick={() => setShowModal(false)}
+              className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">
+              Close
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Render data if present */}
+      {data.Must_Run && data.Remaining_Plants && (
         <>
           <SummaryInfoCards data={data} />
+
+          {/* TWO PIE CHARTS FOR ALL PLANTS */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+            <PieChartCard
+              title="Total Generated Energy Distribution"
+              data={allPlantsEnergyData}
+              dataKey="value"
+              nameKey="name"
+            />
+            <PieChartCard
+              title="Total Generated Cost Distribution"
+              data={allPlantsCostData}
+              dataKey="value"
+              nameKey="name"
+            />
+          </div>
+
+          {/* Must Run Table */}
           <CommonTable
             title="Must Run Plants"
+            caption="This table displays the must-run plants and their performance metrics."
             columns={mustRunColumns}
-            data={data.Must_Run}
+            data={data.Must_Run || []}
           />
+
+          {/* Remaining Plants Table */}
           <CommonTable
             title="Remaining Plants"
+            caption="This table displays the remaining plants and their performance metrics."
             columns={remainingColumns}
-            data={data.Remaining_Plants}
+            data={data.Remaining_Plants || []}
           />
         </>
       )}

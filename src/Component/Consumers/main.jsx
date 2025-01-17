@@ -7,8 +7,8 @@ export default function Consumers() {
   const [loading, setLoading] = useState(true);
 
   const columns = [
-    { header: "Consumer Code", key: "Consumer_Code" },
-    { header: "Station Type", key: "Station_Type" },
+    { header: "Consumer Code", accessor: "Consumer_Code" },
+    { header: "Station Type", accessor: "Station_Type" },
   ];
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function Consumers() {
         title="Consumer Details"
         caption="Table showing consumer details"
         columns={columns}
-        data={data}
+        data={data || []}
       />
     </div>
   );

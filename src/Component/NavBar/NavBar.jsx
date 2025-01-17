@@ -11,10 +11,11 @@ export default function NavBar() {
   // Navigation links
   const navigation = [
     { title: "Procurement", path: "/purchase" },
+    { title: "Block Wise Demand", path: "/demand" },
     { title: "Plant List", path: "/plants" },
-    { title: "Banking Data", path: "/banking" },
+    { title: "Generation Plant", path: "/generation-plants" },
     { title: "Consumers List", path: "/consumers" },
-    { title: "Demand", path: "/demand" },
+    { title: "Banking Data", path: "/banking" },
   ];
 
   // Effect for handling scroll and menu state

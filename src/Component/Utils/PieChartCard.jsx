@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -15,35 +8,56 @@ export default function PieChartCard({
   data = [],
   dataKey = "value",
   nameKey = "name",
-  colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"],
+  colors = [
+    "#FF6384",
+    "#36A2EB",
+    "#FFCE56",
+    "#4BC0C0",
+    "#9966FF",
+    "#FF9F40",
+    "#8B0000",
+    "#FFD700",
+    "#00FF00",
+    "#00CED1",
+    "#DC143C",
+    "#FF4500",
+    "#2E8B57",
+    "#20B2AA",
+    "#FF00FF",
+    "#4682B4",
+    "#9ACD32",
+    "#7B68EE",
+    "#8FBC8F",
+    "#D2691E",
+    "#6B8E23",
+    "#708090",
+    "#A0522D",
+    "#F4A460",
+    "#9370DB",
+    "#00BFFF",
+    "#FF1493",
+    "#C71585",
+  ],
 }) {
-  // Calculate total for percentages
   const total = data.reduce((sum, entry) => sum + entry[dataKey], 0);
 
-  // Custom Legend renderer
-  const renderLegend = (props) => {
-    const { payload } = props;
-
-    return (
-      <div className="flex flex-wrap justify-center gap-2 text-sm mt-4">
-        {payload.map((entry, index) => {
-          const percentage = ((entry.payload[dataKey] / total) * 100).toFixed(
-            1
-          );
-          return (
-            <div key={`legend-${index}`} className="flex items-center gap-1">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: entry.color }}
-              />
-              <span>
-                {entry.value}: {percentage}%
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    );
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length > 0) {
+      const entry = payload[0];
+      const percentage = total
+        ? ((entry.value / total) * 100).toFixed(2) + "%"
+        : "0%";
+      return (
+        <div className="p-2 bg-white shadow-md border rounded text-sm">
+          <div>
+            <strong>{entry.name}</strong>
+          </div>
+          <div>Value: {entry.value.toLocaleString()}</div>
+          <div>Share: {percentage}</div>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
@@ -52,7 +66,7 @@ export default function PieChartCard({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0 pt-1">
-        <div className="mx-auto aspect-square max-h-[350px] flex-1">
+        <div className="mx-auto" style={{ height: "450px", width: "100%" }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -61,18 +75,17 @@ export default function PieChartCard({
                 nameKey={nameKey}
                 cx="50%"
                 cy="50%"
-                outerRadius={80}
+                outerRadius={160}
                 fill="#8884d8"
-                label>
+                label={false}>
                 {data.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
-                    fill={entry.color || colors[index % colors.length]}
+                    fill={colors[index % colors.length]} // Use more varied colors
                   />
                 ))}
               </Pie>
-              <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
-              <Legend content={renderLegend} className="flex flex-col" />
+              <Tooltip content={<CustomTooltip />} />
             </PieChart>
           </ResponsiveContainer>
         </div>

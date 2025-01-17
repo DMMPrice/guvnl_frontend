@@ -130,3 +130,15 @@
 .fade-in {
   animation: fadeIn 0.5s ease-in-out;
 }
+select {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+select:focus {
+  border-color: #2563eb; /* Blue-600 Tailwind */
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.5); /* Blue glow */
+}
+
+.custom-dropdown-option:hover {
+  background-color: rgba(229, 231, 235, 0.8); /* Light hover effect */
+}
