@@ -5,7 +5,7 @@ const DashboardCards = ({ stats }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-slideUp">
       <InfoCard
-        header="Total Demand"
+        header="Total Demand (Till 2024)"
         value={stats.totalDemand}
         icon={
           <svg
@@ -27,7 +27,7 @@ const DashboardCards = ({ stats }) => {
       />
 
       <InfoCard
-        header="Total Supply"
+        header="Total Predicted Demand (Till 2027)"
         value={stats.totalSupply}
         icon={
           <svg

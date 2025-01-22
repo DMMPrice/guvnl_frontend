@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/table";
 
 export default function CommonTable({ title, caption, columns, data, footer }) {
-  console.log("CommonTable - Columns:", columns); // Debug log
-  console.log("CommonTable - Data:", data); // Debug log
+  // console.log("CommonTable - Columns:", columns); // Debug log
+  // console.log("CommonTable - Data:", data); // Debug log
 
   if (!columns || !Array.isArray(columns)) {
     console.error("Columns prop is missing or not an array.");

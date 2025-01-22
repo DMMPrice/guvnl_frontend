@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import CommonTable from "../Utils/CommonTable";
 import PlantInfoCards from "./PlantInfoCards";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import EditPlantModal from "./EditPlantModal"; // Import the edit modal
+import DeleteConfirmationModal from "./DeleteConfirmationModal"; // Import the delete confirmation modal
 
 function Plants() {
   const [plantData, setPlantData] = useState({
@@ -11,6 +14,10 @@ function Plants() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedPlant, setSelectedPlant] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletePlantCode, setDeletePlantCode] = useState(null);
 
   useEffect(() => {
     if (!Array.isArray(plantData.must_run) || !Array.isArray(plantData.other)) {
@@ -38,7 +45,43 @@ function Plants() {
     }
   }, []);
 
+  const handleEdit = (plant) => {
+    setSelectedPlant(plant);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSave = (updatedPlant) => {
+    setPlantData((prevState) => ({
+      ...prevState,
+      other: prevState.other.map((plant) =>
+        plant.Code === updatedPlant.Code ? updatedPlant : plant
+      ),
+      must_run: prevState.must_run.map((plant) =>
+        plant.Code === updatedPlant.Code ? updatedPlant : plant
+      ),
+    }));
+    setIsEditModalOpen(false);
+  };
+
+  const handleDelete = (plantCode) => {
+    setDeletePlantCode(plantCode);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    setPlantData((prevState) => ({
+      ...prevState,
+      other: prevState.other.filter((plant) => plant.Code !== deletePlantCode),
+      must_run: prevState.must_run.filter(
+        (plant) => plant.Code !== deletePlantCode
+      ),
+    }));
+    setIsDeleteModalOpen(false);
+    setDeletePlantCode(null);
+  };
+
   const columns = [
+    { header: "Plant Name", accessor: "name" },
     { header: "Plant Code", accessor: "Code" },
     { header: "Plant Capacity (MW)", accessor: "Rated_Capacity" },
     { header: "PAF", render: (row) => `${(row.PAF * 100).toFixed(2)}%` },
@@ -50,6 +93,23 @@ function Plants() {
     {
       header: "Technical Minimum",
       render: (row) => `${(row.Technical_Minimum * 100).toFixed(2)}%`,
+    },
+    {
+      header: "Actions",
+      render: (row) => (
+        <div className="flex space-x-5">
+          <button
+            className="text-blue-500 hover:text-blue-700"
+            onClick={() => handleEdit(row)}>
+            <FaEdit size={20} className="inline-block" />
+          </button>
+          <button
+            className="text-red-500 hover:text-red-700"
+            onClick={() => handleDelete(row.Code)}>
+            <FaTrash size={20} className="inline-block" />
+          </button>
+        </div>
+      ),
     },
   ];
 
@@ -63,7 +123,6 @@ function Plants() {
 
   return (
     <div className="mx-auto px-4">
-      {/* Center-align info cards */}
       <div className="flex justify-center space-x-4 my-6">
         <PlantInfoCards
           mustRunCount={plantData.must_run_count}
@@ -90,6 +149,19 @@ function Plants() {
           <div>No data available for must-run plants.</div>
         )}
       </div>
+
+      <EditPlantModal
+        isOpen={isEditModalOpen}
+        plant={selectedPlant}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleSave}
+      />
+
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }
