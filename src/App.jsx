@@ -10,7 +10,7 @@ import Procurement from "./Component/Procurement/main";
 import NavBar from "./Component/NavBar/NavBar";
 import Footer from "./Component/Footer/Footer";
 import Dashboard from "./Component/Home/Dashboard";
-import Plants from "./Component/Plants/main";
+import Plants from "./Component/Plants List/main";
 import Consumers from "./Component/Consumers/main";
 import SingleDemand from "./Component/Demand/main";
 import Banking from "./Component/Banking/main";
