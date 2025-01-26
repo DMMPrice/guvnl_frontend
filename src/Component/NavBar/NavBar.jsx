@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import Link from "@/assets/logo.svg";
+import { useLocation, Link } from "react-router-dom";
+import Logo from "@/assets/logo.svg";
 import "./NavBar.css";
-import path from "path";
 
 export default function NavBar() {
-  // State and refs
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navRef = useRef();
+  const location = useLocation(); // Get the current location
 
-  // Navigation links
   const navigation = [
     { title: "Procurement", path: "/purchase" },
     { title: "Block Wise Demand", path: "/demand" },
@@ -18,22 +17,7 @@ export default function NavBar() {
     { title: "Banking Data", path: "/banking" },
   ];
 
-  // Effect for handling scroll and menu state
   useEffect(() => {
-    const body = document.body;
-
-    // Toggle body overflow based on menu state
-    const toggleBodyOverflow = () => {
-      if (isMenuOpen) {
-        body.classList.add("overflow-hidden");
-      } else {
-        body.classList.remove("overflow-hidden");
-      }
-    };
-
-    toggleBodyOverflow();
-
-    // Handle navbar stickiness on scroll
     const handleScroll = () => {
       if (window.scrollY > 80) {
         navRef.current.classList.add("sticky", "shadow-lg");
@@ -44,12 +28,8 @@ export default function NavBar() {
 
     window.addEventListener("scroll", handleScroll);
 
-    // Cleanup event listeners and classes
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      body.classList.remove("overflow-hidden");
-    };
-  }, [isMenuOpen]);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <nav
@@ -59,7 +39,7 @@ export default function NavBar() {
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <a href="/" className="flex items-center">
-            <img src={Link} width={40} height={20} alt="Dashboard logo" />
+            <img src={Logo} width={40} height={20} alt="Dashboard logo" />
           </a>
 
           {/* Mobile Menu Button */}
@@ -69,7 +49,6 @@ export default function NavBar() {
               className="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600"
               aria-label="Toggle menu">
               {isMenuOpen ? (
-                // Close Icon
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
@@ -82,7 +61,6 @@ export default function NavBar() {
                   />
                 </svg>
               ) : (
-                // Hamburger Icon
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
@@ -107,12 +85,16 @@ export default function NavBar() {
             } w-full lg:w-auto`}>
             <ul className="flex flex-col lg:flex-row lg:space-x-6 mt-4 lg:mt-0">
               {navigation.map((item) => (
-                <li
-                  key={item.title}
-                  className="text-gray-600 hover:text-blue-600">
-                  <a href={item.path} className="block py-2">
+                <li key={item.title}>
+                  <Link
+                    to={item.path}
+                    className={`block py-2 ${
+                      location.pathname === item.path
+                        ? "font-bold text-blue-600"
+                        : "text-gray-600 hover:text-blue-600"
+                    }`}>
                     {item.title}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

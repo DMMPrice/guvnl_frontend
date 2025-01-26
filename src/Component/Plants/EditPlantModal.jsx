@@ -31,7 +31,7 @@ function EditPlantModal({ isOpen, plant, onClose, onSave }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Name: formData.Name || "",
+          Name: formData.name || "",
           Code: formData.Code || "",
           Ownership: formData.Ownership || "Public",
           Fuel_Type: formData.Fuel_Type || "Coal",
@@ -66,6 +66,17 @@ function EditPlantModal({ isOpen, plant, onClose, onSave }) {
       <div className="bg-white p-6 rounded-lg shadow-lg w-[600px]">
         <h2 className="text-lg font-bold mb-4">Edit Plant Details</h2>
         <form>
+          <div className="mb-4">
+            <label className="block text-gray-700">Plant Name</label>
+            <input
+              type="text"
+              name="Name"
+              value={formData.name || ""}
+              onChange={handleChange}
+              disabled
+              className="w-full border border-gray-300 rounded-md p-2 mt-1"
+            />
+          </div>
           <div className="mb-4">
             <label className="block text-gray-700">Plant Code</label>
             <input
