@@ -1,0 +1,14 @@
+@media (max-width: 768px) {
+  .landing-container {
+    flex-direction: column;
+  }
+
+  .login-section,
+  .carousel-section {
+    width: 100%;
+  }
+
+  .carousel-section {
+    height: 300px;
+  }
+}

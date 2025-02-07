@@ -3,6 +3,14 @@ import CustomSelect from "../Utils/CustomSelect";
 import InfoCard from "../Utils/InfoCard";
 import CommonTable from "../Utils/CommonTable";
 import { API_URL } from "../../config";
+import {
+  FaKey,
+  FaIndustry,
+  FaFire,
+  FaBolt,
+  FaBatteryFull,
+  FaBriefcase,
+} from "react-icons/fa";
 
 function CodeDetails() {
   const [options, setOptions] = useState([]);
@@ -85,41 +93,41 @@ function CodeDetails() {
           />
 
           {codeDetails && (
-            <div className="grid grid-cols-2 lg:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
               <InfoCard
                 header="Code"
                 value={codeDetails.Code}
-                icon="🔑"
+                icon={<FaKey className="text-blue-500" />}
                 bgColor="bg-blue-50"
               />
               <InfoCard
                 header="Name"
                 value={codeDetails.name}
-                icon="🏭"
+                icon={<FaIndustry className="text-green-500" />}
                 bgColor="bg-green-50"
               />
               <InfoCard
                 header="Fuel Type"
                 value={codeDetails.Fuel_Type}
-                icon="🔥"
+                icon={<FaFire className="text-yellow-500" />}
                 bgColor="bg-yellow-50"
               />
               <InfoCard
                 header="Max Power"
                 value={`${codeDetails.Max_Power} MW`}
-                icon="⚡"
+                icon={<FaBolt className="text-purple-500" />}
                 bgColor="bg-purple-50"
               />
               <InfoCard
                 header="Min Power"
                 value={`${codeDetails.Min_Power} MW`}
-                icon="🔋"
+                icon={<FaBatteryFull className="text-red-500" />}
                 bgColor="bg-red-50"
               />
               <InfoCard
                 header="Ownership"
                 value={codeDetails.Ownership}
-                icon="💼"
+                icon={<FaBriefcase className="text-indigo-500" />}
                 bgColor="bg-indigo-50"
               />
             </div>

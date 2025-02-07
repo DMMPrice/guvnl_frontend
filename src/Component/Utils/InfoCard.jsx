@@ -11,7 +11,8 @@ export default function InfoCard({
   className = "",
 }) {
   return (
-    <div className={`p-6 rounded-xl shadow-md ${bgColor} ${className}`}>
+    <div
+      className={`p-6 rounded-xl shadow-md transition-transform transform hover:-translate-y-2 hover:shadow-lg ${bgColor} ${className}`}>
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-gray-500">{header}</p>

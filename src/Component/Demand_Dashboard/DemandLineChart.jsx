@@ -19,8 +19,10 @@ export default function DemandLineChart({ dailyData, chartConfig }) {
             <LineChart
               data={dailyData}
               margin={{
+                top: 100, // ✅ Increased top margin to prevent cutting
                 left: 12,
                 right: 12,
+                bottom: 20, // ✅ Added margin to accommodate legend
               }}>
               <CartesianGrid vertical={false} />
               <XAxis
@@ -29,8 +31,12 @@ export default function DemandLineChart({ dailyData, chartConfig }) {
                 axisLine={false}
                 tickMargin={8}
               />
-              <Legend verticalAlign="top" height={36} />
+
+              {/* ✅ Moved Legend Below the Chart */}
+              <Legend verticalAlign="bottom" align="center" height={50} />
+
               <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+
               <Line
                 dataKey="actual"
                 type="monotone"
