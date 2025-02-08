@@ -37,7 +37,7 @@ const SignInForm = ({ setIsAuthenticated }) => {
         ">
         <InputField
           label="Email"
-          type="email"
+          type="test"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
