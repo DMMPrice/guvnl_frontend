@@ -5,6 +5,7 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import EditPlantModal from "./EditPlantModal"; // Import the edit modal
 import DeleteConfirmationModal from "./DeleteConfirmationModal"; // Import the delete confirmation modal
 import AddPlantModal from "./AddPlantModal"; // Import the add modal
+import { API_URL } from "../../config";
 
 function Plants() {
   const [plantData, setPlantData] = useState({
@@ -38,9 +39,7 @@ function Plants() {
   const fetchPlantData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}procurement/plant`
-      );
+      const response = await fetch(`${API_URL}procurement/plant`);
       const data = await response.json();
       if (data.must_run && data.other) {
         setPlantData(data);
@@ -56,16 +55,13 @@ function Plants() {
 
   const handleAddPlant = async (newPlant) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}procurement/plant`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newPlant),
-        }
-      );
+      const response = await fetch(`${API_URL}procurement/plant`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newPlant),
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -111,7 +107,7 @@ function Plants() {
 
   const confirmDelete = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/procurement/plant", {
+      const response = await fetch(`${API_URL}procurement/plant`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

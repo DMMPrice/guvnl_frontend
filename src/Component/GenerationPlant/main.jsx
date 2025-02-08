@@ -48,7 +48,7 @@ function CodeDetails() {
 
     setLoadingTable(true); // Start table loading animation
     try {
-      const response = await fetch(`http://127.0.0.1:5000/procurement/${code}`);
+      const response = await fetch(`${API_URL}procurement/${code}`);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }

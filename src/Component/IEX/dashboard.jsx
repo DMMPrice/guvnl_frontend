@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import DashboardCards from "./DashboardCards";
 import IEXLineChart from "./IEXLineChart";
 import CustomDatePicker from "../Utils/CustomDatePicker";
+import { API_URL } from "../../config";
 import { Loader2 } from "lucide-react";
 import { CSVLink } from "react-csv"; // ✅ Import CSV Export Functionality
 
@@ -21,7 +22,7 @@ export default function IEXDashboard() {
   useEffect(() => {
     const fetchDashboardStats = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/iex/dashboard");
+        const response = await fetch(`${API_URL}iex/dashboard`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -37,7 +38,7 @@ export default function IEXDashboard() {
 
     const fetchDemandData = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/iex/all");
+        const response = await fetch(`${API_URL}iex/all`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

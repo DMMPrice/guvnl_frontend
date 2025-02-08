@@ -84,6 +84,15 @@ function App() {
           }
         />
         <Route
+          path="/block-purchase"
+          element={
+            <PrivateRoute
+              element={<SingleDemand />}
+              isAuthenticated={isAuthenticated}
+            />
+          }
+        />
+        <Route
           path="/menu"
           element={
             <PrivateRoute

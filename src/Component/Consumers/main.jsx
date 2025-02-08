@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CommonTable from "../Utils/CommonTable";
+import { API_URL } from "../../config";
 import { Loader2 } from "lucide-react";
 
 export default function Consumers() {
@@ -12,7 +13,7 @@ export default function Consumers() {
   ];
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}consumer/`)
+    fetch(`${API_URL}consumer/`)
       .then((response) => response.json())
       .then((data) => {
         setData(data);

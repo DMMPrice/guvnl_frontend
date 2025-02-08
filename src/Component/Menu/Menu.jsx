@@ -7,11 +7,6 @@ import { PiNuclearPlantDuotone } from "react-icons/pi";
 import { GiNuclearPlant } from "react-icons/gi";
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 import { FaFileAlt } from "react-icons/fa";
-import { MdFileUpload } from "react-icons/md";
-import { FaFileUpload } from "react-icons/fa";
-import { RiFileUploadFill } from "react-icons/ri";
-
-import path from "path";
 
 const menuItems = [
   {
@@ -36,7 +31,7 @@ const menuItems = [
       },
       {
         title: "Block Wise Procurement",
-        path: "/block-demand",
+        path: "/block-purchase",
         icon: <GiPowerLightning className="h-6 w-6 text-purple-600" />,
       },
     ],
@@ -79,7 +74,7 @@ const menuItems = [
       },
       {
         title: "Consumer Data",
-        path: "/consumer-data",
+        path: "/banking",
         icon: <FiUserCheck className="h-6 w-6 text-indigo-600" />,
       },
     ],
@@ -91,22 +86,22 @@ const menuItems = [
       {
         title: "Demand Data",
         path: "/upload-demand",
-        icon: <MdFileUpload className="h-6 w-6 text-green-600" />,
+        icon: <FaFileAlt className="h-6 w-6 text-green-600" />,
       },
       {
         title: "IEX Data",
         path: "/upload-iex",
-        icon: <FaFileUpload className="h-6 w-6 text-green-600" />,
+        icon: <FaFileAlt className="h-6 w-6 text-green-600" />,
       },
       {
         title: "Plant Data",
         path: "/upload-demand",
-        icon: <MdFileUpload className="h-6 w-6 text-green-600" />,
+        icon: <FaFileAlt className="h-6 w-6 text-green-600" />,
       },
       {
         title: "Open Access Data",
         path: "/upload-demand",
-        icon: <RiFileUploadFill className="h-6 w-6 text-green-600" />,
+        icon: <FaFileAlt className="h-6 w-6 text-green-600" />,
       },
     ],
   },

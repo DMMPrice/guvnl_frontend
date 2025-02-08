@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { API_URL } from "../../config";
 
 export default function SingleDemand() {
   const [data, setData] = useState([]);
@@ -91,9 +92,7 @@ export default function SingleDemand() {
       );
 
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }plant/?start_date=${finalFormattedDate}&price_cap=10`
+        `${API_URL}plant/?start_date=${finalFormattedDate}&price_cap=10`
       );
       const result = await response.json();
       setData(result);
