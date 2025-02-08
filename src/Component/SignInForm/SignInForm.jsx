@@ -13,7 +13,7 @@ const SignInForm = ({ setIsAuthenticated }) => {
     e.preventDefault();
 
     // Simple demo check
-    if (email === "user@test.com" && password === "test") {
+    if (email === "guest" && password === "guest") {
       setError("");
       setIsAuthenticated(true);
       navigate("/menu");
