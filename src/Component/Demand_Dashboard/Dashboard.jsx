@@ -3,19 +3,18 @@ import DashboardCards from "./DashboardCards";
 import { API_URL } from "../../config";
 import DemandLineChart from "./DemandLineChart";
 import { Loader2 } from "lucide-react";
-import CustomDatePicker from "../Utils/CustomDatePicker"; // ✅ Import Date Picker
-import { CSVLink } from "react-csv"; // ✅ For CSV Export
+import { CSVLink } from "react-csv";
+import BasicDateTimePicker from "../Utils/DateTimePicker"; // ✅ Updated to use DateTimePicker
 
 export default function Dashboard() {
-  const [demandData, setDemandData] = useState(null); // Data for the line chart
-  const [dashboardStats, setDashboardStats] = useState(null); // Data for the dashboard cards
+  const [demandData, setDemandData] = useState(null);
+  const [dashboardStats, setDashboardStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [startDate, setStartDate] = useState(null); // ✅ Start Date
-  const [endDate, setEndDate] = useState(null); // ✅ End Date
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   useEffect(() => {
-    // Fetch demand line chart data
     const fetchDemandData = async () => {
       try {
         const response = await fetch(`${API_URL}demand/all`);
@@ -31,7 +30,6 @@ export default function Dashboard() {
       }
     };
 
-    // Fetch dashboard overview stats
     const fetchDashboardStats = async () => {
       try {
         const response = await fetch(`${API_URL}demand/dashboard`);
@@ -39,10 +37,8 @@ export default function Dashboard() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-
-        // Format the API response for display
         setDashboardStats({
-          totalDemand: `${(data.demand_actual / 1e6).toFixed(2)} MW`, // Convert from kWh to MW
+          totalDemand: `${(data.demand_actual / 1e6).toFixed(2)} MW`,
           totalSupply: `${(data.demand_predicted / 1e6).toFixed(2)} MW`,
           averagePrice: `₹${data.avg_price.toFixed(2)}/unit`,
           totalPlants: data.plant_count.toString(),
@@ -52,11 +48,10 @@ export default function Dashboard() {
       }
     };
 
-    fetchDemandData(); // Fetch demand data for the chart
-    fetchDashboardStats(); // Fetch dashboard overview stats
+    fetchDemandData();
+    fetchDashboardStats();
   }, []);
 
-  // ✅ Function to Aggregate Daily Data
   const getDailyAggregates = () => {
     if (!demandData || !Array.isArray(demandData)) return [];
 
@@ -82,11 +77,10 @@ export default function Dashboard() {
 
   const dailyData = getDailyAggregates();
 
-  // ✅ Filter data based on selected Start & End Dates
   const filteredData = dailyData.filter((entry) => {
     const entryDate = new Date(entry.day);
-    if (startDate && entryDate < startDate) return false;
-    if (endDate && entryDate > endDate) return false;
+    if (startDate && entryDate < new Date(startDate)) return false;
+    if (endDate && entryDate > new Date(endDate)) return false;
     return true;
   });
 
@@ -123,21 +117,19 @@ export default function Dashboard() {
       <div className="flex flex-wrap gap-4 items-center mb-6 px-4 py-3 bg-white shadow-md rounded-lg">
         <div className="flex flex-col">
           <label className="text-gray-700 font-medium">Start Date</label>
-          <CustomDatePicker
-            selected={startDate}
+          <BasicDateTimePicker
+            label="Start Date"
+            value={startDate}
             onChange={setStartDate}
-            placeholderText="Pick a date"
-            className="px-3 py-2 border border-gray-300 rounded-md"
           />
         </div>
 
         <div className="flex flex-col">
           <label className="text-gray-700 font-medium">End Date</label>
-          <CustomDatePicker
-            selected={endDate}
+          <BasicDateTimePicker
+            label="End Date"
+            value={endDate}
             onChange={setEndDate}
-            placeholderText="Pick a date"
-            className="px-3 py-2 border border-gray-300 rounded-md"
           />
         </div>
 
@@ -150,12 +142,20 @@ export default function Dashboard() {
           </button>
 
           <CSVLink
-            data={filteredData}
-            filename={`demand_data_${
-              startDate ? startDate.toISOString().slice(0, 10) : "full"
-            }_to_${endDate ? endDate.toISOString().slice(0, 10) : "full"}.csv`}
+            data={
+              demandData
+                ? demandData.map((entry) => ({
+                    timestamp: entry.TimeStamp,
+                    demand_actual: entry["Demand(Actual)"],
+                    demand_predicted: entry["Demand(Pred)"],
+                  }))
+                : []
+            }
+            filename={`raw_demand_data_${new Date()
+              .toISOString()
+              .slice(0, 10)}.csv`}
             className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition duration-200 text-center shadow">
-            Download CSV
+            Download Raw Data CSV
           </CSVLink>
         </div>
       </div>
@@ -164,8 +164,12 @@ export default function Dashboard() {
       {dashboardStats && (
         <DashboardCards
           stats={dashboardStats}
-          startDate={startDate ? startDate.toISOString().slice(0, 10) : null}
-          endDate={endDate ? endDate.toISOString().slice(0, 10) : null}
+          startDate={
+            startDate ? new Date(startDate).toISOString().slice(0, 10) : null
+          }
+          endDate={
+            endDate ? new Date(endDate).toISOString().slice(0, 10) : null
+          }
         />
       )}
 
