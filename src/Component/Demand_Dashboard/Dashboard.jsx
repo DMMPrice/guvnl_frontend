@@ -5,15 +5,17 @@ import DemandLineChart from "./DemandLineChart";
 import { Loader2 } from "lucide-react";
 import { CSVLink } from "react-csv";
 import BasicDateTimePicker from "../Utils/DateTimePicker"; // ✅ Updated to use DateTimePicker
+import CommonTable from "../Utils/CommonTable"; // Added table component
 
 export default function Dashboard() {
-  const [demandData, setDemandData] = useState(null);
+  const [demandData, setDemandData] = useState(null); // Raw data from API
   const [dashboardStats, setDashboardStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
+  // Fetch raw demand data and dashboard stats on mount
   useEffect(() => {
     const fetchDemandData = async () => {
       try {
@@ -37,6 +39,7 @@ export default function Dashboard() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        // Initially set with API stats (these will be overridden by dynamic totals on filtering)
         setDashboardStats({
           totalDemand: `${(data.demand_actual / 1e6).toFixed(2)} MW`,
           totalSupply: `${(data.demand_predicted / 1e6).toFixed(2)} MW`,
@@ -52,6 +55,7 @@ export default function Dashboard() {
     fetchDashboardStats();
   }, []);
 
+  // Aggregation logic for the line chart data remains unchanged.
   const getDailyAggregates = () => {
     if (!demandData || !Array.isArray(demandData)) return [];
 
@@ -77,6 +81,7 @@ export default function Dashboard() {
 
   const dailyData = getDailyAggregates();
 
+  // Filter aggregated data for the line chart based on selected dates.
   const filteredData = dailyData.filter((entry) => {
     const entryDate = new Date(entry.day);
     if (startDate && entryDate < new Date(startDate)) return false;
@@ -93,6 +98,50 @@ export default function Dashboard() {
     actual: { label: "Actual Demand", color: "rgba(14, 165, 233, 1)" },
     pred: { label: "Predicted Demand", color: "rgb(248, 8, 76)" },
   };
+
+  // Compute dynamic dashboard stats from the raw API data based on the filter.
+  // Here we filter the raw data (using its TimeStamp) to compute total actual and predicted.
+  // Note that the average price remains unchanged.
+  let dynamicStats = dashboardStats;
+  if (demandData && Array.isArray(demandData)) {
+    const filteredRaw = demandData.filter((entry) => {
+      const entryDate = new Date(entry.TimeStamp);
+      if (startDate && entryDate < new Date(startDate)) return false;
+      if (endDate && entryDate > new Date(endDate)) return false;
+      return true;
+    });
+    const totalActual = filteredRaw.reduce(
+      (sum, entry) => sum + Number(entry["Demand(Actual)"] || 0),
+      0
+    );
+    const totalPredicted = filteredRaw.reduce(
+      (sum, entry) => sum + Number(entry["Demand(Pred)"] || 0),
+      0
+    );
+    // Convert to MW (assuming the API values are in Watts) and format to 2 decimal places.
+    dynamicStats = {
+      averagePrice: dashboardStats ? dashboardStats.averagePrice : "",
+      totalPlants: dashboardStats ? dashboardStats.totalPlants : "",
+      totalDemand: `${(totalActual / 1e6).toFixed(2)} MW`,
+      totalSupply: `${(totalPredicted / 1e6).toFixed(2)} MW`,
+    };
+  }
+
+  // Prepare CSV data for export (using the filtered chart data)
+  const csvData = [
+    ["Date", "Actual Demand", "Predicted Demand"],
+    ...filteredData.map((entry) => [entry.day, entry.actual, entry.pred]),
+  ];
+
+  // Prepare CSV data for raw (non-aggregated) data export
+  const rawCSVData = [
+    ["Timestamp", "Actual Demand", "Predicted Demand"],
+    ...(demandData || []).map((entry) => [
+      entry.TimeStamp,
+      entry["Demand(Actual)"],
+      entry["Demand(Pred)"],
+    ]),
+  ];
 
   if (loading) {
     return (
@@ -141,29 +190,32 @@ export default function Dashboard() {
             Clear
           </button>
 
+          {/* CSV Download for Aggregated Chart Data */}
           <CSVLink
-            data={
-              demandData
-                ? demandData.map((entry) => ({
-                    timestamp: entry.TimeStamp,
-                    demand_actual: entry["Demand(Actual)"],
-                    demand_predicted: entry["Demand(Pred)"],
-                  }))
-                : []
-            }
+            data={csvData}
+            filename={`demand_data_${
+              startDate ? startDate.toISOString().slice(0, 10) : "full"
+            }_to_${endDate ? endDate.toISOString().slice(0, 10) : "full"}.csv`}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition duration-200 text-center shadow">
+            Download CSV
+          </CSVLink>
+
+          {/* CSV Download for Raw Data */}
+          <CSVLink
+            data={rawCSVData}
             filename={`raw_demand_data_${new Date()
               .toISOString()
               .slice(0, 10)}.csv`}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition duration-200 text-center shadow">
+            className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition duration-200 text-center shadow">
             Download Raw Data CSV
           </CSVLink>
         </div>
       </div>
 
-      {/* ✅ Updated Cards with Start & End Date */}
-      {dashboardStats && (
+      {/* ✅ Updated Cards with dynamically computed totals based on filter */}
+      {dynamicStats && (
         <DashboardCards
-          stats={dashboardStats}
+          stats={dynamicStats}
           startDate={
             startDate ? new Date(startDate).toISOString().slice(0, 10) : null
           }
@@ -176,6 +228,32 @@ export default function Dashboard() {
       {/* ✅ Updated Line Chart with Filtered Data */}
       {filteredData.length > 0 && (
         <DemandLineChart dailyData={filteredData} chartConfig={chartConfig} />
+      )}
+
+      {/* ✅ Raw Data Table (using the same logic) */}
+      {demandData && (
+        <CommonTable
+          title="Raw Demand Data"
+          caption="Non-Aggregated Demand Data (Raw API Data)"
+          columns={[
+            {
+              accessor: "TimeStamp",
+              header: "Timestamp",
+              render: (row) => new Date(row.TimeStamp).toLocaleString(),
+            },
+            {
+              accessor: "Demand(Actual)",
+              header: "Actual Demand",
+              render: (row) => Number(row["Demand(Actual)"]).toFixed(2),
+            },
+            {
+              accessor: "Demand(Pred)",
+              header: "Predicted Demand",
+              render: (row) => Number(row["Demand(Pred)"]).toFixed(2),
+            },
+          ]}
+          data={demandData}
+        />
       )}
     </div>
   );

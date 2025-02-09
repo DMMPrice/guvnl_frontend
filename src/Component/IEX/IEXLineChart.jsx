@@ -1,5 +1,5 @@
 import React from "react";
-import { LineChart, Line, Tooltip, Legend } from "recharts";
+import { LineChart, Line, Tooltip, Legend, XAxis } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function IEXLineChart({ data, chartConfig }) {
@@ -25,30 +25,33 @@ export default function IEXLineChart({ data, chartConfig }) {
         <CardContent>
           <div style={{ width: "100%", overflowX: "auto" }}>
             <LineChart
-              width={1400} // ✅ Increased width
-              height={500} // ✅ Increased height
+              width={1400} // Increased width
+              height={500} // Increased height
               data={data}
-              margin={{ top: 10, right: 20, left: 0, bottom: 20 }} // ✅ Adjusted margins
+              margin={{ top: 200, right: 20, left: 0, bottom: 20 }} // Adjusted margins
             >
-              {/* ✅ Removed X-Axis */}
+              {/* Adding a hidden X-Axis that uses the "day" property from your data */}
+              <XAxis dataKey="day" hide />
 
-              {/* ✅ Moving legend to bottom center to prevent overlap */}
+              {/* Moving legend to bottom center to prevent overlap */}
               <Legend
                 verticalAlign="bottom"
                 align="center"
                 wrapperStyle={{ paddingTop: 10 }}
               />
 
-              {/* ✅ Custom Tooltip with rounded values */}
+              {/* Custom Tooltip with rounded values and formatted date */}
               <Tooltip
                 formatter={(value, name) => [
-                  `${parseFloat(value).toFixed(2)}`, // ✅ Rounds to 2 decimal places
+                  `${parseFloat(value).toFixed(2)}`, // Rounds to 2 decimal places
                   name === "actual" ? "Actual Price" : "Predicted Price",
                 ]}
-                labelFormatter={(label) => `Date: ${label}`}
+                labelFormatter={(label) =>
+                  `Date: ${new Date(label).toLocaleString()}`
+                }
               />
 
-              {/* ✅ Rendering "actual" first with opacity for better visibility */}
+              {/* Rendering "actual" first with opacity for better visibility */}
               <Line
                 type="monotone"
                 dataKey="actual"

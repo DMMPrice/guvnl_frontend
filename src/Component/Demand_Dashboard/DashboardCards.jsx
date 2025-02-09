@@ -8,7 +8,7 @@ const DashboardCards = ({ stats }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-slideUp mt-4">
       <InfoCard
-        header="Total Demand (Till 2024)"
+        header="Total Demand"
         value={stats.totalDemand}
         icon={<MdElectricBolt size={24} />}
         textColor="text-blue-800"
@@ -19,7 +19,7 @@ const DashboardCards = ({ stats }) => {
       />
 
       <InfoCard
-        header="Total Predicted Demand (Till 2027)"
+        header="Total Predicted Demand"
         value={stats.totalSupply}
         icon={<MdElectricBolt size={24} />}
         textColor="text-green-800"
@@ -31,7 +31,7 @@ const DashboardCards = ({ stats }) => {
 
       <InfoCard
         header="Average Price"
-        value={stats.averagePrice}
+        value={stats.averagePrice} // expects 'averagePrice'
         icon={<FaIndianRupeeSign size={24} />}
         textColor="text-yellow-800"
         bgColor="bg-yellow-100"
