@@ -1,29 +1,56 @@
 import React, { useState, useEffect } from "react";
 import DashboardCards from "./DashboardCards";
 import IEXLineChart from "./IEXLineChart";
-import BasicDateTimePicker from "../Utils/DateTimePicker"; // Use BasicDateTimePicker here
-import CommonTable from "../Utils/CommonTable"; // Import the CommonTable component
+import BasicDateTimePicker from "../Utils/DateTimePicker";
+import CommonTable from "../Utils/CommonTable";
 import { API_URL } from "../../config";
 import { Loader2 } from "lucide-react";
 import { CSVLink } from "react-csv";
 
 export default function IEXDashboard() {
-  // Aggregated data for the chart
-  const [demandData, setDemandData] = useState([]);
-  // Raw non-aggregated data for the table
+  // --- Aggregated data for optional stats ---
+  const [demandData, setDemandData] = useState([]); // Entire aggregated dataset
+  // --- Raw (non-aggregated) data (full) from API ---
   const [rawData, setRawData] = useState([]);
-  // Filtered (aggregated) data for the chart based on date filters
+
+  // --- Filtered aggregated data ---
   const [filteredData, setFilteredData] = useState([]);
+  // --- Filtered raw data ---
+  const [filteredRawData, setFilteredRawData] = useState([]);
+
   const [dashboardStats, setDashboardStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Date states for filtering the chart (the table always shows raw data)
+  // Date states for filtering
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+
+  // Default (earliest, latest) dates from aggregated data
   const [defaultStartDate, setDefaultStartDate] = useState(null);
   const [defaultEndDate, setDefaultEndDate] = useState(null);
 
+  // ------------------------------------------------------------------
+  // Helper to subtract 5h30m from an array of raw data
+  // ------------------------------------------------------------------
+  const shiftRawDataByFiveThirty = (dataArray) => {
+    return dataArray.map((item) => {
+      const dateObj = new Date(item.timestamp);
+      // Subtract 5 hours 30 minutes = 330 minutes
+      dateObj.setMinutes(dateObj.getMinutes() - 330);
+
+      // Return a new object with updated timestamp + dateTime
+      return {
+        ...item,
+        timestamp: dateObj.toISOString(),
+        dateTime: dateObj.toLocaleString(),
+      };
+    });
+  };
+
+  // ------------------------------------------------------------------
+  // 1) Fetch data (dashboard stats + IEX data)
+  // ------------------------------------------------------------------
   useEffect(() => {
     const fetchDashboardStats = async () => {
       try {
@@ -32,6 +59,7 @@ export default function IEXDashboard() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+
         setDashboardStats({
           avgPredictedPrice: data.Avg_Pred_Price,
           avgPrice: data.Avg_Price,
@@ -49,22 +77,35 @@ export default function IEXDashboard() {
         }
         const data = await response.json();
 
-        // Create raw (non-aggregated) data for the table.
-        // Include a full date & time string and round the numeric values.
-        const formattedRawData = data.map((entry) => ({
-          dateTime: new Date(entry.TimeStamp).toLocaleString(), // Full date and time
-          day: new Date(entry.TimeStamp).toISOString().slice(0, 10), // For aggregation and chart filtering
-          actual: Number(entry.Actual).toFixed(2),
-          predicted: Number(entry.Pred).toFixed(2),
-        }));
+        // Format raw data
+        const formattedRawData = data.map((entry) => {
+          const timeObj = new Date(entry.TimeStamp);
+          return {
+            // For table & filtering
+            timestamp: entry.TimeStamp,
+            dateTime: timeObj.toLocaleString(),
+
+            // For aggregator
+            day: timeObj.toISOString().slice(0, 10),
+
+            // Numeric values
+            actual: Number(entry.Actual).toFixed(2),
+            predicted: Number(entry.Pred).toFixed(2),
+          };
+        });
         setRawData(formattedRawData);
 
-        // Aggregate data by day for the line chart.
+        // --- Aggregate by day (for initial chart & stats) ---
         const aggregates = {};
         formattedRawData.forEach((item) => {
           const day = item.day;
           if (!aggregates[day]) {
-            aggregates[day] = { day, actualSum: 0, predictedSum: 0, count: 0 };
+            aggregates[day] = {
+              day,
+              actualSum: 0,
+              predictedSum: 0,
+              count: 0,
+            };
           }
           aggregates[day].actualSum += Number(item.actual);
           aggregates[day].predictedSum += Number(item.predicted);
@@ -77,17 +118,21 @@ export default function IEXDashboard() {
           predicted: (sums.predictedSum / sums.count).toFixed(2),
         }));
 
-        // Sort aggregated data by date (ascending)
+        // Sort aggregated data
         aggregatedData.sort((a, b) => new Date(a.day) - new Date(b.day));
 
         setDemandData(aggregatedData);
-        setFilteredData(aggregatedData);
+        setFilteredData(aggregatedData); // no filter => aggregated
+        setFilteredRawData(formattedRawData); // table => raw data
 
+        // Determine earliest & latest from aggregated
         if (aggregatedData.length > 0) {
-          setDefaultStartDate(new Date(aggregatedData[0].day));
-          setDefaultEndDate(
-            new Date(aggregatedData[aggregatedData.length - 1].day)
+          const earliest = new Date(aggregatedData[0].day);
+          const latest = new Date(
+            aggregatedData[aggregatedData.length - 1].day
           );
+          setDefaultStartDate(earliest);
+          setDefaultEndDate(latest);
         }
       } catch (error) {
         setError(error.message);
@@ -98,16 +143,40 @@ export default function IEXDashboard() {
 
     fetchDashboardStats();
     fetchDemandData();
-  }, []);
+  }, [API_URL]);
 
-  // Filter the aggregated chart data based on the selected dates.
-  // The table will always show the full raw data.
+  // ------------------------------------------------------------------
+  // 2) Filter AGGREGATED data (still used for stats or initial chart)
+  // ------------------------------------------------------------------
   useEffect(() => {
+    if (!demandData || demandData.length === 0) return;
+
+    // No filters => full aggregated
     if (!startDate && !endDate) {
       setFilteredData(demandData);
+
+      // Revert dashboardStats to overall average if needed
+      if (demandData.length && dashboardStats) {
+        const avgPredictedPrice = (
+          demandData.reduce((sum, e) => sum + Number(e.predicted), 0) /
+          demandData.length
+        ).toFixed(2);
+
+        const avgPrice = (
+          demandData.reduce((sum, e) => sum + Number(e.actual), 0) /
+          demandData.length
+        ).toFixed(2);
+
+        setDashboardStats((prev) => ({
+          ...prev,
+          avgPredictedPrice,
+          avgPrice,
+        }));
+      }
       return;
     }
 
+    // Filter aggregator data by day
     const filtered = demandData.filter((entry) => {
       const entryDate = new Date(entry.day);
       return (
@@ -119,15 +188,15 @@ export default function IEXDashboard() {
 
     setFilteredData(filtered);
 
-    if (filtered.length > 0) {
+    // Recompute aggregator-based stats
+    if (filtered.length > 0 && dashboardStats) {
       const avgPredictedPrice = (
-        filtered.reduce((sum, entry) => sum + Number(entry.predicted), 0) /
+        filtered.reduce((sum, e) => sum + Number(e.predicted), 0) /
         filtered.length
       ).toFixed(2);
 
       const avgPrice = (
-        filtered.reduce((sum, entry) => sum + Number(entry.actual), 0) /
-        filtered.length
+        filtered.reduce((sum, e) => sum + Number(e.actual), 0) / filtered.length
       ).toFixed(2);
 
       setDashboardStats((prevStats) => ({
@@ -136,44 +205,88 @@ export default function IEXDashboard() {
         avgPrice,
       }));
     }
-  }, [startDate, endDate, demandData]);
+  }, [startDate, endDate, demandData, dashboardStats]);
 
+  // ------------------------------------------------------------------
+  // 3) Filter RAW data (line chart & table if filter) & SHIFT -5:30
+  // ------------------------------------------------------------------
+  useEffect(() => {
+    if (!rawData || rawData.length === 0) return;
+
+    // If no filter => show ALL raw data (unshifted)
+    if (!startDate && !endDate) {
+      setFilteredRawData(rawData);
+      return;
+    }
+
+    // Filter raw data
+    let filteredRaw = rawData.filter((entry) => {
+      const rowDate = new Date(entry.timestamp);
+      return (
+        (!startDate || rowDate >= startDate) && (!endDate || rowDate <= endDate)
+      );
+    });
+
+    // Subtract 5h30 if filter is applied
+    filteredRaw = shiftRawDataByFiveThirty(filteredRaw);
+
+    setFilteredRawData(filteredRaw);
+  }, [startDate, endDate, rawData]);
+
+  // ------------------------------------------------------------------
+  // 4) Handle "Clear" => revert line chart to aggregated
+  // ------------------------------------------------------------------
   const handleClearFilters = () => {
     setStartDate(null);
     setEndDate(null);
+
+    // Revert aggregator data
     setFilteredData(demandData);
 
-    setDashboardStats((prevStats) => ({
-      ...prevStats,
-      avgPredictedPrice: demandData.length
-        ? (
-            demandData.reduce(
-              (sum, entry) => sum + Number(entry.predicted),
-              0
-            ) / demandData.length
-          ).toFixed(2)
-        : prevStats.avgPredictedPrice,
-      avgPrice: demandData.length
-        ? (
-            demandData.reduce((sum, entry) => sum + Number(entry.actual), 0) /
-            demandData.length
-          ).toFixed(2)
-        : prevStats.avgPrice,
-    }));
+    // Revert to all raw data (no shift)
+    setFilteredRawData(rawData);
+
+    // Reset stats to overall average if needed
+    if (demandData.length && dashboardStats) {
+      const avgPredictedPrice = (
+        demandData.reduce((sum, e) => sum + Number(e.predicted), 0) /
+        demandData.length
+      ).toFixed(2);
+
+      const avgPrice = (
+        demandData.reduce((sum, e) => sum + Number(e.actual), 0) /
+        demandData.length
+      ).toFixed(2);
+
+      setDashboardStats((prevStats) => ({
+        ...prevStats,
+        avgPredictedPrice,
+        avgPrice,
+      }));
+    }
   };
 
-  // Prepare CSV data for export (using the filtered chart data)
-  const csvData = [
-    ["Date", "Actual Price", "Predicted Price"],
-    ...filteredData.map((entry) => [entry.day, entry.actual, entry.predicted]),
-  ];
+  // ------------------------------------------------------------------
+  // 5) Decide chart data: no filter => aggregated, filter => raw (already shifted)
+  // ------------------------------------------------------------------
+  const hasFilter = Boolean(startDate || endDate);
+  const lineChartData = hasFilter ? filteredRawData : filteredData;
 
-  // Prepare CSV data for raw (non-aggregated) data export
+  // ------------------------------------------------------------------
+  // 6) Prepare SINGLE CSV for RAW data (filteredRawData)
+  // ------------------------------------------------------------------
   const rawCSVData = [
     ["Date & Time", "Actual Price", "Predicted Price"],
-    ...rawData.map((entry) => [entry.dateTime, entry.actual, entry.predicted]),
+    ...filteredRawData.map((entry) => [
+      entry.dateTime,
+      entry.actual,
+      entry.predicted,
+    ]),
   ];
 
+  // ------------------------------------------------------------------
+  // 7) Loading / Error
+  // ------------------------------------------------------------------
   if (loading) {
     return (
       <div className="flex justify-center items-center h-[80vh]">
@@ -182,18 +295,20 @@ export default function IEXDashboard() {
       </div>
     );
   }
-
   if (error) {
     return <div className="text-red-500 text-center mt-4">Error: {error}</div>;
   }
 
+  // ------------------------------------------------------------------
+  // 8) Chart config & Table columns
+  // ------------------------------------------------------------------
   const chartConfig = {
     actual: { label: "Actual Price", color: "rgba(14, 165, 233, 1)" },
     predicted: { label: "Predicted Price", color: "rgb(248, 8, 76)" },
   };
 
-  // Define table columns for the raw (non-aggregated) API data.
-  // A new column "Date & Time" is added to show the full date and time.
+  // For the table, we’re now storing the SHIFTED dateTime if user filters
+  // (in effect #3 above). If no filters, it's unshifted.
   const tableColumns = [
     { accessor: "dateTime", header: "Date & Time" },
     {
@@ -208,13 +323,16 @@ export default function IEXDashboard() {
     },
   ];
 
+  // ------------------------------------------------------------------
+  // 9) Render
+  // ------------------------------------------------------------------
   return (
     <div className="mx-8 p-6 animate-fadeIn">
       <h1 className="text-2xl font-bold mb-6 text-gray-800 animate-slideDown">
         IEX Market Overview
       </h1>
 
-      {/* Date Pickers and Action Buttons for chart filtering */}
+      {/* Date Pickers + Action Buttons */}
       <div className="flex flex-wrap gap-6 mb-6 items-center p-4">
         <div className="flex flex-col">
           <BasicDateTimePicker
@@ -236,27 +354,18 @@ export default function IEXDashboard() {
             className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg transition duration-200">
             Clear
           </button>
-          {/* CSV Download for Aggregated Chart Data */}
-          <CSVLink
-            data={csvData}
-            filename={`iex_data_${
-              startDate ? startDate.toISOString().slice(0, 10) : "full"
-            }_to_${endDate ? endDate.toISOString().slice(0, 10) : "full"}.csv`}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg transition duration-200 text-center">
-            Download CSV
-          </CSVLink>
-          {/* CSV Download for Raw Data */}
+
+          {/* SINGLE CSV Download (Raw Data Only) */}
           <CSVLink
             data={rawCSVData}
-            filename={`iex_raw_data_${new Date()
-              .toISOString()
-              .slice(0, 10)}.csv`}
+            filename={`iex_raw_${new Date().toISOString().slice(0, 10)}.csv`}
             className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg transition duration-200 text-center">
             Download Raw Data CSV
           </CSVLink>
         </div>
       </div>
 
+      {/* Dashboard Stats (optional) */}
       {dashboardStats && (
         <DashboardCards
           stats={dashboardStats}
@@ -273,18 +382,25 @@ export default function IEXDashboard() {
         />
       )}
 
-      {filteredData.length > 0 && (
-        <>
-          {/* The LineChart uses the aggregated (filtered) data as before */}
-          <IEXLineChart data={filteredData} chartConfig={chartConfig} />
-          {/* The table displays the raw non-aggregated data with full date & time */}
-          <CommonTable
-            title="Raw IEX Data"
-            caption="Non-Aggregated IEX Data (Raw API Data with Date & Time)"
-            columns={tableColumns}
-            data={rawData}
-          />
-        </>
+      {/* 
+        Line Chart:
+        - Aggregated + no filter => (no time shift)
+        - Raw + filter => time shifted by 5h30
+        Also note that we've removed the Y-axis in IEXLineChart,
+        so no Y labels appear.
+      */}
+      {lineChartData.length > 0 && (
+        <IEXLineChart data={lineChartData} chartConfig={chartConfig} />
+      )}
+
+      {/* Table with RAW Data (shifted if user sets date) */}
+      {filteredRawData.length > 0 && (
+        <CommonTable
+          title="Raw IEX Data"
+          caption="Filtered Non-Aggregated IEX Data (Raw API Data with possible -5:30 shift)"
+          columns={tableColumns}
+          data={filteredRawData}
+        />
       )}
     </div>
   );
