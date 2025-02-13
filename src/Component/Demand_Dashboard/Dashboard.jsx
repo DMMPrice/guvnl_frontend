@@ -15,11 +15,11 @@ export default function Dashboard() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
-  // This state controls the delayed appearance of the chart
+  // Control delayed appearance of the chart
   const [showChart, setShowChart] = useState(false);
 
   // -----------------------------
-  // 1) Fetch raw demand data and dashboard stats on mount
+  // 1) Fetch demand data & stats on mount
   // -----------------------------
   useEffect(() => {
     const fetchDemandData = async () => {
@@ -44,7 +44,7 @@ export default function Dashboard() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        // Initially set with API stats (will be overridden by filtering)
+
         setDashboardStats({
           totalDemand: `${(data.demand_actual / 1e6).toFixed(2)} MW`,
           totalSupply: `${(data.demand_predicted / 1e6).toFixed(2)} MW`,
@@ -61,41 +61,27 @@ export default function Dashboard() {
   }, []);
 
   // -----------------------------
-  // 2) Once data is loaded, set a 5-second timer to show chart
+  // 2) Once data is loaded, set a 2-second timer (was 5s) to show chart
   // -----------------------------
   useEffect(() => {
-    // Only trigger the timer if loading is done and we have data (or no error)
     if (!loading && demandData && !error) {
       const timer = setTimeout(() => {
         setShowChart(true);
-      }, 5000); // 5 seconds
-
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [loading, demandData, error]);
 
-  // Helper function to add 5 hours 30 minutes to a given date
-  const addFiveHoursThirty = (date) => {
-    if (!date) return null;
-    const newDate = new Date(date);
-    newDate.setMinutes(newDate.getMinutes() + 330); // 5.5 hours = 330 minutes
-    return newDate;
-  };
-
   // -----------------------------
-  // 3) Filter raw data by date range (+5:30 shift)
+  // 3) Filter raw data by date range (NO +5:30 shift)
   // -----------------------------
   let filteredRaw = [];
   if (demandData && Array.isArray(demandData)) {
-    // Compute the adjusted start/end once
-    const adjustedStart = addFiveHoursThirty(startDate);
-    const adjustedEnd = addFiveHoursThirty(endDate);
-
     filteredRaw = demandData.filter((entry) => {
       const entryDate = new Date(entry.TimeStamp);
 
-      if (adjustedStart && entryDate < adjustedStart) return false;
-      if (adjustedEnd && entryDate > adjustedEnd) return false;
+      if (startDate && entryDate < new Date(startDate)) return false;
+      if (endDate && entryDate > new Date(endDate)) return false;
 
       return true;
     });
@@ -116,14 +102,14 @@ export default function Dashboard() {
     );
 
     dynamicStats = {
-      ...dashboardStats, // carry over averagePrice, totalPlants
+      ...dashboardStats,
       totalDemand: `${(totalActual / 1e6).toFixed(2)} MW`,
       totalSupply: `${(totalPredicted / 1e6).toFixed(2)} MW`,
     };
   }
 
   // -----------------------------
-  // 5) Single CSV data (raw, filtered)
+  // 5) CSV data (raw, filtered)
   // -----------------------------
   const rawCSVData = [
     ["Timestamp", "Actual Demand", "Predicted Demand"],
@@ -149,7 +135,7 @@ export default function Dashboard() {
   };
 
   // -----------------------------
-  // 7) Rendering / UI
+  // 7) UI rendering
   // -----------------------------
   if (loading) {
     return (
@@ -159,7 +145,6 @@ export default function Dashboard() {
       </div>
     );
   }
-
   if (error) {
     return <div className="text-red-500 text-center mt-4">Error: {error}</div>;
   }
@@ -180,7 +165,6 @@ export default function Dashboard() {
             onChange={setStartDate}
           />
         </div>
-
         <div className="flex flex-col">
           <label className="text-gray-700 font-medium">End Date</label>
           <BasicDateTimePicker
@@ -213,35 +197,19 @@ export default function Dashboard() {
       {dynamicStats && (
         <DashboardCards
           stats={dynamicStats}
-          // If you display the chosen dates, also show them with +5.5 hours if needed
           startDate={
-            startDate
-              ? new Date(addFiveHoursThirty(startDate))
-                  .toISOString()
-                  .slice(0, 10)
-              : null
+            startDate ? new Date(startDate).toISOString().slice(0, 10) : null
           }
           endDate={
-            endDate
-              ? new Date(addFiveHoursThirty(endDate)).toISOString().slice(0, 10)
-              : null
+            endDate ? new Date(endDate).toISOString().slice(0, 10) : null
           }
         />
       )}
 
-      {/* 
-        Line Chart with Raw Filtered Data, 
-        only shown after 5 seconds (showChart === true)
-      */}
+      {/* Line Chart after 2s */}
       {showChart && filteredRaw.length > 0 && (
         <DemandLineChart data={filteredRaw} chartConfig={chartConfig} />
       )}
-
-      {/* 
-        If you want to indicate that the chart is 
-        "preparing" but not shown yet, show something 
-        else (optional):
-      */}
       {!showChart && !loading && (
         <p className="text-gray-500 mt-4">
           The chart is being prepared in the background. It will appear
@@ -249,7 +217,7 @@ export default function Dashboard() {
         </p>
       )}
 
-      {/* Raw Data Table (Filtered) */}
+      {/* Raw Data Table */}
       {filteredRaw.length > 0 && (
         <CommonTable
           title="Raw Demand Data"

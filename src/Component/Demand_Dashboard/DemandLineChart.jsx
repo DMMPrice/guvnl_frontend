@@ -8,16 +8,12 @@ import {
 } from "@/components/ui/chart";
 
 /**
- * @param {Object[]} data - An array of raw data objects.
- * @param {String} data[].TimeStamp - The timestamp for each data point.
- * @param {Number} data[].Demand(Actual) - The actual demand value.
- * @param {Number} data[].Demand(Pred) - The predicted demand value.
- * @param {Object} chartConfig - Contains styling/color config for each line, e.g.:
- *   {
- *     actual: { label: "Actual Demand", color: "blue" },
- *     pred: { label: "Predicted Demand", color: "red" },
- *   }
+ * Adds 5 hours 30 minutes to a given Date object.
  */
+function addFiveHoursThirty(dateObj) {
+  dateObj.setMinutes(dateObj.getMinutes() + 330); // +5h30m
+  return dateObj;
+}
 export default function DemandLineChart({ data, chartConfig }) {
   return (
     <div className="mt-8">
@@ -47,6 +43,12 @@ export default function DemandLineChart({ data, chartConfig }) {
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
+                tickFormatter={(val) => {
+                  if (!val) return "";
+                  const dateObj = addFiveHoursThirty(new Date(val));
+                  // Return desired string, e.g. just date or date+time
+                  return dateObj.toLocaleDateString();
+                }}
               />
 
               {/* Optional YAxis to show numeric scale */}
