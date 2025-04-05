@@ -1,17 +1,14 @@
-// App.jsx
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    Navigate,
 } from "react-router-dom";
-
 import "./App.css";
 
 // Components
 import NavBar from "./Component/NavBar/NavBar";
-import Footer from "./Component/Footer/Footer";
 import LandingPage from "./Component/LandingPage/LandingPage";
 import Error404 from "./Component/Utils/error";
 
@@ -26,135 +23,133 @@ import Banking from "./Component/Banking/main";
 import GenerationPlant from "./Component/GenerationPlant/main";
 import Menu from "./Component/Menu/Menu";
 
-// Private Route Wrapper
-const PrivateRoute = ({ element, isAuthenticated }) => {
-  return isAuthenticated ? element : <Navigate to="/signin" replace />;
+// ✅ Updated Private Route wrapper to accept Component (not element)
+const PrivateRoute = ({Component, isAuthenticated}) => {
+    return isAuthenticated ? <Component/> : <Navigate to="/signin" replace/>;
 };
 
 function App() {
-  // 1. Initialize from localStorage, fallback to false if nothing is stored
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const storedAuth = localStorage.getItem("isAuthenticated");
-    return storedAuth ? JSON.parse(storedAuth) : false;
-  });
+    const [isAuthenticated, setIsAuthenticated] = useState(() => {
+        const storedAuth = localStorage.getItem("isAuthenticated");
+        return storedAuth ? JSON.parse(storedAuth) : false;
+    });
 
-  // 2. Whenever isAuthenticated changes, update localStorage
-  useEffect(() => {
-    localStorage.setItem("isAuthenticated", JSON.stringify(isAuthenticated));
-  }, [isAuthenticated]);
+    useEffect(() => {
+        localStorage.setItem("isAuthenticated", JSON.stringify(isAuthenticated));
+    }, [isAuthenticated]);
 
-  return (
-    <Router>
-      {/* Conditionally render the NavBar if user is logged in */}
-      {isAuthenticated && <NavBar setIsAuthenticated={setIsAuthenticated} />}
+    return (
+        <Router>
+            {isAuthenticated && <NavBar setIsAuthenticated={setIsAuthenticated}/>}
 
-      <Routes>
-        {/* Public Routes */}
-        <Route
-          path="/"
-          element={<LandingPage setIsAuthenticated={setIsAuthenticated} />}
-        />
-        <Route
-          path="/signin"
-          element={<LandingPage setIsAuthenticated={setIsAuthenticated} />}
-        />
+            <Routes>
+                {/* Public Routes */}
+                <Route
+                    path="/"
+                    element={<LandingPage setIsAuthenticated={setIsAuthenticated}/>}
+                />
+                <Route
+                    path="/signin"
+                    element={<LandingPage setIsAuthenticated={setIsAuthenticated}/>}
+                />
 
-        {/* Private Routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute
-              element={<Dashboard />}
-              isAuthenticated={isAuthenticated}
-            />
-          }
-        />
-        <Route
-          path="/iex-dashboard"
-          element={<IEXDashboard />}
-          isAuthenticated={isAuthenticated}
-        />
-        <Route
-          path="/purchase"
-          element={
-            <PrivateRoute
-              element={<Procurement />}
-              isAuthenticated={isAuthenticated}
-            />
-          }
-        />
-        <Route
-          path="/block-purchase"
-          element={
-            <PrivateRoute
-              element={<SingleDemand />}
-              isAuthenticated={isAuthenticated}
-            />
-          }
-        />
-        <Route
-          path="/menu"
-          element={
-            <PrivateRoute
-              element={<Menu />}
-              isAuthenticated={isAuthenticated}
-            />
-          }
-        />
-        <Route
-          path="/plants"
-          element={
-            <PrivateRoute
-              element={<Plants />}
-              isAuthenticated={isAuthenticated}
-            />
-          }
-        />
-        <Route
-          path="/consumers"
-          element={
-            <PrivateRoute
-              element={<Consumers />}
-              isAuthenticated={isAuthenticated}
-            />
-          }
-        />
-        <Route
-          path="/demand"
-          element={
-            <PrivateRoute
-              element={<SingleDemand />}
-              isAuthenticated={isAuthenticated}
-            />
-          }
-        />
-        <Route
-          path="/banking"
-          element={
-            <PrivateRoute
-              element={<Banking />}
-              isAuthenticated={isAuthenticated}
-            />
-          }
-        />
-        <Route
-          path="/generation-plants"
-          element={
-            <PrivateRoute
-              element={<GenerationPlant />}
-              isAuthenticated={isAuthenticated}
-            />
-          }
-        />
+                {/* ✅ Private Routes with Component instead of element */}
+                <Route
+                    path="/menu"
+                    element={
+                        <PrivateRoute
+                            Component={Menu}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+                <Route
+                    path="/dashboard"
+                    element={
+                        <PrivateRoute
+                            Component={Dashboard}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+                <Route
+                    path="/iex-dashboard"
+                    element={
+                        <PrivateRoute
+                            Component={IEXDashboard}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+                <Route
+                    path="/purchase"
+                    element={
+                        <PrivateRoute
+                            Component={Procurement}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+                <Route
+                    path="/block-purchase"
+                    element={
+                        <PrivateRoute
+                            Component={SingleDemand}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+                <Route
+                    path="/plants"
+                    element={
+                        <PrivateRoute
+                            Component={Plants}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+                <Route
+                    path="/consumers"
+                    element={
+                        <PrivateRoute
+                            Component={Consumers}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+                <Route
+                    path="/demand"
+                    element={
+                        <PrivateRoute
+                            Component={SingleDemand}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+                <Route
+                    path="/banking"
+                    element={
+                        <PrivateRoute
+                            Component={Banking}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+                <Route
+                    path="/generation-plants"
+                    element={
+                        <PrivateRoute
+                            Component={GenerationPlant}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
 
-        {/* Catch-all for unknown routes */}
-        <Route path="*" element={<Error404 />} />
-      </Routes>
-
-      {/* The Footer is always visible */}
-      <Footer />
-    </Router>
-  );
+                {/* Catch-all route */}
+                <Route path="*" element={<Error404/>}/>
+            </Routes>
+        </Router>
+    );
 }
 
 export default App;
