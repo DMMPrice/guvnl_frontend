@@ -19,9 +19,11 @@ import Procurement from "./Component/Procurement/main";
 import Plants from "./Component/Plants List/main";
 import Consumers from "./Component/Consumers/main";
 import SingleDemand from "./Component/Demand/main";
+import MassProcurementOutput from "@/Component/Mass_Procurement/Generate_Procurement/Page.jsx";
 import Banking from "./Component/Banking/main";
 import GenerationPlant from "./Component/GenerationPlant/main";
 import Menu from "./Component/Menu/Menu";
+import ComingSoon from "@/Component/Utils/ComingSoon.jsx";
 
 // ✅ Updated Private Route wrapper to accept Component (not element)
 const PrivateRoute = ({Component, isAuthenticated}) => {
@@ -54,6 +56,8 @@ function App() {
                 />
 
                 {/* ✅ Private Routes with Component instead of element */}
+
+                {/* Menu Routes */}
                 <Route
                     path="/menu"
                     element={
@@ -144,8 +148,17 @@ function App() {
                         />
                     }
                 />
+                <Route path="/mass-plant-output"
+                       element={
+                           <PrivateRoute
+                               Component={MassProcurementOutput}
+                               isAuthenticated={isAuthenticated}
+                           />
+                       }
+                />
 
                 {/* Catch-all route */}
+                <Route path="/dev" element={<ComingSoon/>}/>
                 <Route path="*" element={<Error404/>}/>
             </Routes>
         </Router>

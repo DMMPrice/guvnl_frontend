@@ -5,20 +5,25 @@ import {TbSolarElectricity} from "react-icons/tb";
 import {GiPowerLightning} from "react-icons/gi";
 import {PiNuclearPlantDuotone} from "react-icons/pi";
 import {GiNuclearPlant} from "react-icons/gi";
-import {MdArrowBack, MdKeyboardArrowRight} from "react-icons/md";
+import {MdArrowBack, MdKeyboardArrowRight, MdSpaceDashboard} from "react-icons/md";
 import {FaFileAlt} from "react-icons/fa";
 import CommonConfirmModal from "@/Component/Utils/ConfirmModal";
 
 const menuItems = [
     {
-        title: "Demand",
-        icon: <GiPowerLightning className="h-10 w-10 text-blue-600"/>,
+        title: "Dashboards",
+        icon: <MdSpaceDashboard className="h-10 w-10 text-blue-600 rotate-90"/>,
         allowedRoles: ["admin", "guest"],
         submenu: [
             {
-                title: "Dashboard",
+                title: "Demand Dashboard",
                 path: "/dashboard",
                 icon: <GiPowerLightning className="h-6 w-6 text-green-600"/>,
+            },
+            {
+                title: "IEX Dashboard",
+                path: "/iex-dashboard",
+                icon: <TbSolarElectricity className="h-10 w-10 text-red-600"/>,
             },
         ],
     },
@@ -40,19 +45,19 @@ const menuItems = [
         ],
     },
     {
-        title: "IEX Data",
-        icon: <TbSolarElectricity className="h-10 w-10 text-red-600"/>,
-        allowedRoles: ["admin", "guest"],
+        title: "Mass Procurement Output",
+        icon: <FiShoppingCart className="h-10 w-10 text-pink-600"/>,
+        allowedRoles: ["admin"],
         submenu: [
             {
-                title: "Dashboard",
-                path: "/iex-dashboard",
-                icon: <TbSolarElectricity className="h-10 w-10 text-red-600"/>,
+                title: "Generate Procurement Output",
+                path: "/mass-plant-output",
+                icon: <FiShoppingCart className="h-6 w-6 text-pink-600"/>,
             },
         ],
     },
     {
-        title: "Generators",
+        title: "Plant Generator",
         icon: <PiNuclearPlantDuotone className="h-10 w-10 text-red-600"/>,
         allowedRoles: ["admin", "guest"],
         submenu: [
@@ -92,22 +97,22 @@ const menuItems = [
         submenu: [
             {
                 title: "Demand Data",
-                path: "/upload-demand",
+                path: "/dev",
                 icon: <FaFileAlt className="h-6 w-6 text-green-600"/>,
             },
             {
                 title: "IEX Data",
-                path: "/upload-iex",
+                path: "/dev",
                 icon: <FaFileAlt className="h-6 w-6 text-green-600"/>,
             },
             {
                 title: "Plant Data",
-                path: "/upload-demand",
+                path: "/dev",
                 icon: <FaFileAlt className="h-6 w-6 text-green-600"/>,
             },
             {
                 title: "Open Access Data",
-                path: "/upload-demand",
+                path: "/dev",
                 icon: <FaFileAlt className="h-6 w-6 text-green-600"/>,
             },
         ],
