@@ -3,6 +3,7 @@ import React, {useState} from "react";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import axios from "axios";
 import BasicDateTimePicker from "@/Component/Utils/DateTimePicker.jsx";
 import InputField from "@/Component/Utils/InputField.jsx";
 import ProcurementActions from "./ProcurementActions.jsx"; // Adjust path as needed
@@ -75,11 +76,10 @@ const ProcurementForm = () => {
     const [savingProgress, setSavingProgress] = useState(0);
     const [totalSaving, setTotalSaving] = useState(0);
 
-    // Function to sequentially POST each response to the save endpoint.
+    // Function to sequentially POST each response to the save endpoint using Axios.
     const saveResponsesToDB = async (data) => {
-        // Ensure SAVE_URL does not have a trailing slash, then append '/demand'
-        const baseUrl = SAVE_URL.replace(/\/$/, "");
-        const saveEndpoint = `${baseUrl}/demand`;
+        // Use SAVE_URL directly since it already points to the /demand endpoint.
+        const saveEndpoint = SAVE_URL;
         console.log("Saving data to endpoint:", saveEndpoint);
         setTotalSaving(data.length);
         setSavingProgress(0);
@@ -87,12 +87,11 @@ const ProcurementForm = () => {
         for (let i = 0; i < data.length; i++) {
             try {
                 console.log(`Saving record ${i + 1}`);
-                const res = await fetch(saveEndpoint, {
-                    method: "POST",
+                const res = await axios.post(saveEndpoint, data[i], {
                     headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify(data[i]),
+                    // Optionally, you can add redirect: 'follow' if necessary.
                 });
-                if (!res.ok) {
+                if (res.status < 200 || res.status >= 300) {
                     throw new Error(`Failed to save record ${i + 1} with status ${res.status}`);
                 } else {
                     console.log(`Record ${i + 1} saved successfully.`);
@@ -133,7 +132,7 @@ const ProcurementForm = () => {
         setLoading(true);
 
         try {
-            // Create an array of GET fetch promises for each time slot.
+            // Create an array of GET fetch promises using Axios for each time slot.
             const fetchPromises = times.map((t) => {
                 // Format time in IST as "YYYY-MM-DD HH:mm:ss"
                 const formattedDate = t.tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
@@ -141,17 +140,12 @@ const ProcurementForm = () => {
                     formattedDate
                 )}&price_cap=${procurementName}`;
                 console.log("Fetching URL:", url);
-                return fetch(url)
+                return axios
+                    .get(url)
                     .then((res) => {
-                        if (!res.ok) {
-                            throw new Error(`API request failed with status ${res.status}`);
-                        }
-                        return res.json();
-                    })
-                    .then((json) => {
                         // Update progress after each successful fetch.
                         setProgress((prev) => prev + 1);
-                        return json;
+                        return res.data;
                     });
             });
 
