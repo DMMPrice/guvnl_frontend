@@ -1,4 +1,3 @@
-// ProcurementForm.jsx
 import React, {useState} from "react";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -6,12 +5,12 @@ import timezone from "dayjs/plugin/timezone";
 import axios from "axios";
 import BasicDateTimePicker from "@/Component/Utils/DateTimePicker.jsx";
 import InputField from "@/Component/Utils/InputField.jsx";
-import ProcurementActions from "./ProcurementActions.jsx"; // Adjust path as needed
-import ErrorModal from "@/Component/Utils/ErrorModal.jsx"; // Adjust path as needed
+import ProcurementActions from "./ProcurementActions.jsx";
+import ErrorModal from "@/Component/Utils/ErrorModal.jsx";
 import CSVResponseHandler from "./CSVResponseHandler.jsx";
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
-import {Progress} from "@/components/ui/progress"; // ShadeCN Progress component
-import {API_URL, SAVE_URL} from "@/config.js"; // Import dynamic URLs
+import {Progress} from "@/components/ui/progress";
+import {API_URL, SAVE_URL} from "@/config.js";
 
 // Extend dayjs with UTC and timezone plugins
 dayjs.extend(utc);
@@ -54,7 +53,7 @@ const SavingModal = ({progress, total}) => {
 };
 
 const ProcurementForm = () => {
-    // Form fields (empty by default)
+    // Form fields
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [procurementName, setProcurementName] = useState("");
@@ -68,6 +67,7 @@ const ProcurementForm = () => {
     const [errorCode, setErrorCode] = useState(null);
     const [loading, setLoading] = useState(false);
     const [responses, setResponses] = useState(null);
+    const [failedCount, setFailedCount] = useState(0);
     const [progress, setProgress] = useState(0);
     const [totalRequests, setTotalRequests] = useState(0);
 
@@ -76,29 +76,20 @@ const ProcurementForm = () => {
     const [savingProgress, setSavingProgress] = useState(0);
     const [totalSaving, setTotalSaving] = useState(0);
 
-    // Function to sequentially POST each response to the save endpoint using Axios.
+    // Function to sequentially POST each response to the save endpoint
     const saveResponsesToDB = async (data) => {
-        // Use SAVE_URL directly since it already points to the /demand endpoint.
         const saveEndpoint = SAVE_URL;
-        console.log("Saving data to endpoint:", saveEndpoint);
         setTotalSaving(data.length);
         setSavingProgress(0);
         setSaving(true);
+
         for (let i = 0; i < data.length; i++) {
             try {
-                console.log(`Saving record ${i + 1}`);
-                const res = await axios.post(saveEndpoint, data[i], {
+                await axios.post(saveEndpoint, data[i], {
                     headers: {"Content-Type": "application/json"},
-                    // Optionally, you can add redirect: 'follow' if necessary.
                 });
-                if (res.status < 200 || res.status >= 300) {
-                    throw new Error(`Failed to save record ${i + 1} with status ${res.status}`);
-                } else {
-                    console.log(`Record ${i + 1} saved successfully.`);
-                }
             } catch (err) {
-                console.error("Error saving record:", err);
-                // Optionally, accumulate errors or notify the user
+                console.error(`Failed to save record ${i + 1}:`, err);
             } finally {
                 setSavingProgress((prev) => prev + 1);
             }
@@ -117,45 +108,52 @@ const ProcurementForm = () => {
             return;
         }
 
-        // Generate an array of times in 15-minute increments between startDate and endDate.
-        let times = [];
+        // Generate times in 15-minute increments
+        const times = [];
         let current = dayjs(startDate);
         const end = dayjs(endDate);
         while (current.isBefore(end) || current.isSame(end)) {
             times.push(current);
             current = current.add(15, "minute");
         }
+
         setTotalRequests(times.length);
         setProgress(0);
-
-        // Show loading modal while fetching data
+        setFailedCount(0);
         setLoading(true);
 
         try {
-            // Create an array of GET fetch promises using Axios for each time slot.
+            // Prepare GET requests with inline progress updates
             const fetchPromises = times.map((t) => {
-                // Format time in IST as "YYYY-MM-DD HH:mm:ss"
                 const formattedDate = t.tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
                 const url = `${API_URL.replace(/\/$/, "")}/plant?start_date=${encodeURIComponent(
                     formattedDate
                 )}&price_cap=${procurementName}`;
-                console.log("Fetching URL:", url);
+
                 return axios
                     .get(url)
-                    .then((res) => {
-                        // Update progress after each successful fetch.
+                    .then((res) => ({status: 'fulfilled', data: res.data}))
+                    .catch((err) => ({status: 'rejected', error: err}))
+                    .finally(() => {
                         setProgress((prev) => prev + 1);
-                        return res.data;
                     });
             });
 
-            // Wait for all GET requests to complete
-            const data = await Promise.all(fetchPromises);
-            setResponses(data);
+            // Wait for all requests to finish
+            const results = await Promise.all(fetchPromises);
 
-            // If user opted to save data, POST each response sequentially.
-            if (saveToDatabase) {
-                await saveResponsesToDB(data);
+            // Separate successful responses
+            const successfulData = results
+                .filter((r) => r.status === 'fulfilled')
+                .map((r) => r.data);
+            const failed = results.filter((r) => r.status === 'rejected').length;
+
+            setResponses(successfulData);
+            setFailedCount(failed);
+
+            // Optionally save to DB
+            if (saveToDatabase && successfulData.length > 0) {
+                await saveResponsesToDB(successfulData);
             }
         } catch (error) {
             console.error("Error during fetching/saving:", error);
@@ -172,57 +170,38 @@ const ProcurementForm = () => {
         setStartDate(null);
         setEndDate(null);
         setResponses(null);
+        setFailedCount(0);
     };
 
     return (
         <>
-            <form
-                className="mx-8 p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-md"
-                onSubmit={handleSubmit}
-            >
+            <form className="mx-8 p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-md" onSubmit={handleSubmit}>
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-row gap-4 items-center">
-                        <InputField
-                            label="Enter IEX Price Cap"
-                            value={procurementName}
-                            onChange={(e) => setProcurementName(e.target.value)}
-                        />
-                        <BasicDateTimePicker
-                            label="Start Date"
-                            value={startDate}
-                            onChange={(newValue) => setStartDate(newValue)}
-                        />
-                        <BasicDateTimePicker
-                            label="End Date"
-                            value={endDate}
-                            onChange={(newValue) => setEndDate(newValue)}
-                        />
+                        <InputField label="Enter IEX Price Cap" value={procurementName}
+                                    onChange={(e) => setProcurementName(e.target.value)}/>
+                        <BasicDateTimePicker label="Start Date" value={startDate} onChange={setStartDate}/>
+                        <BasicDateTimePicker label="End Date" value={endDate} onChange={setEndDate}/>
                         <ProcurementActions onClear={handleClear}/>
                     </div>
                     <div className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            id="saveToDb"
-                            checked={saveToDatabase}
-                            onChange={(e) => setSaveToDatabase(e.target.checked)}
-                        />
-                        <label htmlFor="saveToDb" className="text-sm text-gray-700">
-                            Save data to database
-                        </label>
+                        <input type="checkbox" id="saveToDb" checked={saveToDatabase}
+                               onChange={(e) => setSaveToDatabase(e.target.checked)}/>
+                        <label htmlFor="saveToDb" className="text-sm text-gray-700">Save data to database</label>
                     </div>
                 </div>
             </form>
+
             {loading && <LoadingModal progress={progress} total={totalRequests}/>}
             {saving && <SavingModal progress={savingProgress} total={totalSaving}/>}
+
             {responses && !loading && !saving && (
-                <CSVResponseHandler responses={responses} onClose={() => setResponses(null)}/>
+                <CSVResponseHandler responses={responses} failedCount={failedCount} onClose={() => setResponses(null)}/>
             )}
+
             {errorModalOpen && (
-                <ErrorModal
-                    message={errorMessage}
-                    errorCode={errorCode}
-                    onClose={() => setErrorModalOpen(false)}
-                />
+                <ErrorModal message={`${errorMessage} (${failedCount} unsuccessful)`} errorCode={errorCode}
+                            onClose={() => setErrorModalOpen(false)}/>
             )}
         </>
     );
