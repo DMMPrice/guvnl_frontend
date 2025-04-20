@@ -20,7 +20,7 @@ function EditPlantModal({isOpen, plant, onClose, onSave}) {
 
     const handleSave = async () => {
         setIsUpdating(true); // Set loading state
-        const apiEndpoint = `${import.meta.env.VITE_API_URL}procurement/${
+        const apiEndpoint = `${import.meta.env.VITE_API_URL}plant/${
             formData.Code
         }`; // Dynamic endpoint based on plant code
 

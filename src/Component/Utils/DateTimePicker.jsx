@@ -4,6 +4,15 @@ import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 import {DateTimePicker} from "@mui/x-date-pickers/DateTimePicker";
 
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+// Extend dayjs with timezone support and set default to IST
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Kolkata");
+
 export default function BasicDateTimePicker({label, value, onChange, textFieldProps = {}}) {
     const shouldDisableTime = (timeValue, clockType) => {
         if (clockType === "minutes") {
@@ -33,8 +42,16 @@ export default function BasicDateTimePicker({label, value, onChange, textFieldPr
             <DemoContainer components={["DateTimePicker"]}>
                 <DateTimePicker
                     label={label}
-                    value={value}
-                    onChange={onChange}
+                    value={value ? dayjs(value).tz("Asia/Kolkata") : null} // Ensure it's treated as IST
+                    onChange={(newValue) => {
+                        // Convert and pass value in IST timezone
+                        if (newValue) {
+                            const istTime = newValue.tz("Asia/Kolkata");
+                            onChange(istTime);
+                        } else {
+                            onChange(null);
+                        }
+                    }}
                     shouldDisableTime={shouldDisableTime}
                     ampm={false}
                     format="DD/MM/YYYY HH:mm"

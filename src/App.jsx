@@ -13,15 +13,16 @@ import LandingPage from "./Component/LandingPage/LandingPage";
 import Error404 from "./Component/Utils/error";
 
 // Protected pages/components
-import Dashboard from "./Component/Demand_Dashboard/Dashboard";
-import IEXDashboard from "./Component/IEX/dashboard";
+import Dashboard from "./Component/Dashboards/Demand Dashboard/Dashboard";
+import IEXDashboard from "./Component/Dashboards/IEX Dashboard/dashboard";
 import Procurement from "./Component/Procurement/main";
-import Plants from "./Component/Plants List/main";
+import Plants from "./Component/Plant_Generator/Plants_List/main";
+import GenerationPlant from "./Component/Plant_Generator/Generation_Plant/main";
+import PlantAvailabilityFactor from "./Component/Plant_Generator/Plant_Availibility_Factor/Page.jsx";
 import Consumers from "./Component/Consumers/main";
 import SingleDemand from "./Component/Demand/main";
 import MassProcurementOutput from "@/Component/Mass_Procurement/Generate_Procurement/Page.jsx";
 import Banking from "./Component/Banking/main";
-import GenerationPlant from "./Component/GenerationPlant/main";
 import Menu from "./Component/Menu/Menu";
 import ComingSoon from "@/Component/Utils/ComingSoon.jsx";
 
@@ -113,6 +114,22 @@ function App() {
                     }
                 />
                 <Route
+                    path="/generation-plants"
+                    element={
+                        <PrivateRoute
+                            Component={GenerationPlant}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+                <Route path="/plant-availability-factor"
+                       element={
+                           <PrivateRoute
+                               Component={PlantAvailabilityFactor}
+                               isAuthenticated={isAuthenticated}
+                           />
+                       }/>
+                <Route
                     path="/consumers"
                     element={
                         <PrivateRoute
@@ -135,15 +152,6 @@ function App() {
                     element={
                         <PrivateRoute
                             Component={Banking}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
-                <Route
-                    path="/generation-plants"
-                    element={
-                        <PrivateRoute
-                            Component={GenerationPlant}
                             isAuthenticated={isAuthenticated}
                         />
                     }

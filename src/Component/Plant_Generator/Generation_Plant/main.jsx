@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import CustomSelect from "../Utils/CustomSelect";
-import InfoCard from "../Utils/InfoCard";
-import CommonTable from "../Utils/CommonTable";
-import { API_URL } from "../../config";
+import CustomSelect from "../../Utils/CustomSelect.jsx";
+import InfoCard from "../../Utils/InfoCard.jsx";
+import CommonTable from "../../Utils/CommonTable.jsx";
+import { API_URL } from "../../../config.js";
 import {
   FaKey,
   FaIndustry,
@@ -24,7 +24,7 @@ function CodeDetails() {
     const fetchCodes = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${API_URL}procurement/all`);
+        const response = await fetch(`${API_URL}plant/all`);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }

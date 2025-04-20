@@ -1,5 +1,5 @@
 import React from "react";
-import InfoCard from "../Utils/InfoCard"; // Importing InfoCard component
+import InfoCard from "../../Utils/InfoCard.jsx"; // Importing InfoCard component
 import { FaChartLine, FaDollarSign, FaCalendarAlt } from "react-icons/fa"; // Importing React Icons
 
 const DashboardCards = ({ stats, startDate, endDate }) => {

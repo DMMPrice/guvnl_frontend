@@ -1,11 +1,21 @@
 import React, {useState, useRef, useEffect} from "react";
 import {Link, useNavigate} from "react-router-dom";
-import {FiShoppingCart, FiUsers, FiUserCheck} from "react-icons/fi";
+import {
+    FiShoppingCart,
+    FiUsers,
+    FiUserCheck,
+} from "react-icons/fi";
 import {TbSolarElectricity} from "react-icons/tb";
-import {GiPowerLightning} from "react-icons/gi";
+import {
+    GiPowerLightning,
+    GiNuclearPlant,
+} from "react-icons/gi";
 import {PiNuclearPlantDuotone} from "react-icons/pi";
-import {GiNuclearPlant} from "react-icons/gi";
-import {MdArrowBack, MdKeyboardArrowRight, MdSpaceDashboard} from "react-icons/md";
+import {
+    MdArrowBack,
+    MdKeyboardArrowRight,
+    MdSpaceDashboard,
+} from "react-icons/md";
 import {FaFileAlt} from "react-icons/fa";
 import CommonConfirmModal from "@/Component/Utils/ConfirmModal";
 
@@ -13,7 +23,7 @@ const menuItems = [
     {
         title: "Dashboards",
         icon: <MdSpaceDashboard className="h-10 w-10 text-blue-600 rotate-90"/>,
-        allowedRoles: ["admin", "guest"],
+        allowedRoles: ["admin", "guest", "super-admin"],
         submenu: [
             {
                 title: "Demand Dashboard",
@@ -30,25 +40,20 @@ const menuItems = [
     {
         title: "Procurement",
         icon: <FiShoppingCart className="h-10 w-10 text-green-600"/>,
-        allowedRoles: ["admin", "guest"],
+        allowedRoles: ["admin", "guest", "super-admin"],
         submenu: [
             {
                 title: "Procurement",
                 path: "/purchase",
                 icon: <FiShoppingCart className="h-6 w-6 text-green-600"/>,
+                allowedRoles: ["super-admin"],
             },
             {
                 title: "Block Wise Procurement",
                 path: "/block-purchase",
                 icon: <GiPowerLightning className="h-6 w-6 text-purple-600"/>,
+                allowedRoles: ["admin", "guest", "super-admin"],
             },
-        ],
-    },
-    {
-        title: "Mass Procurement Output",
-        icon: <FiShoppingCart className="h-10 w-10 text-pink-600"/>,
-        allowedRoles: ["admin"],
-        submenu: [
             {
                 title: "Generate Procurement Output",
                 path: "/mass-plant-output",
@@ -59,7 +64,7 @@ const menuItems = [
     {
         title: "Plant Generator",
         icon: <PiNuclearPlantDuotone className="h-10 w-10 text-red-600"/>,
-        allowedRoles: ["admin", "guest"],
+        allowedRoles: ["admin", "guest", "super-admin"],
         submenu: [
             {
                 title: "Generator Plant List",
@@ -71,21 +76,26 @@ const menuItems = [
                 path: "/generation-plants",
                 icon: <GiNuclearPlant className="h-6 w-6 text-yellow-600"/>,
             },
+            {
+                title: "Plant Availability Factor",
+                path: "/plant-availability-factor",
+                icon: <PiNuclearPlantDuotone className="h-6 w-6 text-blue-600"/>,
+            },
         ],
     },
     {
         title: "Open Access",
         icon: <FiUsers className="h-10 w-10 text-pink-600"/>,
-        allowedRoles: ["admin", "guest"],
+        allowedRoles: ["admin", "guest", "super-admin"],
         submenu: [
             {
                 title: "Consumer List",
-                path: "/consumers",
+                path: "/dev",
                 icon: <FiUsers className="h-6 w-6 text-pink-600"/>,
             },
             {
                 title: "Consumer Data",
-                path: "/banking",
+                path: "/dev",
                 icon: <FiUserCheck className="h-6 w-6 text-indigo-600"/>,
             },
         ],
@@ -93,7 +103,7 @@ const menuItems = [
     {
         title: "Upload Data",
         icon: <FaFileAlt className="h-10 w-10 text-green-600"/>,
-        allowedRoles: ["admin", "guest"],
+        allowedRoles: ["super-admin"],
         submenu: [
             {
                 title: "Demand Data",
@@ -125,28 +135,18 @@ const Menu = () => {
     const menuRef = useRef(null);
     const navigate = useNavigate();
 
-    // Get user role from localStorage. Defaults to "guest" if not set.
     const role = localStorage.getItem("userType") || "guest";
 
-    // Filter menu items based on allowed roles.
     const filteredMenuItems = menuItems.filter(
         (item) => !item.allowedRoles || item.allowedRoles.includes(role)
     );
 
-    const handleMenuClick = (index) => {
-        setActiveMenu(index);
-    };
-
-    const goBackToMainMenu = () => {
-        setActiveMenu(null);
-    };
-
-    const handleLogout = () => {
-        setIsConfirmModalOpen(true);
-    };
+    const handleMenuClick = (index) => setActiveMenu(index);
+    const goBackToMainMenu = () => setActiveMenu(null);
+    const handleLogout = () => setIsConfirmModalOpen(true);
 
     const confirmLogout = () => {
-        localStorage.removeItem("isAuthenticated");
+        localStorage.clear();
         navigate("/signin");
         setIsConfirmModalOpen(false);
     };
@@ -157,7 +157,6 @@ const Menu = () => {
                 setActiveMenu(null);
             }
         };
-
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
@@ -193,19 +192,13 @@ const Menu = () => {
                                     </div>
                                 </div>
                             ))
-                            : filteredMenuItems[activeMenu]?.submenu?.map((subItem, subIndex) => (
-                                <div key={subIndex} className="relative w-full">
-                                    {subItem.action === "logout" ? (
-                                        <button
-                                            onClick={handleLogout}
-                                            className="block w-full text-left bg-white p-6 border border-gray-200 rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-105"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                {subItem.icon}
-                                                <p className="text-md font-medium text-gray-700">{subItem.title}</p>
-                                            </div>
-                                        </button>
-                                    ) : (
+                            : filteredMenuItems[activeMenu]?.submenu
+                                ?.filter(
+                                    (subItem) =>
+                                        !subItem.allowedRoles || subItem.allowedRoles.includes(role)
+                                )
+                                .map((subItem, subIndex) => (
+                                    <div key={subIndex} className="relative w-full">
                                         <Link to={subItem.path} className="block w-full">
                                             <div
                                                 className="flex flex-col items-center bg-white p-6 border border-gray-200 rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-105">
@@ -215,12 +208,13 @@ const Menu = () => {
                                                 </p>
                                             </div>
                                         </Link>
-                                    )}
-                                </div>
-                            ))}
+                                    </div>
+                                ))}
                     </div>
                 </div>
             </div>
+
+            {/* Confirm Modal (optional trigger from top bar) */}
             <CommonConfirmModal
                 isOpen={isConfirmModalOpen}
                 onClose={() => setIsConfirmModalOpen(false)}

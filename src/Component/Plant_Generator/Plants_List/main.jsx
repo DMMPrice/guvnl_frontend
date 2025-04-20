@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import CommonTable from "../Utils/CommonTable";
-import PlantInfoCards from "./PlantInfoCards";
+import CommonTable from "../../Utils/CommonTable.jsx";
+import PlantInfoCards from "./PlantInfoCards.jsx";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import EditPlantModal from "./EditPlantModal"; // Import the edit modal
-import DeleteConfirmationModal from "./DeleteConfirmationModal"; // Import the delete confirmation modal
-import AddPlantModal from "./AddPlantModal"; // Import the add modal
-import { API_URL } from "../../config";
+import EditPlantModal from "./EditPlantModal.jsx"; // Import the edit modal
+import DeleteConfirmationModal from "./DeleteConfirmationModal.jsx"; // Import the delete confirmation modal
+import AddPlantModal from "./AddPlantModal.jsx"; // Import the add modal
+import { API_URL } from "../../../config.js";
 
 function Plants() {
   const [plantData, setPlantData] = useState({
@@ -39,7 +39,7 @@ function Plants() {
   const fetchPlantData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}procurement/plant`);
+      const response = await fetch(`${API_URL}plant/`);
       const data = await response.json();
       if (data.must_run && data.other) {
         setPlantData(data);
@@ -55,7 +55,7 @@ function Plants() {
 
   const handleAddPlant = async (newPlant) => {
     try {
-      const response = await fetch(`${API_URL}procurement/plant`, {
+      const response = await fetch(`${API_URL}plant/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -107,7 +107,7 @@ function Plants() {
 
   const confirmDelete = async () => {
     try {
-      const response = await fetch(`${API_URL}procurement/plant`, {
+      const response = await fetch(`${API_URL}plant/`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

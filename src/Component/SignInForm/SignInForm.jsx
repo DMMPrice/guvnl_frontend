@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import {Button} from "@/components/ui/button";
 import InputField from "@/Component/Utils/InputField";
@@ -11,6 +11,14 @@ const SignInForm = ({setIsAuthenticated}) => {
     const [error, setError] = useState("");
     const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
+
+    // ✅ Redirect if already authenticated
+    useEffect(() => {
+        const isAuthenticated = localStorage.getItem("isAuthenticated");
+        if (isAuthenticated === "true") {
+            navigate("/menu");
+        }
+    }, []);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -27,24 +35,19 @@ const SignInForm = ({setIsAuthenticated}) => {
             return;
         }
 
-        // In this example, if username is "guest" then role = "guest", else "admin"
-        if (username === "guest" && password === "guest") {
-            localStorage.setItem("userType", "guest");
-            setError("");
-            setIsAuthenticated(true);
-            localStorage.setItem("isAuthenticated", "true");
-            localStorage.setItem("username", username);
-            navigate("/menu");
-        } else {
-            // For any other valid credentials, set the role as admin.
-            // (In a real application, validate credentials with your backend.)
+        // Basic mock auth logic
+        if (username === "super-admin" && password === "super-admin") {
+            localStorage.setItem("userType", "super-admin");
+        } else if (username === "admin" && password === "admin") {
             localStorage.setItem("userType", "admin");
-            setError("");
-            setIsAuthenticated(true);
-            localStorage.setItem("isAuthenticated", "true");
-            localStorage.setItem("username", username);
-            navigate("/menu");
+        } else {
+            localStorage.setItem("userType", "guest");
         }
+
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("username", username);
+        setIsAuthenticated(true);
+        navigate("/menu");
     };
 
     return (
@@ -53,8 +56,6 @@ const SignInForm = ({setIsAuthenticated}) => {
                 onSubmit={handleSubmit}
                 className="max-w-md w-full bg-white p-6 rounded-xl shadow-lg border border-gray-300"
             >
-
-                {/* Username Input */}
                 <InputField
                     label="Username"
                     type="text"
@@ -63,7 +64,6 @@ const SignInForm = ({setIsAuthenticated}) => {
                     className="w-full text-gray-900 bg-white border border-gray-400 placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500"
                 />
 
-                {/* Password Input */}
                 <InputField
                     label="Password"
                     type="password"
@@ -72,7 +72,6 @@ const SignInForm = ({setIsAuthenticated}) => {
                     className="w-full text-gray-900 bg-white border border-gray-400 placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500"
                 />
 
-                {/* Submit Button */}
                 <Button
                     type="submit"
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mt-4 transition"
@@ -81,7 +80,6 @@ const SignInForm = ({setIsAuthenticated}) => {
                 </Button>
             </form>
 
-            {/* Error Modal (Overlay) */}
             {showModal && <ErrorModal message={error} onClose={() => setShowModal(false)}/>}
         </div>
     );
