@@ -78,7 +78,7 @@ const ProcurementForm = () => {
 
     // Function to sequentially POST each response to the save endpoint
     const saveResponsesToDB = async (data) => {
-        const saveEndpoint = SAVE_URL;
+        const saveEndpoint = `${SAVE_URL}demand/`;
         setTotalSaving(data.length);
         setSavingProgress(0);
         setSaving(true);
@@ -126,7 +126,7 @@ const ProcurementForm = () => {
             // Prepare GET requests with inline progress updates
             const fetchPromises = times.map((t) => {
                 const formattedDate = t.tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
-                const url = `${API_URL.replace(/\/$/, "")}/plant?start_date=${encodeURIComponent(
+                const url = `${API_URL.replace(/\/$/, "")}/procurement?start_date=${encodeURIComponent(
                     formattedDate
                 )}&price_cap=${procurementName}`;
 
