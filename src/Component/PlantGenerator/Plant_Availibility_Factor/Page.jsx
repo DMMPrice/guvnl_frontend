@@ -4,6 +4,7 @@ import AddPAFModal from "./AddPAFModal.jsx";
 import EditPAFModal from "./EditPAFModal.jsx";
 import DeleteConfirmationModal from "../Plants_List/DeleteConfirmationModal.jsx";
 import {FaEdit, FaTrash} from "react-icons/fa";
+import {Loader2} from "lucide-react"; // ✅ Import Loader
 import {API_URL} from "../../../config.js";
 
 export default function PAFAvailability() {
@@ -17,7 +18,6 @@ export default function PAFAvailability() {
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [deleteCode, setDeleteCode] = useState(null);
 
-    // 1️⃣ Fetch PAF records
     const fetchPafData = async () => {
         setLoading(true);
         try {
@@ -35,7 +35,6 @@ export default function PAFAvailability() {
         fetchPafData();
     }, []);
 
-    // 2️⃣ Handlers
     const handleAdd = async (newRec) => {
         try {
             const res = await fetch(`${API_URL}availability/`, {
@@ -94,7 +93,6 @@ export default function PAFAvailability() {
         }
     };
 
-    // 3️⃣ Build table columns
     const monthCols = [
         "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
@@ -131,7 +129,12 @@ export default function PAFAvailability() {
     ];
 
     if (loading) {
-        return <div>Loading PAF data…</div>;
+        return (
+            <div className="flex justify-center items-center h-[80vh]">
+                <Loader2 className="h-8 w-8 animate-spin mr-2"/>
+                <p className="text-gray-700 text-lg font-semibold">Loading PAF data...</p>
+            </div>
+        );
     }
 
     return (

@@ -2,8 +2,6 @@ import React, {useState, useRef, useEffect} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {
     FiShoppingCart,
-    FiUsers,
-    FiUserCheck,
 } from "react-icons/fi";
 import {TbSolarElectricity} from "react-icons/tb";
 import {
@@ -17,7 +15,9 @@ import {
     MdSpaceDashboard,
 } from "react-icons/md";
 import {FaFileAlt} from "react-icons/fa";
+import {PiPiggyBankDuotone} from "react-icons/pi";
 import CommonConfirmModal from "@/Component/Utils/ConfirmModal";
+import {LuPiggyBank} from "react-icons/lu";
 
 const menuItems = [
     {
@@ -38,24 +38,24 @@ const menuItems = [
         ],
     },
     {
-        title: "Procurement",
+        title: "BlockWise",
         icon: <FiShoppingCart className="h-10 w-10 text-green-600"/>,
         allowedRoles: ["admin", "guest", "super-admin"],
         submenu: [
             {
-                title: "Procurement",
+                title: "BlockWise",
                 path: "/purchase",
                 icon: <FiShoppingCart className="h-6 w-6 text-green-600"/>,
                 allowedRoles: ["super-admin"],
             },
             {
-                title: "Block Wise Procurement",
+                title: "Block Wise BlockWise",
                 path: "/block-purchase",
                 icon: <GiPowerLightning className="h-6 w-6 text-purple-600"/>,
                 allowedRoles: ["admin", "guest", "super-admin"],
             },
             {
-                title: "Generate Procurement Output",
+                title: "Generate BlockWise Output",
                 path: "/mass-plant-output",
                 icon: <FiShoppingCart className="h-6 w-6 text-pink-600"/>,
             },
@@ -84,19 +84,14 @@ const menuItems = [
         ],
     },
     {
-        title: "Open Access",
-        icon: <FiUsers className="h-10 w-10 text-pink-600"/>,
+        title: "Banking Data",
+        icon: <LuPiggyBank className="h-10 w-10 text-pink-600"/>,
         allowedRoles: ["admin", "guest", "super-admin"],
         submenu: [
             {
-                title: "Consumer List",
-                path: "/dev",
-                icon: <FiUsers className="h-6 w-6 text-pink-600"/>,
-            },
-            {
-                title: "Consumer Data",
-                path: "/dev",
-                icon: <FiUserCheck className="h-6 w-6 text-indigo-600"/>,
+                title: "Banking Data",
+                path: "/banking",
+                icon: <PiPiggyBankDuotone className="h-6 w-6 text-pink-600"/>,
             },
         ],
     },

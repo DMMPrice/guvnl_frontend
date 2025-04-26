@@ -1,5 +1,5 @@
-import CustomDatePicker from "../Utils/CustomDatePicker";
-import CustomSelect from "../Utils/CustomSelect";
+import CustomDatePicker from "../../Utils/CustomDatePicker.jsx";
+import CustomSelect from "../../Utils/CustomSelect.jsx";
 import { Loader2 } from "lucide-react";
 
 export default function ProcurementForm({

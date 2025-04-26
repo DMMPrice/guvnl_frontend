@@ -1,5 +1,5 @@
 import React from "react";
-import CommonTable from "../Utils/CommonTable";
+import CommonTable from "../../Utils/CommonTable.jsx";
 
 export default function ShowData({ data }) {
   if (!data || data.length === 0) {

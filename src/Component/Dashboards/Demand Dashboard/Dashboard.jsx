@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import DashboardCards from "./DashboardCards.jsx";
-import {API_URL} from "@/config.js";
+import {API_URL, POWERBI_URL} from "@/config.js";
 import DemandLineChart from "./DemandLineChart.jsx";
 import {Loader2} from "lucide-react";
 import {CSVLink} from "react-csv";
@@ -154,7 +154,7 @@ export default function Dashboard() {
     return (
         <div className="mx-8 p-6 animate-fadeIn">
             <h1 className="text-2xl font-bold mb-6 text-gray-800 animate-slideDown">
-                Dashboard Overview
+                Demand Dashboard Overview
             </h1>
 
             {/* Filters */}
@@ -190,6 +190,12 @@ export default function Dashboard() {
                         className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition duration-200 shadow"
                     >
                         Clear
+                    </button>
+                    <button
+                        onClick={() => window.open(POWERBI_URL, "_blank", "noopener,noreferrer")}
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition duration-200 shadow"
+                    >
+                        Show in PowerBI
                     </button>
                 </div>
             </div>

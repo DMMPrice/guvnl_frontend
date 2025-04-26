@@ -15,14 +15,13 @@ import Error404 from "./Component/Utils/error";
 // Protected pages/components
 import Dashboard from "./Component/Dashboards/Demand Dashboard/Dashboard";
 import IEXDashboard from "./Component/Dashboards/IEX Dashboard/dashboard";
-import Procurement from "./Component/Procurement/main";
-import Plants from "./Component/Plant_Generator/Plants_List/main";
-import GenerationPlant from "./Component/Plant_Generator/Generation_Plant/main";
-import PlantAvailabilityFactor from "./Component/Plant_Generator/Plant_Availibility_Factor/Page.jsx";
-import Consumers from "./Component/Consumers/main";
+import Procurement from "./Component/Procurement/BlockWise/main";
+import Plants from "./Component/PlantGenerator/Plants_List/main";
+import GenerationPlant from "./Component/PlantGenerator/Generation_Plant/main";
+import PlantAvailabilityFactor from "./Component/PlantGenerator/Plant_Availibility_Factor/Page.jsx";
 import SingleDemand from "./Component/Demand/main";
-import MassProcurementOutput from "@/Component/Mass_Procurement/Generate_Procurement/Page.jsx";
-import Banking from "./Component/Banking/main";
+import MassProcurementOutput from "@/Component/Procurement/Mass_Procurement/Generate_Procurement/Page.jsx";
+import Banking from "./Component/BankingData/Banking/Page.jsx";
 import Menu from "./Component/Menu/Menu";
 import ComingSoon from "@/Component/Utils/ComingSoon.jsx";
 
@@ -129,15 +128,6 @@ function App() {
                                isAuthenticated={isAuthenticated}
                            />
                        }/>
-                <Route
-                    path="/consumers"
-                    element={
-                        <PrivateRoute
-                            Component={Consumers}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
                 <Route
                     path="/demand"
                     element={
