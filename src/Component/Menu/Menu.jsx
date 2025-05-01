@@ -3,7 +3,7 @@ import {Link, useNavigate} from "react-router-dom";
 import {
     FiShoppingCart,
 } from "react-icons/fi";
-import {TbSolarElectricity} from "react-icons/tb";
+import {TbBrandCarbon, TbSolarElectricity} from "react-icons/tb";
 import {
     GiPowerLightning,
     GiNuclearPlant,
@@ -17,28 +17,45 @@ import {
 import {FaFileAlt} from "react-icons/fa";
 import {PiPiggyBankDuotone} from "react-icons/pi";
 import CommonConfirmModal from "@/Component/Utils/ConfirmModal";
-import {LuPiggyBank} from "react-icons/lu";
+import {LuChartNoAxesCombined, LuPiggyBank} from "react-icons/lu";
 
 const menuItems = [
     {
         title: "Dashboards",
-        icon: <MdSpaceDashboard className="h-10 w-10 text-blue-600 rotate-90"/>,
+        icon: <MdSpaceDashboard className="h-10 w-10 text-cyan-800 rotate-90"/>,
         allowedRoles: ["admin", "guest", "super-admin"],
         submenu: [
             {
                 title: "Demand Dashboard",
-                path: "/dashboard",
+                path: "/demand-dashboard",
                 icon: <GiPowerLightning className="h-6 w-6 text-green-600"/>,
             },
             {
                 title: "IEX Dashboard",
                 path: "/iex-dashboard",
-                icon: <TbSolarElectricity className="h-10 w-10 text-red-600"/>,
+                icon: <TbSolarElectricity className="h-6 w-6 text-red-600"/>,
+            },
+            {
+                title: "Consolidated Dashboard",
+                path: "/dashboard",
+                icon: <LuChartNoAxesCombined className="h-6 w-6 text-indigo-600"/>,
+            }
+        ],
+    },
+    {
+        title: "Carbon Footprints Section",
+        icon: <MdSpaceDashboard className="h-10 w-10 text-orange-600 rotate-90"/>,
+        allowedRoles: ["admin", "guest", "super-admin"],
+        submenu: [
+            {
+                title: "Carbon Footprints Page",
+                path: "/dev",
+                icon: <TbBrandCarbon className="h-6 w-6 text-cyan-800"/>,
             },
         ],
     },
     {
-        title: "BlockWise",
+        title: "Procurement Section",
         icon: <FiShoppingCart className="h-10 w-10 text-green-600"/>,
         allowedRoles: ["admin", "guest", "super-admin"],
         submenu: [
@@ -49,7 +66,7 @@ const menuItems = [
                 allowedRoles: ["super-admin"],
             },
             {
-                title: "Block Wise BlockWise",
+                title: "Block Wise Procurement",
                 path: "/block-purchase",
                 icon: <GiPowerLightning className="h-6 w-6 text-purple-600"/>,
                 allowedRoles: ["admin", "guest", "super-admin"],
@@ -62,7 +79,7 @@ const menuItems = [
         ],
     },
     {
-        title: "Plant Generator",
+        title: "Generator Plant Section",
         icon: <PiNuclearPlantDuotone className="h-10 w-10 text-red-600"/>,
         allowedRoles: ["admin", "guest", "super-admin"],
         submenu: [

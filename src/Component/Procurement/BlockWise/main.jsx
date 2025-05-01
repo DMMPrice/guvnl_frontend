@@ -192,7 +192,7 @@ export default function Procurement() {
                                     {
                                         dataKey: "Total IEX Data Generated (kWh)",
                                         color: "#ff7300",
-                                        label: "IEX Dashboard Data Generation (kWh)",
+                                        label: "IEX Page Data Generation (kWh)",
                                     },
                                 ]}
                             />

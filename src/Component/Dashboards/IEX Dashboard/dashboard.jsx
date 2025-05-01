@@ -148,7 +148,7 @@ export default function IEXDashboard() {
         rawFiltered = shiftRawDataByFiveThirty(rawFiltered);
         setFilteredRawData(rawFiltered);
 
-        // Dashboard stats for filtered
+        // Page stats for filtered
         if (filtered.length > 0) {
             const avgPredictedPrice = (
                 filtered.reduce((sum, e) => sum + Number(e.predicted), 0) /

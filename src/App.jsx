@@ -13,7 +13,8 @@ import LandingPage from "./Component/LandingPage/LandingPage";
 import Error404 from "./Component/Utils/error";
 
 // Protected pages/components
-import Dashboard from "./Component/Dashboards/Demand Dashboard/Dashboard";
+import DemandDashboard from "./Component/Dashboards/Demand Dashboard/Page.jsx";
+import ConsolidateDashboard from "./Component/Dashboards/Consolidated Dashboard/Page.jsx";
 import IEXDashboard from "./Component/Dashboards/IEX Dashboard/dashboard";
 import Procurement from "./Component/Procurement/BlockWise/main";
 import Plants from "./Component/PlantGenerator/Plants_List/main";
@@ -58,6 +59,13 @@ function App() {
                 {/* ✅ Private Routes with Component instead of element */}
 
                 {/* Menu Routes */}
+                <Route path="/dashboard"
+                       element={
+                           <PrivateRoute
+                               Component={ConsolidateDashboard}
+                               isAuthenticated={isAuthenticated}
+                           />
+                       }/>
                 <Route
                     path="/menu"
                     element={
@@ -68,10 +76,10 @@ function App() {
                     }
                 />
                 <Route
-                    path="/dashboard"
+                    path="/demand-dashboard"
                     element={
                         <PrivateRoute
-                            Component={Dashboard}
+                            Component={DemandDashboard}
                             isAuthenticated={isAuthenticated}
                         />
                     }

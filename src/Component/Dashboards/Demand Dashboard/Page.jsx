@@ -15,7 +15,7 @@ import timezone from "dayjs/plugin/timezone";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export default function Dashboard() {
+export default function Page() {
     const [demandData, setDemandData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [dashboardStats, setDashboardStats] = useState(null);
@@ -49,8 +49,8 @@ export default function Dashboard() {
                 setDemandData(rawJson);
                 setFilteredData(rawJson);
                 setDashboardStats({
-                    totalDemand: `${(statsJson.demand_actual / 1e6).toFixed(2)} MW`,
-                    totalSupply: `${(statsJson.demand_predicted / 1e6).toFixed(2)} MW`,
+                    totalDemand: `${(statsJson.demand_actual).toFixed(2)} MW`,
+                    totalSupply: `${(statsJson.demand_predicted).toFixed(2)} MW`,
                     averagePrice: `₹${statsJson.avg_price.toFixed(2)}/unit`,
                     totalPlants: statsJson.plant_count.toString(),
                 });
@@ -88,8 +88,8 @@ export default function Dashboard() {
 
             setDynamicStats({
                 ...dashboardStats,
-                totalDemand: `${(totalActual / 1e6).toFixed(2)} MW`,
-                totalSupply: `${(totalPred / 1e6).toFixed(2)} MW`,
+                totalDemand: `${(totalActual).toFixed(2)} MW`,
+                totalSupply: `${(totalPred).toFixed(2)} MW`,
             });
         }
     }, [filteredData, dashboardStats]);
@@ -200,7 +200,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* Dashboard Content */}
+            {/* Page Content */}
             {isFilterApplied && (
                 <>
                     {dynamicStats && (

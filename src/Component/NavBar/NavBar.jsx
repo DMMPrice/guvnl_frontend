@@ -44,7 +44,7 @@ export default function NavBar({ setIsAuthenticated }) {
 
             {/* Logo */}
             <Link to="/menu" className="flex items-center">
-              <img src={Logo} className="w-24" alt="Dashboard logo"/>
+              <img src={Logo} className="w-24" alt="Page logo"/>
             </Link>
 
             {/* Mobile Menu Toggle */}
