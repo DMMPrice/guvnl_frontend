@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import CSVDownloadModal from "./CSVDownloadModal.jsx";
 
 // Safely stringify any cell
@@ -9,21 +9,21 @@ const safeCell = (value) => {
         : String(value);
 };
 
-const CSVResponseHandler = ({responses, onClose}) => {
+const CSVResponseHandler = ({ responses, onClose }) => {
     const [consolidatedUrl, setConsolidatedUrl] = useState(null);
     const [rawUrl, setRawUrl] = useState(null);
 
     useEffect(() => {
         if (!responses?.length) return;
 
-        // ── build Consolidated rows ────────────────────────────────
+        // ── Build consolidated rows ─────────────────────────────
         const consolidatedRows = responses.map((resp) => {
             const must = resp.Must_Run || [];
             const other = resp.Remaining_Plants || [];
             let iexGist = "";
             const iex = resp.IEX_Data;
+
             if (Array.isArray(iex)) {
-                // if it really is an array, map through it
                 iexGist = iex
                     .map(
                         (p) =>
@@ -31,9 +31,8 @@ const CSVResponseHandler = ({responses, onClose}) => {
                     )
                     .join(" ; ");
             } else if (iex && typeof iex === "object") {
-                // single‐object case
                 iexGist = `Predicted Price: ${iex.Pred_Price} | Predicted Quantity: ${iex.Qty_Pred}`;
-            } // else leave it as empty string if missing
+            }
 
             return {
                 "TimeStamp": resp.TimeStamp,
@@ -58,7 +57,9 @@ const CSVResponseHandler = ({responses, onClose}) => {
                     plant_name: p.plant_name,
                 })),
                 "Must Run Generation Gist": must
-                    .map((p) => `Plant Code: ${p.plant_code}|Plant Name: ${p.plant_name}|Rated Capacity: ${p.Rated_Capacity} MW|Variable Cost: Rs ${p.Variable_Cost}|Generated Energy: ${p.generated_energy} kWh|Net Cost: Rs ${p.net_cost}`)
+                    .map((p) =>
+                        `Plant Code: ${p.plant_code}|Plant Name: ${p.plant_name}|Rated Capacity: ${p.Rated_Capacity} MW|Variable Cost: Rs ${p.Variable_Cost}|Generated Energy: ${p.generated_energy} kWh|Net Cost: Rs ${p.net_cost}`
+                    )
                     .join(" ;\n"),
                 "Others Plant Total Generation [kWh]": resp.Remaining_Plants_Total_Gen,
                 "Total Cost Others Plant [Rs]": resp.Remaining_Plants_Total_Cost,
@@ -78,7 +79,9 @@ const CSVResponseHandler = ({responses, onClose}) => {
                     rated_capacity: p.rated_capacity,
                 })),
                 "Other Plant Generation Gist": other
-                    .map((p) => `Plant Code: ${p.plant_code}|Plant Name: ${p.plant_name}|Rated Capacity: ${p.rated_capacity} MW|Variable Cost: Rs ${p.Variable_Cost}|Generated Energy: ${p.generated_energy} kWh|Net Cost: Rs ${p.net_cost}|PLF: ${p.plf ** 100 ?? 100} %|Backdown Cost: Rs ${p.backdown_cost}|Backdown Rate: Rs ${p.backdown_rate}`)
+                    .map((p) =>
+                        `Plant Code: ${p.plant_code}|Plant Name: ${p.plant_name}|Rated Capacity: ${p.rated_capacity} MW|Variable Cost: Rs ${p.Variable_Cost}|Generated Energy: ${p.generated_energy} kWh|Net Cost: Rs ${p.net_cost}|PLF: ${(p.plf ?? 1) * 100} %|Backdown Cost: Rs ${p.backdown_cost}|Backdown Rate: Rs ${p.backdown_rate}`
+                    )
                     .join(" ;\n"),
                 "Power Exchange Qty [kWh]": resp.IEX_Gen,
                 "Power Exchange Cost [Rs]": resp.IEX_Cost,
@@ -89,10 +92,10 @@ const CSVResponseHandler = ({responses, onClose}) => {
             };
         });
 
-        // ── build raw rows ─────────────────────────────────────────
+        // ── Raw rows from original response ─────────────────────
         const rawRows = responses;
 
-        // ── helper to turn rows into a URL ─────────────────────────
+        // ── Helper: Convert rows into downloadable CSV blob ─────
         const makeCsvUrl = (rows) => {
             const headers = Object.keys(rows[0]);
             const lines = [
@@ -103,7 +106,7 @@ const CSVResponseHandler = ({responses, onClose}) => {
                         .join(",")
                 )
             ];
-            const blob = new Blob([lines.join("\n")], {type: "text/csv"});
+            const blob = new Blob([lines.join("\n")], { type: "text/csv" });
             return URL.createObjectURL(blob);
         };
 
@@ -112,6 +115,7 @@ const CSVResponseHandler = ({responses, onClose}) => {
     }, [responses]);
 
     if (!consolidatedUrl || !rawUrl) return null;
+
     return (
         <CSVDownloadModal
             consolidatedUrl={consolidatedUrl}
