@@ -1,7 +1,6 @@
 import React from "react";
 import InfoCard from "../../Utils/InfoCard.jsx";
 import {FaIndustry} from "react-icons/fa";
-import {MdDateRange} from "react-icons/md";
 import {PiNuclearPlantFill} from "react-icons/pi";
 
 function PlantInfoCards({mustRunCount, otherCount}) {
@@ -36,16 +35,6 @@ function PlantInfoCards({mustRunCount, otherCount}) {
                 textColor="text-yellow-800"
                 iconBgColor="bg-yellow-300"
                 iconColor="text-yellow-900"
-                className="w-72" // Increased width
-            />
-            <InfoCard
-                header="Updated Since"
-                value={"2024"}
-                icon={<MdDateRange size={24}/>}
-                bgColor="bg-red-100"
-                textColor="text-white-800"
-                iconBgColor="bg-red-300"
-                iconColor="text-red-900"
                 className="w-72" // Increased width
             />
         </div>

@@ -1,183 +1,190 @@
+// src/Component/Dashboard/EditPlantModal.jsx
 import React, {useState, useEffect} from "react";
+import {API_URL} from "@/config.js";
+import {FaTimes} from "react-icons/fa";
+import InputField from "@/Component/Utils/InputField.jsx";
 
-function EditPlantModal({isOpen, plant, onClose, onSave}) {
+export default function EditPlantModal({isOpen, plant, onClose, onSave}) {
     const [formData, setFormData] = useState({});
-    const [isUpdating, setIsUpdating] = useState(false); // For handling loading state
+    const [isUpdating, setIsUpdating] = useState(false);
 
-    // Update the formData whenever the plant prop changes
+    // Seed form data when modal opens or plant changes
     useEffect(() => {
         if (plant) {
             setFormData({...plant});
         }
     }, [plant]);
 
-    if (!isOpen || !plant) return null; // Don't render if modal is closed or plant is not available
+    if (!isOpen || !plant) return null;
 
-    const handleChange = (e) => {
-        const {name, value} = e.target;
-        setFormData({...formData, [name]: value});
-    };
+    const isMustRun = formData.Type === "Must run";
 
     const handleSave = async () => {
-        setIsUpdating(true); // Set loading state
-        const apiEndpoint = `${import.meta.env.VITE_API_URL}plant/${
-            formData.Code
-        }`; // Dynamic endpoint based on plant code
-
+        setIsUpdating(true);
         try {
-            const response = await fetch(apiEndpoint, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    Name: formData.name || "",
-                    Code: formData.Code || "",
-                    Ownership: formData.Ownership || "Public",
-                    Fuel_Type: formData.Fuel_Type || "Coal",
-                    Rated_Capacity: Number(formData.Rated_Capacity) || 0,
-                    PAF: Number(formData.PAF) || 0,
-                    PLF: Number(formData.PLF) || 0,
-                    Aux_Consumption: Number(formData.Aux_Consumption) || 0,
-                    Variable_Cost: Number(formData.Variable_Cost) || 0,
-                    Type: formData.Type || "Other",
-                    Technical_Minimum: Number(formData.Technical_Minimum) || 0,
-                    Max_Power: Number(formData.Max_Power) || 0,
-                    Min_Power: Number(formData.Min_Power) || 0,
-                }),
-            });
+            const endpoint = `${API_URL}plant/${encodeURIComponent(formData.Code)}`;
+            const payload = {
+                // required by API
+                Name: formData.name || "",
+                Code: formData.Code || "",
+                Ownership: formData.Ownership || "",
+                Fuel_Type: formData.Fuel_Type || "",
+                Type: formData.Type || "",
+                Rated_Capacity: Number(formData.Rated_Capacity) || 0,
+                PAF: Number(formData.PAF) || 0,
+                PLF: Number(formData.PLF) || 0,
+                Aux_Consumption: Number(formData.Aux_Consumption) || 0,
+                Variable_Cost: Number(formData.Variable_Cost) || 0,
+                Technical_Minimum: Number(formData.Technical_Minimum) || 0,
+                Max_Power: Number(formData.Max_Power) || 0,
+                Min_Power: Number(formData.Min_Power) || 0,
+            };
 
-            if (response.ok) {
-                const updatedPlant = await response.json();
-                onSave(updatedPlant); // Pass updated data back to parent
-                onClose(); // Close the modal
-            } else {
-                console.error("Failed to update plant:", response.statusText);
+            const res = await fetch(endpoint, {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) {
+                console.error("Update failed:", await res.text());
+                return;
             }
-        } catch (error) {
-            console.error("Error updating plant:", error);
+            const updated = await res.json();
+            onSave(updated);
+            onClose();
+        } catch (err) {
+            console.error("Error updating plant:", err);
         } finally {
-            setIsUpdating(false); // Reset loading state
+            setIsUpdating(false);
         }
     };
 
+    const handleFieldChange = (field) => (e) => {
+        const value = e.target.value;
+        setFormData((f) => ({...f, [field]: value}));
+    };
+
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-80">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-[700px]">
-                <h2 className="text-lg font-bold mb-4">Edit Plant Details</h2>
-                <form className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-gray-700">Plant Name</label>
-                        <input
-                            type="text"
-                            name="Name"
-                            value={formData.name || ""}
-                            onChange={handleChange}
-                            disabled
-                            className="w-full border border-gray-300 rounded-md p-2 mt-1"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700">Plant Code</label>
-                        <input
-                            type="text"
-                            name="Code"
-                            value={formData.Code || ""}
-                            onChange={handleChange}
-                            disabled
-                            className="w-full border border-gray-300 rounded-md p-2 mt-1"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700">Plant Capacity (MW)</label>
-                        <input
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-lg w-[600px] max-w-full p-6 relative">
+                <button
+                    onClick={onClose}
+                    disabled={isUpdating}
+                    className="absolute top-3 right-3 text-gray-600 hover:text-gray-800"
+                >
+                    <FaTimes size={20}/>
+                </button>
+
+                <h2 className="text-xl font-semibold mb-4">Edit {plant.name}</h2>
+
+                {/* Required string fields */}
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                    <InputField
+                        label="Name"
+                        value={formData.name || ""}
+                        onChange={handleFieldChange("name")}
+                    />
+                    <InputField
+                        label="Code"
+                        value={formData.Code || ""}
+                        onChange={handleFieldChange("Code")}
+                    />
+                    <InputField
+                        label="Ownership"
+                        value={formData.Ownership || ""}
+                        onChange={handleFieldChange("Ownership")}
+                    />
+                    <InputField
+                        label="Fuel Type"
+                        value={formData.Fuel_Type || ""}
+                        onChange={handleFieldChange("Fuel_Type")}
+                    />
+                    <InputField
+                        label="Type"
+                        value={formData.Type || ""}
+                        onChange={handleFieldChange("Type")}
+                    />
+                </div>
+
+                {/* Numeric fields */}
+                <div className="grid grid-cols-2 gap-4">
+                    <InputField
+                        label="Capacity (MW)"
+                        type="number"
+                        value={formData.Rated_Capacity}
+                        onChange={handleFieldChange("Rated_Capacity")}
+                    />
+                    <InputField
+                        label="PAF"
+                        type="number"
+                        step="0.01"
+                        value={formData.PAF}
+                        onChange={handleFieldChange("PAF")}
+                    />
+                    <InputField
+                        label="PLF"
+                        type="number"
+                        step="0.01"
+                        value={formData.PLF}
+                        onChange={handleFieldChange("PLF")}
+                    />
+                    <InputField
+                        label="Variable Cost"
+                        type="number"
+                        step="0.01"
+                        value={formData.Variable_Cost}
+                        onChange={handleFieldChange("Variable_Cost")}
+                    />
+                    <InputField
+                        label="Technical Min (%)"
+                        type="number"
+                        step="0.01"
+                        value={formData.Technical_Minimum}
+                        onChange={handleFieldChange("Technical_Minimum")}
+                    />
+                    <InputField
+                        label="Max Power"
+                        type="number"
+                        value={formData.Max_Power}
+                        onChange={handleFieldChange("Max_Power")}
+                    />
+                    <InputField
+                        label="Aux Consumption"
+                        type="number"
+                        step="0.01"
+                        value={formData.Aux_Consumption}
+                        onChange={handleFieldChange("Aux_Consumption")}
+                    />
+                    {isMustRun && (
+                        <InputField
+                            label="Min Power"
                             type="number"
-                            name="Rated_Capacity"
-                            value={formData.Rated_Capacity || ""}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md p-2 mt-1"
+                            value={formData.Min_Power}
+                            onChange={handleFieldChange("Min_Power")}
                         />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700">PAF</label>
-                        <input
-                            type="number"
-                            name="PAF"
-                            value={formData.PAF || ""}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md p-2 mt-1"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700">PLF</label>
-                        <input
-                            type="number"
-                            name="PLF"
-                            value={formData.PLF || ""}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md p-2 mt-1"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700">Aux Consumption</label>
-                        <input
-                            type="number"
-                            name="Aux_Consumption"
-                            value={formData.Aux_Consumption || ""}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md p-2 mt-1"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700">Technical Minimum</label>
-                        <input
-                            type="number"
-                            name="Technical_Minimum"
-                            value={formData.Technical_Minimum || ""}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md p-2 mt-1"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700">Max Power</label>
-                        <input
-                            type="number"
-                            name="Max_Power"
-                            value={formData.Max_Power || ""}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md p-2 mt-1"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700">Min Power</label>
-                        <input
-                            type="number"
-                            name="Min_Power"
-                            value={formData.Min_Power || ""}
-                            onChange={handleChange}
-                            className="w-full border border-gray-300 rounded-md p-2 mt-1"
-                        />
-                    </div>
-                </form>
-                <div className="flex justify-end space-x-4 mt-4">
+                    )}
+                </div>
+
+                {/* Actions */}
+                <div className="mt-6 flex justify-end space-x-3">
                     <button
-                        className="px-4 py-2 bg-gray-500 text-white rounded-md"
                         onClick={onClose}
-                        disabled={isUpdating}>
+                        disabled={isUpdating}
+                        className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                    >
                         Cancel
                     </button>
                     <button
-                        className={`px-4 py-2 rounded-md text-white ${
-                            isUpdating ? "bg-gray-400" : "bg-red-500"
-                        }`}
                         onClick={handleSave}
-                        disabled={isUpdating}>
-                        {isUpdating ? "Updating..." : "Update"}
+                        disabled={isUpdating}
+                        className={`px-4 py-2 rounded text-white ${
+                            isUpdating ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+                        }`}
+                    >
+                        {isUpdating ? "Saving..." : "Save Changes"}
                     </button>
                 </div>
             </div>
         </div>
     );
 }
-
-export default EditPlantModal;

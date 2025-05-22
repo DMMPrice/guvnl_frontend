@@ -6,8 +6,10 @@ import CommonTable from "@/Component/Utils/CommonTable.jsx";
 import {API_URL, POWERBI_URL} from "@/config.js";
 import {Loader2} from "lucide-react";
 import {CSVLink} from "react-csv";
+import PowerBIModal from "@/Component/Utils/PowerBIModal.jsx";
 
 export default function IEXDashboard() {
+
     const [dashboardStats, setDashboardStats] = useState(null);
     const [rawData, setRawData] = useState([]);
     const [demandData, setDemandData] = useState([]);
@@ -256,12 +258,7 @@ export default function IEXDashboard() {
                         className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg text-center">
                         Download Raw Data CSV
                     </CSVLink>
-                    <button
-                        onClick={() => window.open(POWERBI_URL, "_blank", "noopener,noreferrer")}
-                        className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition duration-200 shadow"
-                    >
-                        Show in PowerBI
-                    </button>
+                    <PowerBIModal/>
                 </div>
             </div>
 

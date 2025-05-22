@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import DashboardCards from "./DashboardCards.jsx";
-import {API_URL, POWERBI_URL} from "@/config.js";
+import {API_URL} from "@/config.js";
 import DemandLineChart from "./DemandLineChart.jsx";
 import {Loader2} from "lucide-react";
 import {CSVLink} from "react-csv";
@@ -11,6 +11,7 @@ import ErrorModal from "../../Utils/ErrorModal";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import PowerBIModal from "@/Component/Utils/PowerBIModal.jsx";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -191,12 +192,7 @@ export default function Page() {
                     >
                         Clear
                     </button>
-                    <button
-                        onClick={() => window.open(POWERBI_URL, "_blank", "noopener,noreferrer")}
-                        className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition duration-200 shadow"
-                    >
-                        Show in PowerBI
-                    </button>
+                    <PowerBIModal/>
                 </div>
             </div>
 

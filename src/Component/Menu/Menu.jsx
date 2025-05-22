@@ -18,6 +18,7 @@ import {FaFileAlt} from "react-icons/fa";
 import {PiPiggyBankDuotone} from "react-icons/pi";
 import CommonConfirmModal from "@/Component/Utils/ConfirmModal";
 import {LuChartNoAxesCombined, LuPiggyBank} from "react-icons/lu";
+import {BsDatabaseAdd} from "react-icons/bs";
 
 const menuItems = [
     {
@@ -113,14 +114,14 @@ const menuItems = [
         ],
     },
     {
-        title: "Upload Data",
-        icon: <FaFileAlt className="h-10 w-10 text-green-600"/>,
+        title: "Add Data",
+        icon: <BsDatabaseAdd className="h-10 w-10 text-blue-600"/>,
         allowedRoles: ["super-admin"],
         submenu: [
             {
                 title: "Demand Data",
                 path: "/dev",
-                icon: <FaFileAlt className="h-6 w-6 text-green-600"/>,
+                icon: <GiPowerLightning className="h-6 w-6 text-orange-600"/>,
             },
             {
                 title: "IEX Data",

@@ -20,14 +20,29 @@ const CSVResponseHandler = ({responses, onClose}) => {
         const consolidatedRows = responses.map((resp) => {
             const must = resp.Must_Run || [];
             const other = resp.Remaining_Plants || [];
+            let iexGist = "";
+            const iex = resp.IEX_Data;
+            if (Array.isArray(iex)) {
+                // if it really is an array, map through it
+                iexGist = iex
+                    .map(
+                        (p) =>
+                            `Predicted Price: ${p.Pred_Price} | Predicted Quantity: ${p.Qty_Pred}`
+                    )
+                    .join(" ; ");
+            } else if (iex && typeof iex === "object") {
+                // single‐object case
+                iexGist = `Predicted Price: ${iex.Pred_Price} | Predicted Quantity: ${iex.Qty_Pred}`;
+            } // else leave it as empty string if missing
 
             return {
+                "TimeStamp": resp.TimeStamp,
                 "Demand (Actual) [kWh]": resp["Demand(Actual)"],
                 "Demand (Predicted) [kWh]": resp["Demand(Pred)"],
-                "Banking Unit (kWh)": resp.Banking_Unit,
-                "Demand with Banking (kWh)": resp.Demand_Banked,
-                "Total Must Run Generation (kWh)": resp.Must_Run_Total_Gen,
-                "Total Cost Must Run Generation (Rs.)": resp.Must_Run_Total_Cost,
+                "Banking Unit [kWh]": resp.Banking_Unit,
+                "Demand with Banking [kWh]": resp.Demand_Banked,
+                "Total Must Run Generation [kWh]": resp.Must_Run_Total_Gen,
+                "Total Cost Must Run Generation [Rs]": resp.Must_Run_Total_Cost,
                 "Details of Must Run Generation": must.map((p) => ({
                     Aux_Consumption: p.Aux_Consumption,
                     PAF: p.PAF,
@@ -42,11 +57,11 @@ const CSVResponseHandler = ({responses, onClose}) => {
                     plant_code: p.plant_code,
                     plant_name: p.plant_name,
                 })),
-                "Must Run Generation Jist": must
-                    .map((p) => `${p.plant_name}: ${p.generated_energy} kWh`)
-                    .join(" | "),
-                "Others Plant Total Generation (kWh)": resp.Remaining_Plants_Total_Gen,
-                "Total Cost Others Plant (Rs.)": resp.Remaining_Plants_Total_Cost,
+                "Must Run Generation Gist": must
+                    .map((p) => `Plant Code: ${p.plant_code}|Plant Name: ${p.plant_name}|Rated Capacity: ${p.Rated_Capacity} MW|Variable Cost: Rs ${p.Variable_Cost}|Generated Energy: ${p.generated_energy} kWh|Net Cost: Rs ${p.net_cost}`)
+                    .join(" ;\n"),
+                "Others Plant Total Generation [kWh]": resp.Remaining_Plants_Total_Gen,
+                "Total Cost Others Plant [Rs]": resp.Remaining_Plants_Total_Cost,
                 "Other Plants Details": other.map((p) => ({
                     Aux_Consumption: p.Aux_Consumption,
                     Variable_Cost: p.Variable_Cost,
@@ -62,16 +77,15 @@ const CSVResponseHandler = ({responses, onClose}) => {
                     plf: p.plf,
                     rated_capacity: p.rated_capacity,
                 })),
-                "Other Plant Generation Jist": other
-                    .map((p) => `${p.plant_name}: ${p.generated_energy} kWh`)
-                    .join(" | "),
-                "Power Exchange Qty (kWh)": resp.IEX_Gen,
-                "Power Exchange Cost (Rs.)": resp.IEX_Cost,
-                "Power Exchange Details": resp.IEX_Data,
-                "Backdown Cost": resp.Backdown_Cost,
-                "Rate per Block (Inclusive of all)": resp.Cost_Per_Block,
+                "Other Plant Generation Gist": other
+                    .map((p) => `Plant Code: ${p.plant_code}|Plant Name: ${p.plant_name}|Rated Capacity: ${p.rated_capacity} MW|Variable Cost: Rs ${p.Variable_Cost}|Generated Energy: ${p.generated_energy} kWh|Net Cost: Rs ${p.net_cost}|PLF: ${p.plf ** 100 ?? 100} %|Backdown Cost: Rs ${p.backdown_cost}|Backdown Rate: Rs ${p.backdown_rate}`)
+                    .join(" ;\n"),
+                "Power Exchange Qty [kWh]": resp.IEX_Gen,
+                "Power Exchange Cost [Rs]": resp.IEX_Cost,
+                "Power Exchange Details": iexGist,
+                "Backdown Cost [Rs]": resp.Backdown_Cost,
+                "Rate per Block [Inclusive of all]": resp.Cost_Per_Block,
                 "Block wise Max Price": resp.Last_Price,
-                "TimeStamp": resp.TimeStamp,
             };
         });
 

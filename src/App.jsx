@@ -17,14 +17,15 @@ import DemandDashboard from "./Component/Dashboards/Demand Dashboard/Page.jsx";
 import ConsolidateDashboard from "./Component/Dashboards/Consolidated Dashboard/Page.jsx";
 import IEXDashboard from "./Component/Dashboards/IEX Dashboard/dashboard";
 import Procurement from "./Component/Procurement/BlockWise/main";
-import Plants from "./Component/PlantGenerator/Plants_List/main";
-import GenerationPlant from "./Component/PlantGenerator/Generation_Plant/main";
+import Plants from "./Component/PlantGenerator/Plants_List/Page.jsx";
+import GenerationPlant from "./Component/PlantGenerator/Generation_Plant/Page.jsx";
 import PlantAvailabilityFactor from "./Component/PlantGenerator/Plant_Availibility_Factor/Page.jsx";
 import SingleDemand from "./Component/Demand/main";
 import MassProcurementOutput from "@/Component/Procurement/Mass_Procurement/Generate_Procurement/Page.jsx";
 import Banking from "./Component/BankingData/Banking/Page.jsx";
 import Menu from "./Component/Menu/Menu";
 import ComingSoon from "@/Component/Utils/ComingSoon.jsx";
+import {ToastContainer} from "react-toastify";
 
 // ✅ Updated Private Route wrapper to accept Component (not element)
 const PrivateRoute = ({Component, isAuthenticated}) => {
@@ -49,11 +50,13 @@ function App() {
                 {/* Public Routes */}
                 <Route
                     path="/"
-                    element={<LandingPage setIsAuthenticated={setIsAuthenticated}/>}
+                    element={isAuthenticated ? <Navigate to="/menu" replace/> :
+                        <LandingPage setIsAuthenticated={setIsAuthenticated}/>}
                 />
                 <Route
                     path="/signin"
-                    element={<LandingPage setIsAuthenticated={setIsAuthenticated}/>}
+                    element={isAuthenticated ? <Navigate to="/menu" replace/> :
+                        <LandingPage setIsAuthenticated={setIsAuthenticated}/>}
                 />
 
                 {/* ✅ Private Routes with Component instead of element */}
@@ -167,6 +170,15 @@ function App() {
                 <Route path="/dev" element={<ComingSoon/>}/>
                 <Route path="*" element={<Error404/>}/>
             </Routes>
+            {/* ToastContainer at app root */}
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                pauseOnHover
+            />
         </Router>
     );
 }

@@ -1,3 +1,4 @@
+// src/Component/Utils/AdvancedTable.jsx
 import React, {useState, useMemo, useEffect} from "react";
 import {
     Table,
@@ -11,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import {Button} from "@/components/ui/Button";
 import MultiSelectFilter from "@/Component/Utils/MultiSelectFilter.jsx";
+import CustomSelect from "@/Component/Utils/CustomSelect.jsx";
 import {FaEye, FaEdit, FaTrashAlt} from "react-icons/fa";
 
 export default function AdvancedTable({
@@ -26,13 +28,18 @@ export default function AdvancedTable({
                                           onDelete = null,
                                           onView = null
                                       }) {
+    // ─── Global search, filters, sorting, pagination state ───
     const [searchTerm, setSearchTerm] = useState("");
     const [columnFilters, setColumnFilters] = useState({});
-    const [currentPage, setCurrentPage] = useState(1);
     const [sortBy, setSortBy] = useState(null);
     const [sortDir, setSortDir] = useState("asc");
-    const itemsPerPage = 20;
+    const [currentPage, setCurrentPage] = useState(1);
 
+    // ─── Rows-per-page using CustomSelect (strings) ──────────
+    const rowsPerPageOptions = [10, 20, 50, 100].map(n => n.toString());
+    const [rowsPerPage, setRowsPerPage] = useState("20");
+
+    // ─── Reset handler ───────────────────────────────────────
     const handleReset = () => {
         setSearchTerm("");
         setColumnFilters({});
@@ -41,7 +48,7 @@ export default function AdvancedTable({
         setCurrentPage(1);
     };
 
-    // 1. Filtering
+    // ─── 1. Filtering ────────────────────────────────────────
     const filtered = useMemo(() => {
         let fd = data;
         if (searchTerm) {
@@ -68,13 +75,12 @@ export default function AdvancedTable({
         return fd;
     }, [data, searchTerm, columnFilters, columns]);
 
-    // 2. Sorting
+    // ─── 2. Sorting ─────────────────────────────────────────
     const sorted = useMemo(() => {
         if (!sortBy) return filtered;
         const dir = sortDir === "asc" ? 1 : -1;
         return [...filtered].sort((a, b) => {
-            const va = a[sortBy],
-                vb = b[sortBy];
+            const va = a[sortBy], vb = b[sortBy];
             if (va == null && vb == null) return 0;
             if (va == null) return -dir;
             if (vb == null) return dir;
@@ -85,21 +91,33 @@ export default function AdvancedTable({
         });
     }, [filtered, sortBy, sortDir]);
 
-    // 3. Pagination
-    const totalPages = Math.max(1, Math.ceil(sorted.length / itemsPerPage));
-    useEffect(() => setCurrentPage(1), [searchTerm, sortBy, sortDir, columnFilters]);
+    // ─── 3. Pagination math ──────────────────────────────────
+    const totalPages = Math.max(
+        1,
+        Math.ceil(sorted.length / Number(rowsPerPage))
+    );
+    useEffect(() => setCurrentPage(1), [
+        searchTerm,
+        sortBy,
+        sortDir,
+        columnFilters,
+        rowsPerPage
+    ]);
     useEffect(() => {
         if (currentPage > totalPages) setCurrentPage(totalPages);
-    }, [totalPages]);
+    }, [totalPages, currentPage]);
+
     const paginated = sorted.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
+        (currentPage - 1) * Number(rowsPerPage),
+        currentPage * Number(rowsPerPage)
     );
 
+    // ─── Permissions ────────────────────────────────────────
     const canEdit = onEdit && editRoles.includes(userRole);
     const canDelete = onDelete && deleteRoles.includes(userRole);
     const canView = typeof onView === "function";
 
+    // ─── Handlers ──────────────────────────────────────────
     const handleSort = acc => {
         if (sortBy === acc) setSortDir(d => (d === "asc" ? "desc" : "asc"));
         else {
@@ -132,8 +150,9 @@ export default function AdvancedTable({
         <div className="py-4">
             {title && <h3 className="text-xl font-bold mb-4">{title}</h3>}
 
-            {/* Search / Reset / CSV */}
-            <div className="flex justify-between mb-4">
+            {/* Toolbar */}
+            <div className="flex justify-between mb-4 items-center">
+                {/* Search & Reset */}
                 <div className="flex items-center space-x-2">
                     <input
                         type="text"
@@ -149,12 +168,25 @@ export default function AdvancedTable({
                         Reset
                     </button>
                 </div>
-                <button
-                    onClick={downloadCSV}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                    Download CSV
-                </button>
+
+                {/* CSV & Rows-per-page */}
+                <div className="flex items-center space-x-3">
+                    <button
+                        onClick={downloadCSV}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        Download CSV
+                    </button>
+
+                    <span className="text-sm">Rows per page:</span>
+                    <CustomSelect
+                        options={rowsPerPageOptions}
+                        value={rowsPerPage}
+                        onChange={setRowsPerPage}
+                        placeholder="Select…"
+                        className="w-24"
+                    />
+                </div>
             </div>
 
             {/* Table */}
@@ -295,7 +327,7 @@ export default function AdvancedTable({
                 </Table>
             </div>
 
-            {/* Pagination */}
+            {/* Pagination Controls */}
             <div className="flex justify-between items-center mt-4 px-4">
                 <Button
                     variant="outline"

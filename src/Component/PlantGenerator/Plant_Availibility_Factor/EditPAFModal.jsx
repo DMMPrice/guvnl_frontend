@@ -1,5 +1,6 @@
-// EditPAFModal.jsx
+// src/Component/Dashboard/EditPAFModal.jsx
 import React, {useState, useEffect} from "react";
+import CustomSelect from "@/Component/Utils/CustomSelect.jsx";  // adjust path if needed
 
 const MONTHS = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -15,7 +16,7 @@ export default function EditPAFModal({isOpen, record, onClose, onSave}) {
         Sep: "Y", Oct: "Y", Nov: "Y", Dec: "Y",
     });
 
-    // Whenever `record` changes, populate our form (and ensure every month key exists)
+    // Populate form when record changes
     useEffect(() => {
         if (!record) return;
         setForm({
@@ -35,7 +36,6 @@ export default function EditPAFModal({isOpen, record, onClose, onSave}) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("▶️ Submitting update:", form);
         onSave(form);
     };
 
@@ -74,19 +74,19 @@ export default function EditPAFModal({isOpen, record, onClose, onSave}) {
                     />
                 </div>
 
-                {/* Month flags */}
+                {/* Month flags with CustomSelect */}
                 {MONTHS.map((mon) => (
                     <div key={mon} className="flex items-center space-x-2">
                         <label className="w-8 text-gray-700">{mon}</label>
-                        <select
-                            name={mon}
+                        <CustomSelect
+                            options={["Y", "N"]}
                             value={form[mon]}
-                            onChange={handleChange}
-                            className="border-gray-300 rounded p-1 flex-1"
-                        >
-                            <option value="Y">Y</option>
-                            <option value="N">N</option>
-                        </select>
+                            onChange={(val) =>
+                                setForm(f => ({...f, [mon]: val}))
+                            }
+                            placeholder="Select"
+                            className="flex-1"
+                        />
                     </div>
                 ))}
 
