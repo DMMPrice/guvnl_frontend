@@ -26,6 +26,7 @@ import Banking from "./Component/BankingData/Banking/Page.jsx";
 import Menu from "./Component/Menu/Menu";
 import ComingSoon from "@/Component/Utils/ComingSoon.jsx";
 import {ToastContainer} from "react-toastify";
+import ChatbotOverlay from "@/Component/Chatbot/Page.jsx";
 
 // ✅ Updated Private Route wrapper to accept Component (not element)
 const PrivateRoute = ({Component, isAuthenticated}) => {
@@ -179,6 +180,8 @@ function App() {
                 closeOnClick
                 pauseOnHover
             />
+            {/* Chatbot Overlay */}
+            {isAuthenticated && <ChatbotOverlay/>}
         </Router>
     );
 }

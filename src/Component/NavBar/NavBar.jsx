@@ -27,7 +27,10 @@ export default function NavBar({ setIsAuthenticated }) {
     // ✅ Remove user authentication details
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("username");
-    localStorage.removeItem("password"); // Remove stored password
+    localStorage.removeItem("password");
+
+    // ✅ Reset chatbot sound notification state
+    localStorage.removeItem("sophiaNotificationPlayed");
 
     if (typeof setIsAuthenticated === "function") {
       setIsAuthenticated(false);
