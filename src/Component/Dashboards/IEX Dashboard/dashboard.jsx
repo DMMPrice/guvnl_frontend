@@ -1,18 +1,32 @@
 import React, {useState, useEffect} from "react";
 import DashboardCards from "./DashboardCards.jsx";
-import IEXLineChart from "./IEXLineChart.jsx";
-import BasicDateTimePicker from "@/Component/Utils/DateTimePicker.jsx";
+import CommonComposedChart from "@/Component/Utils/CommonComposedChart.jsx";
+import BasicDateTimePicker from "@/Component/Utils/DateTimeBlock.jsx";
 import CommonTable from "@/Component/Utils/CommonTable.jsx";
-import {API_URL, POWERBI_URL} from "@/config.js";
+import {API_URL} from "@/config.js";
 import {Loader2} from "lucide-react";
 import {CSVLink} from "react-csv";
 import PowerBIModal from "@/Component/Utils/PowerBIModal.jsx";
+import dayjs from "dayjs";
+
+// 👉 Used for chart and dashboard grouping logic (accurate IST conversion)
+const getISTDateInfo = (iso) => {
+    const d = new Date(iso);
+    const ist = new Date(d.getTime() + 330 * 60000); // +5:30
+    return {
+        timestamp: iso, // keep UTC original
+        day: ist.toISOString().slice(0, 10), // "YYYY-MM-DD"
+    };
+};
+
+const getISTDisplayData = (iso) => {
+    const d = new Date(iso);
+    return d.toISOString().replace("T", " ").slice(0, 19);  // NO 5:30 shift
+};
 
 export default function IEXDashboard() {
-
     const [dashboardStats, setDashboardStats] = useState(null);
     const [rawData, setRawData] = useState([]);
-    const [demandData, setDemandData] = useState([]);
     const [filteredRawData, setFilteredRawData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
 
@@ -20,274 +34,208 @@ export default function IEXDashboard() {
     const [endDate, setEndDate] = useState(null);
     const [isFilterApplied, setIsFilterApplied] = useState(false);
 
-    const [defaultStartDate, setDefaultStartDate] = useState(null);
-    const [defaultEndDate, setDefaultEndDate] = useState(null);
-
     const [loading, setLoading] = useState(true);
-    const [rawLoading, setRawLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Load dashboard stats immediately
+    // Helper to map and format a single IEX entry
+    const mapIEXEntry = (entry) => {
+        const dateInfo = getISTDateInfo(entry.TimeStamp);
+        return {
+            timestamp: dateInfo.timestamp,
+            day: dateInfo.day,
+            dateTime: getISTDisplayData(entry.TimeStamp),
+            Actual: Number(entry.Actual).toFixed(2),
+            Pred: Number(entry.Pred).toFixed(2),
+        };
+    };
+
     useEffect(() => {
-        const fetchStats = async () => {
+        (async () => {
             try {
-                const res = await fetch(`${API_URL}iex/dashboard`);
-                if (!res.ok) throw new Error("Failed to load dashboard stats");
-                const data = await res.json();
-                setDashboardStats({
-                    avgPredictedPrice: data.Avg_Pred_Price,
-                    avgPrice: data.Avg_Price,
+                const defaultStart = "2023-03-01 00:00";
+                const defaultEnd = "2023-03-31 00:00";
+
+                const res = await fetch(`${API_URL}dashboard?start_date=${encodeURIComponent(defaultStart)}&end_date=${encodeURIComponent(defaultEnd)}`);
+                if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+                const json = await res.json();
+
+                if (json.iex?.length) {
+                    const acts = json.iex.map((e) => Number(e.Actual));
+                    const preds = json.iex.map((e) => Number(e.Pred));
+                    const avgAct = (acts.reduce((s, x) => s + x, 0) / acts.length).toFixed(2);
+                    const avgPred = (preds.reduce((s, x) => s + x, 0) / preds.length).toFixed(2);
+                    setDashboardStats({avgPrice: avgAct, avgPredictedPrice: avgPred});
+                }
+
+                const iexFormatted = json.iex.map(mapIEXEntry);
+
+                setRawData(iexFormatted);
+                setFilteredRawData(iexFormatted);
+
+                const byDay = {};
+                iexFormatted.forEach((e) => {
+                    if (!byDay[e.day]) byDay[e.day] = {day: e.day, sumA: 0, sumP: 0, count: 0};
+                    byDay[e.day].sumA += Number(e.Actual);
+                    byDay[e.day].sumP += Number(e.Pred);
+                    byDay[e.day].count += 1;
                 });
+
+                const daily = Object.values(byDay).map((d) => ({
+                    day: d.day,
+                    Actual: (d.sumA / d.count).toFixed(2),
+                    Pred: (d.sumP / d.count).toFixed(2),
+                }));
+                setFilteredData(daily);
+
+                setStartDate(new Date(daily[0].day + "T00:00:00"));
+                setEndDate(new Date(daily[daily.length - 1].day + "T00:00:00"));
+                setIsFilterApplied(true);
             } catch (err) {
                 setError(err.message);
+            } finally {
+                setLoading(false);
             }
-        };
-        fetchStats();
+        })();
     }, []);
 
-    // Lazy-load raw data after delay
-    useEffect(() => {
-        const delayRawDataFetch = () => {
-            setRawLoading(true);
-            setTimeout(fetchRawData, 400); // small delay
-        };
-        delayRawDataFetch();
-    }, []);
+    const series = [
+        {key: "Actual", label: "Actual Price", type: "line", color: "rgba(14,165,233,1)"},
+        {key: "Pred", label: "Predicted Price", type: "line", color: "rgb(248,8,76)"},
+    ];
 
-    const fetchRawData = async () => {
-        try {
-            const res = await fetch(`${API_URL}iex/all`);
-            if (!res.ok) throw new Error("Failed to load raw IEX data");
-            const data = await res.json();
-
-            const formatted = data.map((entry) => {
-                const timeObj = new Date(entry.TimeStamp);
-                return {
-                    timestamp: entry.TimeStamp,
-                    dateTime: timeObj.toLocaleString("en-IN", {
-                        timeZone: "Asia/Kolkata",
-                        hour12: false,
-                    }),
-                    day: timeObj.toISOString().slice(0, 10),
-                    actual: Number(entry.Actual).toFixed(2),
-                    predicted: Number(entry.Pred).toFixed(2),
-                };
-            });
-
-            setRawData(formatted);
-            setRawLoading(false);
-            setLoading(false);
-
-            // Also build daily aggregates
-            const aggregates = {};
-            formatted.forEach((item) => {
-                const day = item.day;
-                if (!aggregates[day]) {
-                    aggregates[day] = {
-                        day,
-                        actualSum: 0,
-                        predictedSum: 0,
-                        count: 0,
-                    };
-                }
-                aggregates[day].actualSum += Number(item.actual);
-                aggregates[day].predictedSum += Number(item.predicted);
-                aggregates[day].count += 1;
-            });
-
-            const dailyAvg = Object.entries(aggregates).map(([day, sums]) => ({
-                day,
-                actual: (sums.actualSum / sums.count).toFixed(2),
-                predicted: (sums.predictedSum / sums.count).toFixed(2),
-            }));
-
-            setDemandData(dailyAvg);
-            setDefaultStartDate(new Date(dailyAvg[0].day));
-            setDefaultEndDate(new Date(dailyAvg[dailyAvg.length - 1].day));
-        } catch (err) {
-            setError(err.message);
-            setRawLoading(false);
-            setLoading(false);
-        }
-    };
-
-    const shiftRawDataByFiveThirty = (dataArray) => {
-        return dataArray.map((item) => {
-            const dateObj = new Date(item.timestamp);
-            dateObj.setMinutes(dateObj.getMinutes() - 330);
-            return {
-                ...item,
-                timestamp: dateObj.toISOString(),
-                dateTime: dateObj.toLocaleString("en-IN", {
-                    timeZone: "Asia/Kolkata",
-                    hour12: false,
-                }),
-            };
-        });
-    };
-
-    const handleApplyFilters = () => {
+    const handleApplyFilters = async () => {
         if (!startDate || !endDate) {
-            alert("Please select both start and end dates.");
+            alert("Select both start & end dates");
             return;
         }
+        try {
+            setLoading(true);
+            const formattedStart = dayjs(startDate).format("YYYY-MM-DD HH:mm");
+            const formattedEnd = dayjs(endDate).format("YYYY-MM-DD HH:mm");
 
-        // Aggregated filter
-        const filtered = demandData.filter((entry) => {
-            const entryDate = new Date(entry.day);
-            return (
-                entryDate >= startDate &&
-                entryDate <= new Date(new Date(endDate).setHours(23, 59, 59, 999))
+            const res = await fetch(
+                `${API_URL}dashboard?start_date=${encodeURIComponent(formattedStart)}&end_date=${encodeURIComponent(formattedEnd)}`
             );
-        });
-        setFilteredData(filtered);
+            if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+            const json = await res.json();
 
-        // Raw data filter and shift to IST
-        let rawFiltered = rawData.filter((entry) => {
-            const rowDate = new Date(entry.timestamp);
-            return rowDate >= startDate && rowDate <= endDate;
-        });
-        rawFiltered = shiftRawDataByFiveThirty(rawFiltered);
-        setFilteredRawData(rawFiltered);
+            const iexFormatted = json.iex.map(mapIEXEntry);
+            setFilteredRawData(iexFormatted);
 
-        // Page stats for filtered
-        if (filtered.length > 0) {
-            const avgPredictedPrice = (
-                filtered.reduce((sum, e) => sum + Number(e.predicted), 0) /
-                filtered.length
-            ).toFixed(2);
-            const avgPrice = (
-                filtered.reduce((sum, e) => sum + Number(e.actual), 0) / filtered.length
-            ).toFixed(2);
+            const byDay = {};
+            iexFormatted.forEach((e) => {
+                if (!byDay[e.day]) byDay[e.day] = {day: e.day, sumA: 0, sumP: 0, count: 0};
+                byDay[e.day].sumA += Number(e.Actual);
+                byDay[e.day].sumP += Number(e.Pred);
+                byDay[e.day].count += 1;
+            });
 
-            setDashboardStats((prev) => ({
-                ...prev,
-                avgPredictedPrice,
-                avgPrice,
+            const daily = Object.values(byDay).map((d) => ({
+                day: d.day,
+                Actual: (d.sumA / d.count).toFixed(2),
+                Pred: (d.sumP / d.count).toFixed(2),
             }));
-        }
+            setFilteredData(daily);
 
-        setIsFilterApplied(true);
+            const priceArr = daily.map((d) => Number(d.Actual));
+            const predArr = daily.map((d) => Number(d.Pred));
+            const avgAct = priceArr.length ? (priceArr.reduce((s, x) => s + x, 0) / priceArr.length).toFixed(2) : dashboardStats?.avgPrice;
+            const avgPred = predArr.length ? (predArr.reduce((s, x) => s + x, 0) / predArr.length).toFixed(2) : dashboardStats?.avgPredictedPrice;
+            setDashboardStats({avgPrice: avgAct, avgPredictedPrice: avgPred});
+
+            setIsFilterApplied(true);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleClearFilters = () => {
-        setStartDate(null);
-        setEndDate(null);
-        setFilteredData([]);
-        setFilteredRawData([]);
-        setIsFilterApplied(false);
+        setStartDate(new Date(filteredData[0]?.day + "T00:00:00"));
+        setEndDate(new Date(filteredData[filteredData.length - 1]?.day + "T00:00:00"));
+        setFilteredRawData(rawData);
+        setIsFilterApplied(true);
     };
 
-    const rawCSVData = [
-        ["Date & Time (IST)", "Actual Price", "Predicted Price"],
-        ...filteredRawData.map((entry) => [
-            entry.dateTime,
-            entry.actual,
-            entry.predicted,
-        ]),
-    ];
-
-    const tableColumns = [
-        {accessor: "dateTime", header: "Date & Time"},
-        {
-            accessor: "actual",
-            header: "Actual Price",
-            render: (row) => row.actual,
-        },
-        {
-            accessor: "predicted",
-            header: "Predicted Price",
-            render: (row) => row.predicted,
-        },
-    ];
-
-    const chartConfig = {
-        actual: {label: "Actual Price", color: "rgba(14, 165, 233, 1)"},
-        predicted: {label: "Predicted Price", color: "rgb(248, 8, 76)"},
-    };
-
-    if (loading && !dashboardStats) {
+    if (loading)
         return (
             <div className="flex justify-center items-center h-[80vh]">
                 <Loader2 className="h-6 w-6 animate-spin mr-2"/>
-                Loading dashboard...
+                Loading…
             </div>
         );
-    }
 
-    if (error) {
-        return <div className="text-red-500 text-center mt-4">Error: {error}</div>;
-    }
+    if (error) return <div className="text-red-500 text-center mt-4">Error: {error}</div>;
+
+    const rawCSV = [["Date & Time (IST)", "Actual Price", "Predicted Price"], ...filteredRawData.map(e => [e.dateTime, e.Actual, e.Pred])];
+    const tableCols = [
+        {accessor: "dateTime", header: "Date & Time"},
+        {accessor: "Actual", header: "Actual Price"},
+        {accessor: "Pred", header: "Predicted Price"},
+    ];
 
     return (
         <div className="mx-8 p-6 animate-fadeIn">
-            <h1 className="text-2xl font-bold mb-6 text-gray-800 animate-slideDown">
-                IEX Market Overview
-            </h1>
+            <h1 className="text-2xl font-bold mb-6">IEX Market Overview</h1>
 
-            {/* Filters */}
-            <div className="flex flex-wrap gap-6 mb-6 items-center p-4">
-                <div className="flex flex-col">
-                    <BasicDateTimePicker
-                        label="Start Date"
-                        value={startDate}
-                        onChange={setStartDate}
-                    />
-                </div>
-                <div className="flex flex-col">
-                    <BasicDateTimePicker
-                        label="End Date"
-                        value={endDate}
-                        onChange={setEndDate}
-                    />
-                </div>
-                <div className="flex gap-4 pt-2">
-                    <button
-                        onClick={handleApplyFilters}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg">
-                        Apply
-                    </button>
-                    <button
-                        onClick={handleClearFilters}
-                        className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg">
-                        Clear
-                    </button>
-                    <CSVLink
-                        data={rawCSVData}
-                        filename={`iex_raw_${new Date().toISOString().slice(0, 10)}.csv`}
-                        className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg text-center">
-                        Download Raw Data CSV
-                    </CSVLink>
-                    <PowerBIModal/>
-                </div>
+            <div className="flex gap-4 mb-6 items-end">
+                <BasicDateTimePicker label="Start Date" value={startDate} onChange={setStartDate}/>
+                <BasicDateTimePicker label="End Date" value={endDate} onChange={setEndDate}/>
+                <button onClick={handleApplyFilters}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Apply
+                </button>
+                <button onClick={handleClearFilters}
+                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">Clear
+                </button>
+                <CSVLink data={rawCSV} filename={`iex_raw_${new Date().toISOString().slice(0, 10)}.csv`}
+                         className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+                    Download Raw CSV
+                </CSVLink>
+                <PowerBIModal/>
             </div>
 
-            {/* Only show after filter */}
             {isFilterApplied && (
                 <>
                     {dashboardStats && (
                         <DashboardCards
-                            stats={dashboardStats}
-                            startDate={startDate?.toISOString().slice(0, 10)}
-                            endDate={endDate?.toISOString().slice(0, 10)}
+                            stats={{
+                                avgPrice: `${dashboardStats.avgPrice} ₹`,
+                                avgPredictedPrice: `${dashboardStats.avgPredictedPrice} ₹`,
+                            }}
+                            startDate={
+                                startDate instanceof Date && !isNaN(startDate)
+                                    ? dayjs(startDate).format("YYYY-MM-DD")
+                                    : ""
+                            }
+                            endDate={
+                                endDate instanceof Date && !isNaN(endDate)
+                                    ? dayjs(endDate).format("YYYY-MM-DD")
+                                    : ""
+                            }
                         />
                     )}
+
                     {filteredRawData.length > 0 && (
-                        <IEXLineChart data={filteredRawData} chartConfig={chartConfig}/>
+                        <CommonComposedChart
+                            data={filteredRawData}
+                            title="IEX Actual & Predicted Prices"
+                            series={series}
+                            height={300}
+                            maxWidthClass="max-w-4xl"
+                            modalHeight="70vh"
+                        />
                     )}
+
                     {filteredRawData.length > 0 && (
                         <CommonTable
                             title="Raw IEX Data"
-                            caption="Filtered Non-Aggregated IEX Data (Shifted to IST)"
-                            columns={tableColumns}
+                            caption="Actual vs Predicted Prices (IST)"
+                            columns={tableCols}
                             data={filteredRawData}
                         />
                     )}
                 </>
-            )}
-
-            {rawLoading && !isFilterApplied && (
-                <p className="text-sm text-gray-500 mt-4">Fetching raw market data. Please wait...</p>
             )}
         </div>
     );
