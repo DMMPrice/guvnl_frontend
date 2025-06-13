@@ -1,4 +1,3 @@
-// Page.jsx
 import React, {useState, useEffect} from "react";
 import DashboardCards from "./DashboardCards.jsx";
 import {API_URL} from "@/config.js";
@@ -11,12 +10,11 @@ import ErrorModal from "../../Utils/ErrorModal";
 import PowerBIModal from "@/Component/Utils/PowerBIModal.jsx";
 
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
+const getISTDisplayData = (iso) => {
+    const d = new Date(iso);
+    return d.toISOString().replace("T", " ").slice(0, 19);  // NO 5:30 shift
+};
 export default function Page() {
     const [demandData, setDemandData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
@@ -34,7 +32,6 @@ export default function Page() {
     const [showErrorModal, setShowErrorModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
-    // initial load
     useEffect(() => {
         const fetchAll = async () => {
             try {
@@ -42,33 +39,25 @@ export default function Page() {
                 const defaultEnd = "2023-05-31 00:00";
 
                 const [rawRes, statsRes] = await Promise.all([
-                    fetch(
-                        `${API_URL}dashboard?start_date=${encodeURIComponent(
-                            defaultStart
-                        )}&end_date=${encodeURIComponent(defaultEnd)}`
-                    ),
+                    fetch(`${API_URL}dashboard?start_date=${encodeURIComponent(defaultStart)}&end_date=${encodeURIComponent(defaultEnd)}`),
                     fetch(`${API_URL}demand/dashboard`),
                 ]);
 
-                if (!rawRes.ok)
-                    throw new Error(`Demand fetch failed: ${rawRes.status}`);
-                if (!statsRes.ok)
-                    throw new Error(`Stats fetch failed: ${statsRes.status}`);
+                if (!rawRes.ok) throw new Error(`Demand fetch failed: ${rawRes.status}`);
+                if (!statsRes.ok) throw new Error(`Stats fetch failed: ${statsRes.status}`);
 
                 const rawJson = await rawRes.json();
                 const statsJson = await statsRes.json();
 
                 const demandArray = rawJson.demand.map((entry) => ({
                     ...entry,
-                    timestamp: entry.TimeStamp, // for CommonComposedChart
-                    TimeStampIST: dayjs(entry.TimeStamp)
-                        .tz("Asia/Kolkata")
-                        .format("DD MMM YYYY, HH:mm"),
+                    timestamp: entry.TimeStamp,
+                    TimeStampIST: getISTDisplayData(entry.TimeStamp),
                 }));
 
                 setDemandData(demandArray);
                 setFilteredData(demandArray);
-                setIsFilterApplied(true); // show default data immediately
+                setIsFilterApplied(true);
 
                 setDashboardStats({
                     totalDemand: `${statsJson.demand_actual.toFixed(2)} MW`,
@@ -86,7 +75,6 @@ export default function Page() {
         fetchAll();
     }, []);
 
-    // show chart after data is in
     useEffect(() => {
         if (!loading && demandData.length && !error) {
             const timer = setTimeout(() => setShowChart(true), 2000);
@@ -94,7 +82,6 @@ export default function Page() {
         }
     }, [loading, demandData, error]);
 
-    // recalc dynamicStats if filter changes
     useEffect(() => {
         if (!dashboardStats) return;
 
@@ -118,7 +105,6 @@ export default function Page() {
         }
     }, [filteredData, dashboardStats]);
 
-    // apply date filters
     const handleApplyFilters = async () => {
         if (!startDate || !endDate) {
             setErrorMessage("Please select both Start and End date with time.");
@@ -128,20 +114,14 @@ export default function Page() {
 
         try {
             setLoading(true);
-            const res = await fetch(
-                `${API_URL}dashboard?start_date=${encodeURIComponent(
-                    startDate
-                )}&end_date=${encodeURIComponent(endDate)}`
-            );
+            const res = await fetch(`${API_URL}dashboard?start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}`);
             if (!res.ok) throw new Error("Failed to fetch filtered data.");
             const json = await res.json();
 
             const filtered = json.demand.map((entry) => ({
                 ...entry,
                 timestamp: entry.TimeStamp,
-                TimeStampIST: dayjs(entry.TimeStamp)
-                    .tz("Asia/Kolkata")
-                    .format("DD MMM YYYY, HH:mm"),
+                TimeStampIST: getISTDisplayData(entry.TimeStamp),
             }));
 
             setFilteredData(filtered);
@@ -161,7 +141,6 @@ export default function Page() {
         setIsFilterApplied(false);
     };
 
-    // CSV data
     const rawCSVData = [
         ["Timestamp (IST)", "Actual Demand", "Predicted Demand"],
         ...filteredData.map((entry) => [
@@ -171,13 +150,11 @@ export default function Page() {
         ]),
     ];
 
-    // chart styling config
     const chartConfig = {
         actual: {label: "Actual Demand", color: "rgb(0,31,63)"},
         pred: {label: "Predicted Demand", color: "rgb(46,245,0)"},
     };
 
-    // series array for CommonComposedChart
     const series = [
         {
             key: "Demand(Actual)",
@@ -216,21 +193,13 @@ export default function Page() {
             <div className="flex flex-wrap gap-4 items-end mb-6 px-4 py-3 bg-white shadow-md rounded-lg">
                 <div className="flex flex-col">
                     <label className="text-gray-700 font-medium">Start Date</label>
-                    <BasicDateTimePicker
-                        label="Start DateTime"
-                        value={startDate}
-                        onChange={setStartDate}
-                    />
+                    <BasicDateTimePicker label="Start DateTime" value={startDate} onChange={setStartDate}/>
                 </div>
                 <div className="flex flex-col">
                     <label className="text-gray-700 font-medium">End Date</label>
-                    <BasicDateTimePicker
-                        label="End DateTime"
-                        value={endDate}
-                        onChange={setEndDate}
-                    />
+                    <BasicDateTimePicker label="End DateTime" value={endDate} onChange={setEndDate}/>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-4 flex-wrap">
                     <button
                         onClick={handleApplyFilters}
                         className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition duration-200 shadow"
@@ -243,6 +212,13 @@ export default function Page() {
                     >
                         Clear
                     </button>
+                    <CSVLink
+                        data={rawCSVData}
+                        filename={`raw_demand_data_${new Date().toISOString().slice(0, 10)}.csv`}
+                        className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition duration-200 shadow"
+                    >
+                        Download CSV
+                    </CSVLink>
                     <PowerBIModal/>
                 </div>
             </div>
@@ -252,12 +228,8 @@ export default function Page() {
                     {dynamicStats && (
                         <DashboardCards
                             stats={dynamicStats}
-                            startDate={
-                                startDate ? new Date(startDate).toISOString().slice(0, 10) : null
-                            }
-                            endDate={
-                                endDate ? new Date(endDate).toISOString().slice(0, 10) : null
-                            }
+                            startDate={startDate ? dayjs(startDate).format("YYYY-MM-DD") : ""}
+                            endDate={endDate ? dayjs(endDate).format("YYYY-MM-DD") : ""}
                         />
                     )}
 
@@ -271,22 +243,8 @@ export default function Page() {
                             modalHeight="70vh"
                         />
                     ) : (
-                        <p className="text-gray-500 mt-4">
-                            Chart is loading or no data to display.
-                        </p>
+                        <p className="text-gray-500 mt-4">Chart is loading or no data to display.</p>
                     )}
-
-                    <div className="mt-4 text-right">
-                        <CSVLink
-                            data={rawCSVData}
-                            filename={`raw_demand_data_${new Date()
-                                .toISOString()
-                                .slice(0, 10)}.csv`}
-                            className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition duration-200 shadow"
-                        >
-                            Download CSV
-                        </CSVLink>
-                    </div>
 
                     {filteredData.length > 0 && (
                         <CommonTable
@@ -294,13 +252,8 @@ export default function Page() {
                             caption="Non-Aggregated Demand Data (Raw API Data)"
                             columns={[
                                 {
-                                    accessor: "TimeStamp",
-                                    header: "Timestamp",
-                                    render: (row) =>
-                                        new Date(row.TimeStamp).toLocaleString("en-IN", {
-                                            timeZone: "Asia/Kolkata",
-                                            hour12: false,
-                                        }),
+                                    accessor: "TimeStampIST",
+                                    header: "Timestamp (IST)",
                                 },
                                 {
                                     accessor: "Demand(Actual)",
@@ -320,10 +273,7 @@ export default function Page() {
             )}
 
             {showErrorModal && (
-                <ErrorModal
-                    message={errorMessage}
-                    onClose={() => setShowErrorModal(false)}
-                />
+                <ErrorModal message={errorMessage} onClose={() => setShowErrorModal(false)}/>
             )}
         </div>
     );

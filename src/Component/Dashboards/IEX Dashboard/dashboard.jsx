@@ -99,8 +99,8 @@ export default function IEXDashboard() {
     }, []);
 
     const series = [
-        {key: "Actual", label: "Actual Price", type: "line", color: "rgba(14,165,233,1)"},
         {key: "Pred", label: "Predicted Price", type: "line", color: "rgb(248,8,76)"},
+        {key: "Actual", label: "Actual Price", type: "line", color: "rgba(14,165,233,1)"},
     ];
 
     const handleApplyFilters = async () => {
