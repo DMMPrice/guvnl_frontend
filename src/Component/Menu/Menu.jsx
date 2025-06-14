@@ -40,7 +40,13 @@ const menuItems = [
                 title: "Consolidated Dashboard",
                 path: "/dashboard",
                 icon: <LuChartNoAxesCombined className="h-6 w-6 text-indigo-600"/>,
-            }
+            },
+             {
+                title: "Power Theft Monitor",
+                path: "/power-theft",
+                icon: <GiPowerLightning className="h-6 w-6 text-red-600"/>,
+                description: "Track and monitor power theft cases",
+            },
         ],
     },
     {
@@ -140,6 +146,14 @@ const menuItems = [
             },
         ],
     },
+    {
+        title: "Power Section",
+        icon: <GiPowerLightning className="h-10 w-10 text-yellow-600"/>,
+        allowedRoles: ["admin", "guest", "super-admin"],
+        submenu: [
+           
+        ],
+    },
 ];
 
 const Menu = () => {
@@ -175,6 +189,10 @@ const Menu = () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    const handleMenuItemClick = (path) => {
+        navigate(path);
+    };
 
     return (
         <>

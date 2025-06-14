@@ -1,5 +1,6 @@
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
+import { Line, Bar } from "recharts"
 
 import { cn } from "@/lib/utils"
 
@@ -360,4 +361,6 @@ export {
   ChartLegend,
   ChartLegendContent,
   ChartStyle,
+  Line,
+  Bar,
 }
