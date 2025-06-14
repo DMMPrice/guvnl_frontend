@@ -27,11 +27,12 @@ import Menu from "./Component/Menu/Menu";
 import ComingSoon from "@/Component/Utils/ComingSoon.jsx";
 import {ToastContainer} from "react-toastify";
 import ChatbotOverlay from "@/Component/Chatbot/Page.jsx";
+import PowerTheftDashboard from "./Component/PowerThefting/PowerTheftDashboard";
 
 // ✅ Updated Private Route wrapper to accept Component (not element)
-const PrivateRoute = ({Component, isAuthenticated}) => {
-    return isAuthenticated ? <Component/> : <Navigate to="/signin" replace/>;
-};
+function PrivateRoute({ Component, isAuthenticated }) {
+    return isAuthenticated ? <Component /> : <Navigate to="/signin" replace />;
+}
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -165,6 +166,15 @@ function App() {
                                isAuthenticated={isAuthenticated}
                            />
                        }
+                />
+                <Route
+                    path="/power-theft"
+                    element={
+                        <PrivateRoute
+                            Component={PowerTheftDashboard}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
                 />
 
                 {/* Catch-all route */}
