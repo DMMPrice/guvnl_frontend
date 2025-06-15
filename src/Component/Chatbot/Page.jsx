@@ -81,7 +81,7 @@ export default function Page() {
     const renderContent = () => {
         if (step === 0) return (
             <div className="flex flex-col gap-2">
-                <p className="text-sm text-gray-800 mb-1">1. Select Demand Type:</p>
+                <p className="text-sm text-gray-800 mb-1">1. Choose your requirement:</p>
                 {DEMAND_TYPES.map(t => (
                     <Button key={t} onClick={() => {
                         setSelectedDemandType(t);
@@ -148,7 +148,7 @@ export default function Page() {
                     <div
                         className="fixed bottom-24 right-6 w-[360px] h-[600px] bg-white shadow-2xl rounded-lg overflow-hidden flex flex-col">
                         <div className="bg-[#0052cc] text-white px-4 py-2 flex justify-between">
-                            <span className="font-semibold">DURGA</span>
+                            <span className="font-semibold">ARADHYA</span>
                             <button onClick={() => setOpen(false)} className="text-xl">×</button>
                         </div>
                         <div className="flex-1 p-4 overflow-auto text-sm">{renderContent()}</div>
