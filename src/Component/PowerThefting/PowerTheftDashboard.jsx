@@ -21,6 +21,12 @@ const PowerTheftDashboard = () => {
   // Add analysis type selection
   const [analysisType, setAnalysisType] = useState('distribution');
   const [tableData, setTableData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Initialize data on component mount
+  useEffect(() => {
+    updateChartData();
+  }, []);
 
   // Dummy data structure
   const dummyData = {
@@ -59,29 +65,36 @@ const PowerTheftDashboard = () => {
       updateChartData();
     }
   }, [selectedDistrict, selectedFeeder, selectedDTR]);
-
   const updateChartData = () => {
-    // Generate distribution data
-    const newDistributionData = Array.from({ length: 24 }, (_, i) => ({
-      timestamp: new Date(2023, 0, 1, i).toISOString(),
-      substationSupply: (440 + Math.random() * 10).toFixed(2),
-      feederSupply: (435 + Math.random() * 8).toFixed(2),
-      dtrSupply: (407 + Math.random() * 6).toFixed(2),
-      consumerSupply: (368 + Math.random() * 5).toFixed(2)
-    }));
+    setIsLoading(true);
+    
+    try {
+      // Generate distribution data
+      const newDistributionData = Array.from({ length: 24 }, (_, i) => ({
+        timestamp: new Date(2023, 0, 1, i).toISOString(),
+        substationSupply: (440 + Math.random() * 10).toFixed(2),
+        feederSupply: (435 + Math.random() * 8).toFixed(2),
+        dtrSupply: (407 + Math.random() * 6).toFixed(2),
+        consumerSupply: (368 + Math.random() * 5).toFixed(2)
+      }));
 
-    // Generate loss data
-    const newLossData = Array.from({ length: 24 }, (_, i) => ({
-      timestamp: new Date(2023, 0, 1, i).toISOString(),
-      substationLoss: (1 + Math.random() * 0.5).toFixed(3),
-      feederLoss: (6 + Math.random() * 1).toFixed(3),
-      dtrLoss: (9 + Math.random() * 1).toFixed(3),
-      totalLoss: (16 + Math.random() * 2).toFixed(3)
-    }));
+      // Generate loss data
+      const newLossData = Array.from({ length: 24 }, (_, i) => ({
+        timestamp: new Date(2023, 0, 1, i).toISOString(),
+        substationLoss: (1 + Math.random() * 0.5).toFixed(3),
+        feederLoss: (6 + Math.random() * 1).toFixed(3),
+        dtrLoss: (9 + Math.random() * 1).toFixed(3),
+        totalLoss: (16 + Math.random() * 2).toFixed(3)
+      }));
 
-    setDistributionData(newDistributionData);
-    setLossData(newLossData);
-    setTableData(analysisType === 'distribution' ? newDistributionData : newLossData);
+      setDistributionData(newDistributionData);
+      setLossData(newLossData);
+      setTableData(analysisType === 'distribution' ? newDistributionData : newLossData);
+    } catch (error) {
+      console.error('Error updating chart data:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Combined chart configuration
@@ -272,11 +285,15 @@ const PowerTheftDashboard = () => {
             </SelectContent>
           </Select>
         </div>
-      </Card>
-
-      {/* Chart Section */}
+      </Card>      {/* Chart Section */}
       <Card className="p-4 mb-6">
-        <CommonComposedChart {...chartConfig} />
+        {distributionData?.length > 0 && lossData?.length > 0 ? (
+          <CommonComposedChart {...chartConfig} />
+        ) : (
+          <div className="flex items-center justify-center h-64">
+            <p className="text-gray-500">Loading data...</p>
+          </div>
+        )}
       </Card>
 
       {/* Table Section */}
@@ -284,12 +301,18 @@ const PowerTheftDashboard = () => {
         <h2 className="text-xl font-semibold mb-4">
           {analysisType === 'distribution' ? 'Distribution Data' : 'Loss Analysis Data'}
         </h2>
-        <CommonTable
-          data={tableData}
-          columns={analysisType === 'distribution' ? distributionColumns : lossColumns}
-          pagination={true}
-          pageSize={10}
-        />
+        {tableData?.length > 0 ? (
+          <CommonTable
+            data={tableData}
+            columns={analysisType === 'distribution' ? distributionColumns : lossColumns}
+            pagination={true}
+            pageSize={10}
+          />
+        ) : (
+          <div className="flex items-center justify-center h-32">
+            <p className="text-gray-500">Loading data...</p>
+          </div>
+        )}
       </Card>
     </div>
   );
