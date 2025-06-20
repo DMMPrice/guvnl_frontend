@@ -8,13 +8,13 @@ import BasicDateTimePicker from "../../Utils/DateTimeBlock.jsx";
 import CommonTable from "../../Utils/CommonTable";
 import ErrorModal from "../../Utils/ErrorModal";
 import PowerBIModal from "@/Component/Utils/PowerBIModal.jsx";
-
 import dayjs from "dayjs";
 
 const getISTDisplayData = (iso) => {
     const d = new Date(iso);
-    return d.toISOString().replace("T", " ").slice(0, 19);  // NO 5:30 shift
+    return d.toISOString().replace("T", " ").slice(0, 19);
 };
+
 export default function Page() {
     const [demandData, setDemandData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
@@ -22,24 +22,23 @@ export default function Page() {
     const [dynamicStats, setDynamicStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
-
     const [showChart, setShowChart] = useState(false);
     const [isFilterApplied, setIsFilterApplied] = useState(false);
-
     const [showErrorModal, setShowErrorModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         const fetchAll = async () => {
             try {
-                const defaultStart = "2023-05-01 00:00";
-                const defaultEnd = "2023-05-31 00:00";
+                // Use full datetime format
+                const defaultStart = "2023-05-01 00:00:00";
+                const defaultEnd = "2023-05-31 23:59:59";
 
                 const [rawRes, statsRes] = await Promise.all([
-                    fetch(`${API_URL}dashboard?start_date=${encodeURIComponent(defaultStart)}&end_date=${encodeURIComponent(defaultEnd)}`),
+                    // Use new endpoint
+                    fetch(`${API_URL}demand/data?start_date=${encodeURIComponent(defaultStart)}&end_date=${encodeURIComponent(defaultEnd)}`),
                     fetch(`${API_URL}demand/dashboard`),
                 ]);
 
@@ -49,6 +48,7 @@ export default function Page() {
                 const rawJson = await rawRes.json();
                 const statsJson = await statsRes.json();
 
+                // Access 'demand' property from response
                 const demandArray = rawJson.demand.map((entry) => ({
                     ...entry,
                     timestamp: entry.TimeStamp,
@@ -66,6 +66,7 @@ export default function Page() {
                     totalPlants: statsJson.plant_count.toString(),
                 });
             } catch (err) {
+                console.error("API Error:", err);
                 setError(err.message);
             } finally {
                 setLoading(false);
@@ -114,7 +115,14 @@ export default function Page() {
 
         try {
             setLoading(true);
-            const res = await fetch(`${API_URL}dashboard?start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}`);
+            // Use new endpoint with formatted dates
+            const formattedStart = dayjs(startDate).format("YYYY-MM-DD HH:mm:ss");
+            const formattedEnd = dayjs(endDate).format("YYYY-MM-DD HH:mm:ss");
+            
+            const res = await fetch(
+                `${API_URL}demand/data?start_date=${encodeURIComponent(formattedStart)}&end_date=${encodeURIComponent(formattedEnd)}`
+            );
+            
             if (!res.ok) throw new Error("Failed to fetch filtered data.");
             const json = await res.json();
 
@@ -127,6 +135,7 @@ export default function Page() {
             setFilteredData(filtered);
             setIsFilterApplied(true);
         } catch (error) {
+            console.error("Filter Error:", error);
             setErrorMessage(error.message);
             setShowErrorModal(true);
         } finally {
@@ -189,7 +198,6 @@ export default function Page() {
                 Demand Dashboard Overview
             </h1>
 
-            {/* Filters */}
             <div className="flex flex-wrap gap-4 items-end mb-6 px-4 py-3 bg-white shadow-md rounded-lg">
                 <div className="flex flex-col">
                     <label className="text-gray-700 font-medium">Start Date</label>
