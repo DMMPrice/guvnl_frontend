@@ -27,7 +27,8 @@ import Menu from "./Component/Menu/Menu";
 import ComingSoon from "@/Component/Utils/ComingSoon.jsx";
 import {ToastContainer} from "react-toastify";
 import ChatbotOverlay from "@/Component/Chatbot/Page.jsx";
-import PowerTheftDashboard from "./Component/PowerThefting/PowerTheftDashboard";
+import PowerTheftDashboard from "./Component/Dashboards/PowerThefting/PowerTheftDashboard.jsx";
+import AddData from "./Component/Admin/addUsers/addUser.jsx";
 
 // ✅ Updated Private Route wrapper to accept Component (not element)
 function PrivateRoute({ Component, isAuthenticated }) {
@@ -172,6 +173,16 @@ function App() {
                     element={
                         <PrivateRoute
                             Component={PowerTheftDashboard}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+
+                <Route
+                    path="/add-user"
+                    element={
+                        <PrivateRoute
+                            Component={ AddData }
                             isAuthenticated={isAuthenticated}
                         />
                     }

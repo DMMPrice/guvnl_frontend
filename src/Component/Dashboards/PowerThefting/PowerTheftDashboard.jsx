@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
-import CommonComposedChart from '../Utils/CommonComposedChart';
+import CommonComposedChart from '../../Utils/CommonComposedChart.jsx';
 import CommonTable from "@/Component/Utils/CommonTable.jsx";
-import { API_BASE } from "../../config.js";
+import { API_BASE } from "../../../config.js";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loader2, Calendar, Clock } from "lucide-react";
