@@ -13,12 +13,15 @@ import {
     MdArrowBack,
     MdKeyboardArrowRight,
     MdSpaceDashboard,
+    MdAdminPanelSettings,
 } from "react-icons/md";
 import {FaFileAlt} from "react-icons/fa";
 import {PiPiggyBankDuotone} from "react-icons/pi";
 import CommonConfirmModal from "@/Component/Utils/ConfirmModal";
 import {LuChartNoAxesCombined, LuPiggyBank} from "react-icons/lu";
 import {BsDatabaseAdd} from "react-icons/bs";
+import path from "path";
+import { MdGroups } from "react-icons/md";
 
 const menuItems = [
     {
@@ -147,11 +150,15 @@ const menuItems = [
         ],
     },
     {
-        title: "Power Section",
-        icon: <GiPowerLightning className="h-10 w-10 text-yellow-600"/>,
-        allowedRoles: ["admin", "guest", "super-admin"],
+        title: "Admin",
+        icon: <MdAdminPanelSettings className="h-10 w-10 text-yellow-600" />,
+        allowedRoles: ["admin", "super-admin"],
         submenu: [
-           
+            {
+                title: "Add Users",
+                path: "/add-user",
+                icon: <MdGroups className="h-6 w-6 text-yellow-600" />,
+            }
         ],
     },
 ];
