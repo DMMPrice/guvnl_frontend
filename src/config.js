@@ -1,8 +1,7 @@
 // src/config.js
-export const DURGA_VERSION = "0.1";
+export const ARADHYA_VERSION = "0.1";
 export const POWERBI_URL = "https://app.powerbi.com/view?r=eyJrIjoiYzhmMmE0ODItYTRlMy00ZjEzLWE1NjQtMjRhODViMDhiZmMxIiwidCI6IjhlZTQ0MWJkLTBjODQtNDYzNS05YTU2LWVkMWUyNjhkZmU4NSIsImMiOjEwfQ==";
 export const API_URL = "http://127.0.0.1:5000/";
-export const API_BASE = API_URL; // Adding API_BASE to point to same URL
 export const SAVE_URL = "http://127.0.0.1:4000/";
 export const CHATBOT_URL = "http://127.0.0.1:5050/";
 // export const SAVE_URL = "https://guvnl.powercasting.online/";

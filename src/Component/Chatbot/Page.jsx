@@ -1,4 +1,3 @@
-// File: src/pages/ChatbotPage.jsx
 import React, {useState} from "react";
 import BasicDateTimePicker from "@/Component/Utils/DateTimeBlock.jsx";
 import {Button} from "@/components/ui/button";
@@ -14,19 +13,19 @@ import {Info, Maximize} from "lucide-react";
 import {ChatbotSheet} from "./ChatbotSheet.jsx";
 import {ChatPanel} from "./ChatPanel.jsx";
 import {ChatInput} from "./ChatInput.jsx";
-import {API_URL, DURGA_VERSION, CHATBOT_URL} from "@/config.js";
+import {API_URL, ARADHYA_VERSION, CHATBOT_URL} from "@/config.js";
 import {GiPowerLightning} from "react-icons/gi";
 import {TbSolarElectricity} from "react-icons/tb";
 import {FiShoppingCart} from "react-icons/fi";
 
 export default function ChatbotPage() {
-    // Side-sheet, full-screen and info dialog visibility
+    // Side-sheet & dialogs
     const [open, setOpen] = useState(false);
     const [fullOpen, setFullOpen] = useState(false);
     const [infoOpen, setInfoOpen] = useState(false);
     const [hasNewMessage, setHasNewMessage] = useState(true);
 
-    // Step control & data states
+    // Step + selection state
     const [step, setStep] = useState(0);
     const [selectedDemandType, setSelectedDemandType] = useState(null);
     const [singleDateTemp, setSingleDateTemp] = useState(null);
@@ -37,19 +36,17 @@ export default function ChatbotPage() {
     const [summary, setSummary] = useState({});
     const [loading, setLoading] = useState(false);
 
-    // Chat input & history
+    // Chat history
     const [message, setMessage] = useState("");
     const [chatMessages, setChatMessages] = useState([]);
 
-    // Menu items
     const DEMAND_TYPES = [
         {label: "Demand", icon: <GiPowerLightning size={24} className="text-green-600"/>},
         {label: "IEX Price", icon: <TbSolarElectricity size={24} className="text-red-600"/>},
         {label: "MOD Price", icon: <FiShoppingCart size={24} className="text-blue-600"/>},
     ];
 
-    // Reset to step 0
-    function resetState() {
+    function resetAll() {
         setStep(0);
         setSelectedDemandType(null);
         setSingleDateTemp(null);
@@ -63,28 +60,6 @@ export default function ChatbotPage() {
         setChatMessages([]);
     }
 
-    // Handlers for opening/closing
-    function handleOpen(next) {
-        if (next) setHasNewMessage(false);
-        setOpen(next);
-        if (next) resetState();
-    }
-
-    function openFull() {
-        setFullOpen(true);
-    }
-
-    function openInfo() {
-        setInfoOpen(true);
-    }
-
-    function onRestart() {
-        setFullOpen(false);
-        setOpen(true);
-        resetState();
-    }
-
-    // Fetch API data
     async function fetchAPI(type, start, end) {
         setLoading(true);
         let endpoint = "";
@@ -107,7 +82,6 @@ export default function ChatbotPage() {
         setLoading(false);
     }
 
-    // Send chat message
     async function sendMessage() {
         if (!message.trim()) return;
         setChatMessages((prev) => [...prev, {sender: "user", text: message}]);
@@ -121,11 +95,10 @@ export default function ChatbotPage() {
         }
     }
 
-    // Render step-wise content
     function renderContent() {
         if (step === 0) {
             return (
-                <div>
+                <div className="p-4">
                     <p className="text-base text-gray-800 mb-3">1. Choose your requirement:</p>
                     <div className="grid grid-cols-2 gap-3">
                         {DEMAND_TYPES.map(({label, icon}) => (
@@ -145,9 +118,10 @@ export default function ChatbotPage() {
                 </div>
             );
         }
+
         if (step === 1) {
             return (
-                <div className="flex flex-col gap-2">
+                <div className="p-4 flex flex-col gap-2">
                     <p className="text-base text-gray-800">
                         Select {selectedDemandType === "MOD Price" ? "single" : "single or range"} date/time for{" "}
                         <strong>{selectedDemandType}</strong>:
@@ -157,7 +131,9 @@ export default function ChatbotPage() {
                             <Button
                                 size="sm"
                                 onClick={() => setIsRangeMode(false)}
-                                className={`w-1/2 ${!isRangeMode ? "bg-blue-600 text-white" : "bg-blue-100 text-gray-800"}`}
+                                className={`w-1/2 ${
+                                    !isRangeMode ? "bg-blue-600 text-white" : "bg-blue-100 text-gray-800"
+                                }`}
                             >
                                 Single
                             </Button>
@@ -200,15 +176,16 @@ export default function ChatbotPage() {
                             </Button>
                         </>
                     )}
-                    <Button onClick={onRestart} size="sm" className="bg-red-500 text-white hover:bg-red-600">
+                    <Button onClick={resetAll} size="sm" className="bg-red-500 text-white hover:bg-red-600">
                         Start Over
                     </Button>
                 </div>
             );
         }
+
         if (step === 2) {
             return (
-                <div className="flex flex-col gap-3">
+                <div className="p-4 flex flex-col gap-3">
                     {!loading ? (
                         <>
                             <p className="text-base font-semibold">Summary:</p>
@@ -219,62 +196,62 @@ export default function ChatbotPage() {
                     ) : (
                         <p className="text-base">Loading data…</p>
                     )}
-                    <Button onClick={onRestart} size="sm" className="bg-[#0052cc] text-white">
+                    <Button onClick={resetAll} size="sm" className="bg-[#0052cc] text-white">
                         Start Over
                     </Button>
                 </div>
             );
         }
+
         return null;
     }
 
     return (
         <>
-            {/* Side sheet trigger */}
             <ChatbotSheet triggerOpen={{open, setOpen}} hasNewMessage={hasNewMessage}>
-                <div className="w-[360px] h-[600px] bg-white shadow-2xl rounded-lg overflow-hidden flex flex-col">
+                <div className="w-full h-full flex flex-col">
                     {/* Header */}
                     <div className="bg-[#0052cc] text-white px-4 py-2 flex justify-between items-center">
-                        <div>
+                        <div className="flex items-baseline gap-2">
                             <span className="font-semibold text-lg">ARADHYA</span>
-                            <span className="ml-2 text-sm opacity-80">v{DURGA_VERSION}</span>
+                            <span className="text-sm opacity-80">v{ARADHYA_VERSION}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <button onClick={openInfo} className="text-white">
+                        <div className="flex items-center gap-3">
+                            <button onClick={() => setInfoOpen(true)} className="text-white">
                                 <Info className="w-5 h-5"/>
                             </button>
-                            <button onClick={openFull} className="text-white">
+                            <button onClick={() => setFullOpen(true)} className="text-white">
                                 <Maximize className="w-5 h-5"/>
                             </button>
-                            <button onClick={() => setOpen(false)} className="text-2xl leading-none">
+                            <button onClick={() => setOpen(false)} className="text-2xl leading-none text-white">
                                 ×
                             </button>
                         </div>
                     </div>
 
-                    {/* Content */}
-                    <div className="flex-1 overflow-auto px-4 py-3 text-base">{renderContent()}</div>
+                    {/* Body */}
+                    <div className="flex-1 overflow-auto">{renderContent()}</div>
 
-                    {/* Chat */}
-                    <div className="mt-1 p-3 border-t">
+                    {/* Footer */}
+                    <div className="p-3 border-t">
                         <ChatPanel chatMessages={chatMessages}/>
                         <ChatInput message={message} setMessage={setMessage} onSend={sendMessage}/>
-                        <div className="text-center text-sm text-gray-400 mt-1">
-                            Powered by ARADHYA v{DURGA_VERSION}
+                        <div className="text-center text-sm text-gray-400 mt-2">
+                            Powered by ARADHYA v{ARADHYA_VERSION}
                         </div>
                     </div>
                 </div>
             </ChatbotSheet>
 
-            {/* Info Dialog */}
+            {/* Info dialog */}
             <Dialog open={infoOpen} onOpenChange={setInfoOpen}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle>About ARADHYA</DialogTitle>
                         <DialogDescription>
                             ARADHYA is your intelligent assistant for accessing demand, IEX, and MOD price data.
-                            Version{" "}
-                            <strong>{DURGA_VERSION}</strong> supports both tile-based selection and chat interaction.
+                            Version <strong>{ARADHYA_VERSION}</strong> supports both tile-based selection and chat
+                            interaction.
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
@@ -288,27 +265,27 @@ export default function ChatbotPage() {
                 </DialogContent>
             </Dialog>
 
-            {/* Fullscreen Dialog */}
+            {/* Full-screen dialog */}
             <Dialog open={fullOpen} onOpenChange={setFullOpen}>
                 <DialogContent className="p-0 w-full max-w-[768px] h-[90vh] overflow-hidden flex flex-col">
-                    {/* Fullscreen Header */}
+                    {/* Header */}
                     <div className="bg-[#0052cc] text-white px-4 py-2 flex justify-between items-center">
-                        <div>
+                        <div className="flex items-baseline gap-2">
                             <span className="font-semibold text-lg">ARADHYA</span>
-                            <span className="ml-2 text-sm opacity-80">v{DURGA_VERSION}</span>
+                            <span className="text-sm opacity-80">v{ARADHYA_VERSION}</span>
                         </div>
                         <button onClick={() => setFullOpen(false)} className="text-2xl leading-none">
                             ×
                         </button>
                     </div>
-                    {/* Fullscreen Body */}
-                    <div className="flex-1 overflow-auto px-4 py-3 text-base">{renderContent()}</div>
-                    {/* Fullscreen Chat */}
+                    {/* Body */}
+                    <div className="flex-1 overflow-auto px-4 py-3">{renderContent()}</div>
+                    {/* Footer */}
                     <div className="p-4 border-t">
                         <ChatPanel chatMessages={chatMessages}/>
                         <ChatInput message={message} setMessage={setMessage} onSend={sendMessage}/>
-                        <div className="text-center text-sm text-gray-400 mt-1">
-                            Powered by ARADHYA v{DURGA_VERSION}
+                        <div className="text-center text-sm text-gray-400 mt-2">
+                            Powered by ARADHYA v{ARADHYA_VERSION}
                         </div>
                     </div>
                 </DialogContent>
