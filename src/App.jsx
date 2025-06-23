@@ -16,12 +16,11 @@ import Error404 from "./Component/Utils/error";
 import DemandDashboard from "./Component/Dashboards/Demand Dashboard/Page.jsx";
 import ConsolidateDashboard from "./Component/Dashboards/Consolidated Dashboard/Page.jsx";
 import IEXDashboard from "./Component/Dashboards/IEX Dashboard/dashboard";
-import Procurement from "./Component/Procurement/BlockWise/main";
+import Procurement from "./Component/Dashboards/Plant_Wise_Procurement_Dashboard/main";
 import Plants from "./Component/PlantGenerator/Plants_List/Page.jsx";
 import GenerationPlant from "./Component/PlantGenerator/Generation_Plant/Page.jsx";
 import PlantAvailabilityFactor from "./Component/PlantGenerator/Plant_Availibility_Factor/Page.jsx";
-import SingleDemand from "./Component/Demand/main";
-import MassProcurementOutput from "@/Component/Procurement/Mass_Procurement/Generate_Procurement/Page.jsx";
+import MassProcurementOutput from "@/Component/Procurement/Generate_BlockWise_Output/Generate_Procurement/Page.jsx";
 import Banking from "./Component/BankingData/Banking/Page.jsx";
 import Menu from "./Component/Menu/Menu";
 import ComingSoon from "@/Component/Utils/ComingSoon.jsx";
@@ -29,10 +28,11 @@ import {ToastContainer} from "react-toastify";
 import ChatbotOverlay from "@/Component/Chatbot/Page.jsx";
 import PowerTheftDashboard from "./Component/Dashboards/PowerThefting/PowerTheftDashboard.jsx";
 import AddData from "./Component/Admin/addUsers/addUser.jsx";
+import BackdownPage from "./Component/PlantGenerator/Backdown_Table/Page.jsx";
 
 // ✅ Updated Private Route wrapper to accept Component (not element)
-function PrivateRoute({ Component, isAuthenticated }) {
-    return isAuthenticated ? <Component /> : <Navigate to="/signin" replace />;
+function PrivateRoute({Component, isAuthenticated}) {
+    return isAuthenticated ? <Component/> : <Navigate to="/signin" replace/>;
 }
 
 function App() {
@@ -109,15 +109,6 @@ function App() {
                     }
                 />
                 <Route
-                    path="/block-purchase"
-                    element={
-                        <PrivateRoute
-                            Component={SingleDemand}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
-                <Route
                     path="/plants"
                     element={
                         <PrivateRoute
@@ -142,15 +133,13 @@ function App() {
                                isAuthenticated={isAuthenticated}
                            />
                        }/>
-                <Route
-                    path="/demand"
-                    element={
-                        <PrivateRoute
-                            Component={SingleDemand}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
+                <Route path="/backdown-table"
+                       element={
+                           <PrivateRoute
+                               Component={BackdownPage}
+                               isAuthenticated={isAuthenticated}
+                           />
+                       }/>
                 <Route
                     path="/banking"
                     element={
@@ -182,7 +171,7 @@ function App() {
                     path="/add-user"
                     element={
                         <PrivateRoute
-                            Component={ AddData }
+                            Component={AddData}
                             isAuthenticated={isAuthenticated}
                         />
                     }

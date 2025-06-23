@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import CommonComposedChart from '../../Utils/CommonComposedChart.jsx';
 import CommonTable from "@/Component/Utils/CommonTable.jsx";
-import { API_BASE } from "../../../config.js";
+import { API_URL } from "../../../config.js";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Loader2, Calendar, Clock } from "lucide-react";
@@ -59,7 +59,7 @@ const PowerTheftDashboard = () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-      const response = await fetch(`${API_BASE}region/all`, {
+      const response = await fetch(`${API_URL}region/all`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -107,7 +107,7 @@ const PowerTheftDashboard = () => {
         toast.error('Network error: Please check your internet connection');
       } else {
         toast.error(
-          `Failed to fetch regions: ${error.message}. Please ensure the backend server is running at ${API_BASE}`
+          `Failed to fetch regions: ${error.message}. Please ensure the backend server is running at ${API_URL}`
         );
       }
       setRegions([]);
@@ -136,7 +136,7 @@ const PowerTheftDashboard = () => {
 
   const fetchDivisions = async (regionId) => {
     try {
-      setIsLoading(true);      const response = await fetch(`${API_BASE}division/by-region/${regionId}`);
+      setIsLoading(true);      const response = await fetch(`${API_URL}division/by-region/${regionId}`);
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Server error: ${response.status} - ${errorText}`);
@@ -177,7 +177,7 @@ const PowerTheftDashboard = () => {
       setIsLoading(true);
       console.log('Fetching substations for division:', divisionId);
       
-      const response = await fetch(`${API_BASE}substation/by-division/${divisionId}`, {
+      const response = await fetch(`${API_URL}substation/by-division/${divisionId}`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -233,7 +233,7 @@ const PowerTheftDashboard = () => {
   }, [selectedSubstation]);  const fetchFeeders = async (substationId) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${API_BASE}feeder/by-substation/${substationId}`, {
+      const response = await fetch(`${API_URL}feeder/by-substation/${substationId}`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -280,7 +280,7 @@ const PowerTheftDashboard = () => {
   const fetchDTRs = async (feederId) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${API_BASE}/dtr/by-feeder/${feederId}`);
+      const response = await fetch(`${API_URL}/dtr/by-feeder/${feederId}`);
       const data = await response.json();
       
       if (!response.ok) {
@@ -309,7 +309,7 @@ const PowerTheftDashboard = () => {
   const fetchConsumers = async (dtrId) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${API_BASE}consumer/by-dtr/${dtrId}`, {
+      const response = await fetch(`${API_URL}consumer/by-dtr/${dtrId}`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -351,7 +351,7 @@ const PowerTheftDashboard = () => {
       const formattedDate = selectedDate.toISOString().split('T')[0];
       params.append('date', formattedDate);
       params.append('time', selectedTime);
-        const url = `${API_BASE}power-theft/analysis?${params.toString()}`;
+        const url = `${API_URL}power-theft/analysis?${params.toString()}`;
       
       const response = await fetch(url, {
         method: 'GET',

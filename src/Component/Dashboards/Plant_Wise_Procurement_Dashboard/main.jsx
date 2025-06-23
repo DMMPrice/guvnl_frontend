@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import ProcurementForm from "./procurementForm.jsx";
 import ShowData from "./ShowData.jsx";
 import {format, addDays} from "date-fns";
-import {API_URL} from "../../../config.js";
+import {API_URL} from "@/config.js";
 import * as XLSX from "xlsx";
 import LineChartComponent from "@/Component/Utils/LineChartComponent.jsx";
 
@@ -144,7 +144,7 @@ export default function Procurement() {
 
         const worksheet = XLSX.utils.json_to_sheet(responseData);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "BlockWise Data");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Plant_Wise_Procurement_Dashboard Data");
         XLSX.writeFile(workbook, "Procurement_Data.xlsx");
     };
 

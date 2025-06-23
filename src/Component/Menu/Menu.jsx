@@ -21,7 +21,7 @@ import CommonConfirmModal from "@/Component/Utils/ConfirmModal";
 import {LuChartNoAxesCombined, LuPiggyBank} from "react-icons/lu";
 import {BsDatabaseAdd} from "react-icons/bs";
 import path from "path";
-import { MdGroups } from "react-icons/md";
+import {MdGroups} from "react-icons/md";
 
 const menuItems = [
     {
@@ -40,11 +40,17 @@ const menuItems = [
                 icon: <TbSolarElectricity className="h-6 w-6 text-red-600"/>,
             },
             {
+                title: "Plant Wise Procurement Dashboard",
+                path: "/purchase",
+                icon: <FiShoppingCart className="h-6 w-6 text-blue-600"/>,
+                allowedRoles: ["super-admin", "admin", "guest"],
+            },
+            {
                 title: "Consolidated Dashboard",
                 path: "/dashboard",
                 icon: <LuChartNoAxesCombined className="h-6 w-6 text-indigo-600"/>,
             },
-             {
+            {
                 title: "Power Theft Monitor",
                 path: "/power-theft",
                 icon: <GiPowerLightning className="h-6 w-6 text-red-600"/>,
@@ -70,19 +76,7 @@ const menuItems = [
         allowedRoles: ["admin", "guest", "super-admin"],
         submenu: [
             {
-                title: "BlockWise",
-                path: "/purchase",
-                icon: <FiShoppingCart className="h-6 w-6 text-green-600"/>,
-                allowedRoles: ["super-admin"],
-            },
-            {
-                title: "Block Wise Procurement",
-                path: "/block-purchase",
-                icon: <GiPowerLightning className="h-6 w-6 text-purple-600"/>,
-                allowedRoles: ["admin", "guest", "super-admin"],
-            },
-            {
-                title: "Generate BlockWise Output",
+                title: "Generate Plant_Wise_Procurement_Dashboard Output",
                 path: "/mass-plant-output",
                 icon: <FiShoppingCart className="h-6 w-6 text-pink-600"/>,
             },
@@ -108,6 +102,11 @@ const menuItems = [
                 path: "/plant-availability-factor",
                 icon: <PiNuclearPlantDuotone className="h-6 w-6 text-blue-600"/>,
             },
+            {
+                title: "Plant Backdown Rates",
+                path: "/backdown-table",
+                icon: <GiPowerLightning className="h-6 w-6 text-orange-600"/>,
+            }
         ],
     },
     {
@@ -151,13 +150,13 @@ const menuItems = [
     },
     {
         title: "Admin",
-        icon: <MdAdminPanelSettings className="h-10 w-10 text-yellow-600" />,
+        icon: <MdAdminPanelSettings className="h-10 w-10 text-yellow-600"/>,
         allowedRoles: ["admin", "super-admin"],
         submenu: [
             {
                 title: "Add Users",
                 path: "/add-user",
-                icon: <MdGroups className="h-6 w-6 text-yellow-600" />,
+                icon: <MdGroups className="h-6 w-6 text-yellow-600"/>,
             }
         ],
     },
