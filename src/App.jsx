@@ -29,6 +29,7 @@ import ChatbotOverlay from "@/Component/Chatbot/Page.jsx";
 import PowerTheftDashboard from "./Component/Dashboards/PowerThefting/PowerTheftDashboard.jsx";
 import AddData from "./Component/Admin/addUsers/addUser.jsx";
 import BackdownPage from "./Component/PlantGenerator/Backdown_Table/Page.jsx";
+import Settings from "./Component/Settings/Settings.jsx";
 
 // ✅ Updated Private Route wrapper to accept Component (not element)
 function PrivateRoute({Component, isAuthenticated}) {
@@ -175,6 +176,12 @@ function App() {
                             isAuthenticated={isAuthenticated}
                         />
                     }
+                />
+
+                {/* Settings */}
+                <Route
+                    path="/theme"
+                    element={<PrivateRoute element={<Settings/>} isAuthenticated={isAuthenticated}/>}
                 />
 
                 {/* Catch-all route */}

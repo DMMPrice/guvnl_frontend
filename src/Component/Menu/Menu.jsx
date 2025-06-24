@@ -13,14 +13,16 @@ import {
     MdArrowBack,
     MdKeyboardArrowRight,
     MdSpaceDashboard,
-    MdAdminPanelSettings,
+    MdAdminPanelSettings, MdPerson, MdLock, MdLogout,
 } from "react-icons/md";
 import {FaCartArrowDown, FaFileAlt} from "react-icons/fa";
 import {PiPiggyBankDuotone} from "react-icons/pi";
 import CommonConfirmModal from "@/Component/Utils/ConfirmModal";
-import {LuChartNoAxesCombined, LuPiggyBank} from "react-icons/lu";
+import {LuChartNoAxesCombined, LuPiggyBank, LuWallpaper} from "react-icons/lu";
 import {BsDatabaseAdd} from "react-icons/bs";
 import {MdGroups} from "react-icons/md";
+import {RiFontSize2, RiUserSettingsLine} from "react-icons/ri";
+import {FaGears} from "react-icons/fa6";
 
 const menuItems = [
     {
@@ -157,6 +159,25 @@ const menuItems = [
                 path: "/add-user",
                 icon: <MdGroups className="h-6 w-6 text-yellow-600"/>,
             }
+        ],
+    },
+    {
+        title: "Settings",
+        icon: <FaGears className="h-10 w-10 text-blue-500"/>,
+        allowedRoles: ["super-admin", "admin", "guest"],
+        submenu: [
+            {title: "Change Theme", path: "/theme", icon: <LuWallpaper className="h-6 w-6 text-blue-500"/>},
+            {title: "Change Font", path: "/dev", icon: <RiFontSize2 className="h-6 w-6 text-red-500"/>},
+        ],
+    },
+    {
+        title: "Profile",
+        icon: <RiUserSettingsLine className="h-10 w-10 text-blue-500"/>,
+        allowedRoles: ["super-admin", "admin", "guest"],
+        submenu: [
+            {title: "Full Profile", path: "/profile", icon: <MdPerson className="h-6 w-6 text-blue-500"/>},
+            {title: "Change Password", path: "/change-password", icon: <MdLock className="h-6 w-6 text-red-500"/>},
+            {title: "Logout", action: "logout", icon: <MdLogout className="h-6 w-8 text-black"/>},
         ],
     },
 ];
