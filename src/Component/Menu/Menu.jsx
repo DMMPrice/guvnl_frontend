@@ -15,12 +15,11 @@ import {
     MdSpaceDashboard,
     MdAdminPanelSettings,
 } from "react-icons/md";
-import {FaFileAlt} from "react-icons/fa";
+import {FaCartArrowDown, FaFileAlt} from "react-icons/fa";
 import {PiPiggyBankDuotone} from "react-icons/pi";
 import CommonConfirmModal from "@/Component/Utils/ConfirmModal";
 import {LuChartNoAxesCombined, LuPiggyBank} from "react-icons/lu";
 import {BsDatabaseAdd} from "react-icons/bs";
-import path from "path";
 import {MdGroups} from "react-icons/md";
 
 const menuItems = [
@@ -105,7 +104,7 @@ const menuItems = [
             {
                 title: "Plant Backdown Rates",
                 path: "/backdown-table",
-                icon: <GiPowerLightning className="h-6 w-6 text-orange-600"/>,
+                icon: <FaCartArrowDown className="h-6 w-6 text-orange-600"/>,
             }
         ],
     },
