@@ -13,7 +13,7 @@ import {
     MdArrowBack,
     MdKeyboardArrowRight,
     MdSpaceDashboard,
-    MdAdminPanelSettings, MdPerson, MdLock, MdLogout,
+    MdPerson, MdLock, MdLogout,
 } from "react-icons/md";
 import {FaCartArrowDown, FaFileAlt} from "react-icons/fa";
 import {PiPiggyBankDuotone} from "react-icons/pi";
@@ -50,12 +50,28 @@ const menuItems = [
                 title: "Consolidated Dashboard",
                 path: "/dashboard",
                 icon: <LuChartNoAxesCombined className="h-6 w-6 text-indigo-600"/>,
+                allowedRoles: ["admin", "guest", "super-admin"],
             },
             {
                 title: "Power Theft Monitor",
                 path: "/power-theft",
                 icon: <GiPowerLightning className="h-6 w-6 text-red-600"/>,
-                description: "Track and monitor power theft cases",
+                allowedRoles: ["admin", "guest", "super-admin"],
+            }, {
+                title: "Feeder Substation Dashboard",
+                path: "/substation-feeder-dashboard",
+                icon: <GiPowerLightning className="h-6 w-6 text-red-600"/>,
+                allowedRoles: ["admin", "guest", "super-admin"],
+            }, {
+                title: "Power Theft Monitor",
+                path: "/power-theft",
+                icon: <GiPowerLightning className="h-6 w-6 text-red-600"/>,
+                allowedRoles: ["admin", "guest", "super-admin"],
+            }, {
+                title: "Power Theft Monitor",
+                path: "/power-theft",
+                icon: <GiPowerLightning className="h-6 w-6 text-red-600"/>,
+                allowedRoles: ["admin", "guest", "super-admin"],
             },
         ],
     },
@@ -77,7 +93,7 @@ const menuItems = [
         allowedRoles: ["admin", "guest", "super-admin"],
         submenu: [
             {
-                title: "Generate Plant_Wise_Procurement_Dashboard Output",
+                title: "Generate Plant-Wise Procurement Output",
                 path: "/mass-plant-output",
                 icon: <FiShoppingCart className="h-6 w-6 text-pink-600"/>,
             },
@@ -129,7 +145,7 @@ const menuItems = [
         submenu: [
             {
                 title: "Demand Data",
-                path: "/dev",
+                path: "/demand/add",
                 icon: <GiPowerLightning className="h-6 w-6 text-orange-600"/>,
             },
             {
@@ -147,13 +163,6 @@ const menuItems = [
                 path: "/dev",
                 icon: <FaFileAlt className="h-6 w-6 text-green-600"/>,
             },
-        ],
-    },
-    {
-        title: "Admin",
-        icon: <MdAdminPanelSettings className="h-10 w-10 text-yellow-600"/>,
-        allowedRoles: ["admin", "super-admin"],
-        submenu: [
             {
                 title: "Add Users",
                 path: "/add-user",
@@ -163,19 +172,19 @@ const menuItems = [
     },
     {
         title: "Settings",
-        icon: <FaGears className="h-10 w-10 text-blue-500"/>,
+        icon: <FaGears className="h-10 w-10 text-cyan-500"/>,
         allowedRoles: ["super-admin", "admin", "guest"],
         submenu: [
-            {title: "Change Theme", path: "/theme", icon: <LuWallpaper className="h-6 w-6 text-blue-500"/>},
-            {title: "Change Font", path: "/dev", icon: <RiFontSize2 className="h-6 w-6 text-red-500"/>},
+            {title: "Change Theme", path: "/theme", icon: <LuWallpaper className="h-6 w-6 text-cyan-600"/>},
+            {title: "Change Font", path: "/dev", icon: <RiFontSize2 className="h-6 w-6 text-indigo-800"/>},
         ],
     },
     {
         title: "Profile",
-        icon: <RiUserSettingsLine className="h-10 w-10 text-blue-500"/>,
+        icon: <RiUserSettingsLine className="h-10 w-10 text-red-500"/>,
         allowedRoles: ["super-admin", "admin", "guest"],
         submenu: [
-            {title: "Full Profile", path: "/profile", icon: <MdPerson className="h-6 w-6 text-blue-500"/>},
+            {title: "Full Profile", path: "/profile", icon: <MdPerson className="h-6 w-6 text-red-500"/>},
             {title: "Change Password", path: "/change-password", icon: <MdLock className="h-6 w-6 text-red-500"/>},
             {title: "Logout", action: "logout", icon: <MdLogout className="h-6 w-8 text-black"/>},
         ],

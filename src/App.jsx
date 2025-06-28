@@ -11,25 +11,35 @@ import "./App.css";
 import NavBar from "./Component/NavBar/NavBar";
 import LandingPage from "./Component/LandingPage/LandingPage";
 import Error404 from "./Component/Utils/error";
+import {ToastContainer} from "react-toastify";
 
 // Protected pages/components
+import Menu from "./Component/Menu/Menu";
+import ComingSoon from "@/Component/Utils/ComingSoon.jsx";
+import ChatbotOverlay from "@/Component/Chatbot/Page.jsx";
+import Settings from "./Component/Settings/Settings.jsx";
+
+// Dashboards Components
 import DemandDashboard from "./Component/Dashboards/Demand Dashboard/Page.jsx";
 import ConsolidateDashboard from "./Component/Dashboards/Consolidated Dashboard/Page.jsx";
 import IEXDashboard from "./Component/Dashboards/IEX Dashboard/dashboard";
-import Procurement from "./Component/Dashboards/Plant_Wise_Procurement_Dashboard/main";
+import Procurement from "./Component/Dashboards/Plant Wise Procurement Dashboard/main";
+import FeederSubstationDashboard from "./Component/Dashboards/Substation Feeder Dashboard/Page.jsx";
+
+// Procurement Components
+import MassProcurementOutput from "@/Component/Procurement/Generate_BlockWise_Output/Generate_Procurement/Page.jsx";
+
+// Plant Generator Components
 import Plants from "./Component/PlantGenerator/Plants_List/Page.jsx";
 import GenerationPlant from "./Component/PlantGenerator/Generation_Plant/Page.jsx";
 import PlantAvailabilityFactor from "./Component/PlantGenerator/Plant_Availibility_Factor/Page.jsx";
-import MassProcurementOutput from "@/Component/Procurement/Generate_BlockWise_Output/Generate_Procurement/Page.jsx";
-import Banking from "./Component/BankingData/Banking/Page.jsx";
-import Menu from "./Component/Menu/Menu";
-import ComingSoon from "@/Component/Utils/ComingSoon.jsx";
-import {ToastContainer} from "react-toastify";
-import ChatbotOverlay from "@/Component/Chatbot/Page.jsx";
-import PowerTheftDashboard from "./Component/Dashboards/PowerThefting/PowerTheftDashboard.jsx";
-import AddData from "./Component/Admin/addUsers/addUser.jsx";
 import BackdownPage from "./Component/PlantGenerator/Backdown_Table/Page.jsx";
-import Settings from "./Component/Settings/Settings.jsx";
+
+// Banking Components
+import Banking from "./Component/BankingData/Banking/Page.jsx";
+
+// Add Data Components
+import DemandDataAddPage from "@/Component/AddData/Demand_Data/Page.jsx"
 
 // ✅ Updated Private Route wrapper to accept Component (not element)
 function PrivateRoute({Component, isAuthenticated}) {
@@ -66,13 +76,6 @@ function App() {
                 {/* ✅ Private Routes with Component instead of element */}
 
                 {/* Menu Routes */}
-                <Route path="/dashboard"
-                       element={
-                           <PrivateRoute
-                               Component={ConsolidateDashboard}
-                               isAuthenticated={isAuthenticated}
-                           />
-                       }/>
                 <Route
                     path="/menu"
                     element={
@@ -82,6 +85,14 @@ function App() {
                         />
                     }
                 />
+                {/* Dashboards Routes */}
+                <Route path="/dashboard"
+                       element={
+                           <PrivateRoute
+                               Component={ConsolidateDashboard}
+                               isAuthenticated={isAuthenticated}
+                           />
+                       }/>
                 <Route
                     path="/demand-dashboard"
                     element={
@@ -109,6 +120,16 @@ function App() {
                         />
                     }
                 />
+                <Route
+                    path="/substation-feeder-dashboard"
+                    element={
+                        <PrivateRoute
+                            Component={FeederSubstationDashboard}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+
                 <Route
                     path="/plants"
                     element={
@@ -158,21 +179,13 @@ function App() {
                            />
                        }
                 />
-                <Route
-                    path="/power-theft"
-                    element={
-                        <PrivateRoute
-                            Component={PowerTheftDashboard}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
+                {/* Add Data */}
 
                 <Route
-                    path="/add-user"
+                    path="/demand/add"
                     element={
                         <PrivateRoute
-                            Component={AddData}
+                            Component={DemandDataAddPage}
                             isAuthenticated={isAuthenticated}
                         />
                     }
