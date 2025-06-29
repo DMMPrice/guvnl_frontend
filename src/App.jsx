@@ -25,6 +25,7 @@ import ConsolidateDashboard from "./Component/Dashboards/Consolidated Dashboard/
 import IEXDashboard from "./Component/Dashboards/IEX Dashboard/dashboard";
 import Procurement from "./Component/Dashboards/Plant Wise Procurement Dashboard/main";
 import FeederSubstationDashboard from "./Component/Dashboards/Substation Feeder Dashboard/Page.jsx";
+import FeederDtrDashboard from "./Component/Dashboards/Feeder DTR Dashboard/Page.jsx";
 
 // Procurement Components
 import MassProcurementOutput from "@/Component/Procurement/Generate_BlockWise_Output/Generate_Procurement/Page.jsx";
@@ -125,6 +126,15 @@ function App() {
                     element={
                         <PrivateRoute
                             Component={FeederSubstationDashboard}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+                <Route
+                    path="/feeder-dtr-dashboard"
+                    element={
+                        <PrivateRoute
+                            Component={FeederDtrDashboard}
                             isAuthenticated={isAuthenticated}
                         />
                     }

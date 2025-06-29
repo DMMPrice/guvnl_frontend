@@ -13,7 +13,7 @@ export default function FeederSubstationDashboard() {
     const [startDate, setStartDate] = useState("2023-04-01 00:00");
     const [endDate, setEndDate] = useState("2023-04-02 00:00");
     const [feederName, setFeederName] = useState("All");
-    const [substationId, setSubstationId] = useState("SUBSTATION 1");
+    const [substationId, setSubstationId] = useState("SUBSTATION_1");
 
     // 2) Applied filters
     const [applied, setApplied] = useState({

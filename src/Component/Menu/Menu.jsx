@@ -6,14 +6,14 @@ import {
 import {TbBrandCarbon, TbSolarElectricity} from "react-icons/tb";
 import {
     GiPowerLightning,
-    GiNuclearPlant,
+    GiNuclearPlant, GiSwordsPower,
 } from "react-icons/gi";
 import {PiNuclearPlantDuotone} from "react-icons/pi";
 import {
     MdArrowBack,
     MdKeyboardArrowRight,
     MdSpaceDashboard,
-    MdPerson, MdLock, MdLogout,
+    MdPerson, MdLock, MdLogout, MdElectricMeter,
 } from "react-icons/md";
 import {FaCartArrowDown, FaFileAlt} from "react-icons/fa";
 import {PiPiggyBankDuotone} from "react-icons/pi";
@@ -23,6 +23,7 @@ import {BsDatabaseAdd} from "react-icons/bs";
 import {MdGroups} from "react-icons/md";
 import {RiFontSize2, RiUserSettingsLine} from "react-icons/ri";
 import {FaGears} from "react-icons/fa6";
+import {SiBuzzfeed} from "react-icons/si";
 
 const menuItems = [
     {
@@ -53,24 +54,19 @@ const menuItems = [
                 allowedRoles: ["admin", "guest", "super-admin"],
             },
             {
-                title: "Power Theft Monitor",
-                path: "/power-theft",
-                icon: <GiPowerLightning className="h-6 w-6 text-red-600"/>,
-                allowedRoles: ["admin", "guest", "super-admin"],
-            }, {
-                title: "Feeder Substation Dashboard",
+                title: "Substation Feeder Dashboard",
                 path: "/substation-feeder-dashboard",
-                icon: <GiPowerLightning className="h-6 w-6 text-red-600"/>,
+                icon: <MdElectricMeter className="h-6 w-6 text-orange-600"/>,
                 allowedRoles: ["admin", "guest", "super-admin"],
             }, {
-                title: "Power Theft Monitor",
-                path: "/power-theft",
-                icon: <GiPowerLightning className="h-6 w-6 text-red-600"/>,
+                title: "Feeder DTR Dashboard",
+                path: "/feeder-dtr-dashboard",
+                icon: <GiSwordsPower className="h-6 w-6 text-cyan-800"/>,
                 allowedRoles: ["admin", "guest", "super-admin"],
             }, {
-                title: "Power Theft Monitor",
+                title: "DTR Consumer Dashboard",
                 path: "/power-theft",
-                icon: <GiPowerLightning className="h-6 w-6 text-red-600"/>,
+                icon: <GiPowerLightning className="h-6 w-6 text-yellow-600"/>,
                 allowedRoles: ["admin", "guest", "super-admin"],
             },
         ],

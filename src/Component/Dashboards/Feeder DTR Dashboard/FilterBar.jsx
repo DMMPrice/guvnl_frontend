@@ -1,25 +1,16 @@
-// src/Component/Dashboards/SubstationFeederDashboard/FilterBar.jsx
 import React from "react";
 import BasicDateTimePicker from "@/Component/Utils/DateTimeBlock.jsx";
 import CustomSelect from "@/Component/Utils/CustomSelect.jsx";
 
-export default function FilterBar({
-                                      startDate,
-                                      endDate,
-                                      feederName,
-                                      substationId,
-                                      feederList,
-                                      onStartDateChange,
-                                      onEndDateChange,
-                                      onFeederChange,
-                                      onSubstationChange,
-                                      onApply,
-                                      onClear,
-                                      onDownload,
-                                  }) {
+export default function FilterBarDTR({
+                                         startDate, endDate, feederName, dtrId,
+                                         feederList, dtrList,
+                                         onStartDateChange, onEndDateChange,
+                                         onFeederChange, onDtrChange,
+                                         onApply, onClear, onDownload
+                                     }) {
     return (
         <div className="flex flex-col gap-2 mb-6">
-            {/* Row 1: filters + apply/clear */}
             <div className="flex flex-wrap items-end gap-4">
                 <BasicDateTimePicker
                     label="Start Date"
@@ -33,20 +24,22 @@ export default function FilterBar({
                     onChange={onEndDateChange}
                     textFieldProps={{className: "w-56"}}
                 />
+
                 <CustomSelect
                     placeholder="Select Feeder"
-                    options={["All", ...feederList.map(f => f.feeder_name)]}
+                    options={feederList.map(f => f.feeder_name)}
                     value={feederName}
                     onChange={onFeederChange}
                     className="w-48"
                 />
                 <CustomSelect
-                    placeholder="Select Substation"
-                    options={[substationId]}
-                    value={substationId}
-                    onChange={onSubstationChange}
+                    placeholder="Select DTR"
+                    options={dtrList.map(d => d.dtr_id)}
+                    value={dtrId}
+                    onChange={onDtrChange}
                     className="w-48"
                 />
+
                 <div className="ml-auto flex gap-3">
                     <button
                         onClick={onApply}
@@ -63,7 +56,6 @@ export default function FilterBar({
                 </div>
             </div>
 
-            {/* Row 2: download */}
             <div className="flex justify-end">
                 <button
                     onClick={onDownload}
