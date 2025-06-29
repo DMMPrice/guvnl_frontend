@@ -42,6 +42,7 @@ import Banking from "./Component/BankingData/Banking/Page.jsx";
 
 // Add Data Components
 import DemandDataAddPage from "@/Component/AddData/Demand_Data/Page.jsx"
+import FeederDtrConsumerTable from "@/Component/AddData/addUsers/page.jsx"
 
 // ✅ Updated Private Route wrapper to accept Component (not element)
 function PrivateRoute({Component, isAuthenticated}) {
@@ -206,6 +207,14 @@ function App() {
                             isAuthenticated={isAuthenticated}
                         />
                     }
+                />
+                <Route path="/feeder-dtr-consumer-table"
+                       element={
+                           <PrivateRoute
+                               Component={FeederDtrConsumerTable}
+                               isAuthenticated={isAuthenticated}
+                           />
+                       }
                 />
 
                 {/* Settings */}

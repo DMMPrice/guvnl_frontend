@@ -160,8 +160,8 @@ const menuItems = [
                 icon: <FaFileAlt className="h-6 w-6 text-green-600"/>,
             },
             {
-                title: "Add Consumer Data",
-                path: "/add-consumer",
+                title: "Consumer Data",
+                path: "/feeder-dtr-consumer-table",
                 icon: <MdGroups className="h-6 w-6 text-yellow-600"/>,
             }
         ],
