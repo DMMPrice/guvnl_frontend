@@ -26,6 +26,7 @@ import IEXDashboard from "./Component/Dashboards/IEX Dashboard/dashboard";
 import Procurement from "./Component/Dashboards/Plant Wise Procurement Dashboard/main";
 import FeederSubstationDashboard from "./Component/Dashboards/Substation Feeder Dashboard/Page.jsx";
 import FeederDtrDashboard from "./Component/Dashboards/Feeder DTR Dashboard/Page.jsx";
+import DtrConsumerDashboard from "./Component/Dashboards/DTR Consumer Dashboard/Page.jsx";
 
 // Procurement Components
 import MassProcurementOutput from "@/Component/Procurement/Generate_BlockWise_Output/Generate_Procurement/Page.jsx";
@@ -138,6 +139,12 @@ function App() {
                             isAuthenticated={isAuthenticated}
                         />
                     }
+                />
+
+                <Route path="/dtr-consumer-dashboard"
+                       element={
+                           <PrivateRoute Component={DtrConsumerDashboard} isAuthenticated={isAuthenticated}/>
+                       }
                 />
 
                 <Route

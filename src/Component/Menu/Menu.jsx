@@ -65,7 +65,7 @@ const menuItems = [
                 allowedRoles: ["admin", "guest", "super-admin"],
             }, {
                 title: "DTR Consumer Dashboard",
-                path: "/power-theft",
+                path: "/dtr-consumer-dashboard",
                 icon: <GiPowerLightning className="h-6 w-6 text-yellow-600"/>,
                 allowedRoles: ["admin", "guest", "super-admin"],
             },
@@ -160,8 +160,8 @@ const menuItems = [
                 icon: <FaFileAlt className="h-6 w-6 text-green-600"/>,
             },
             {
-                title: "Add Users",
-                path: "/add-user",
+                title: "Add Consumer Data",
+                path: "/add-consumer",
                 icon: <MdGroups className="h-6 w-6 text-yellow-600"/>,
             }
         ],

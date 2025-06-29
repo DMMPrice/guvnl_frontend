@@ -116,7 +116,7 @@ export default function FeederDtrDashboard() {
     ];
 
     const series = [
-        {key: "Actual", label: "Actual", type: "line", color: "#1f77b4"},
+        {key: "Actual", label: "Actual", type: "area", color: "#1f77b4"},
         {key: "Theoretical", label: "Theoretical", type: "line", color: "#d62728"}
     ];
 
