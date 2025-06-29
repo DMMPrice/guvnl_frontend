@@ -41,8 +41,10 @@ import BackdownPage from "./Component/PlantGenerator/Backdown_Table/Page.jsx";
 import Banking from "./Component/BankingData/Banking/Page.jsx";
 
 // Add Data Components
-import DemandDataAddPage from "@/Component/AddData/Demand_Data/Page.jsx"
-import FeederDtrConsumerTable from "@/Component/AddData/addUsers/page.jsx"
+import DemandDataAddPage from "@/Component/AddData/Demand Data/Page.jsx"
+import FeederDtrConsumerTable from "@/Component/AddData/Consumer Data/page.jsx"
+import DtrDirectory from "@/Component/AddData/DTR Data/page.jsx";
+import FeederDirectory from "@/Component/AddData/Feeder Data/page.jsx";
 
 // ✅ Updated Private Route wrapper to accept Component (not element)
 function PrivateRoute({Component, isAuthenticated}) {
@@ -216,7 +218,22 @@ function App() {
                            />
                        }
                 />
-
+                <Route path="/feeder-dtr-table"
+                       element={
+                           <PrivateRoute
+                               Component={DtrDirectory}
+                               isAuthenticated={isAuthenticated}
+                           />
+                       }
+                />
+                <Route path="/feeder-directory"
+                       element={
+                           <PrivateRoute
+                               Component={FeederDirectory}
+                               isAuthenticated={isAuthenticated}
+                           />
+                       }
+                />
                 {/* Settings */}
                 <Route
                     path="/theme"
@@ -227,7 +244,8 @@ function App() {
                 <Route path="/dev" element={<ComingSoon/>}/>
                 <Route path="*" element={<Error404/>}/>
             </Routes>
-            {/* ToastContainer at app root */}
+            {/* ToastContainer at app root */
+            }
             <ToastContainer
                 position="top-right"
                 autoClose={3000}
@@ -236,10 +254,14 @@ function App() {
                 closeOnClick
                 pauseOnHover
             />
-            {/* Chatbot Overlay */}
-            {isAuthenticated && <ChatbotOverlay/>}
+            {/* Chatbot Overlay */
+            }
+            {
+                isAuthenticated && <ChatbotOverlay/>
+            }
         </Router>
-    );
+    )
+        ;
 }
 
 export default App;

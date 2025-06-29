@@ -23,7 +23,6 @@ import {BsDatabaseAdd} from "react-icons/bs";
 import {MdGroups} from "react-icons/md";
 import {RiFontSize2, RiUserSettingsLine} from "react-icons/ri";
 import {FaGears} from "react-icons/fa6";
-import {SiBuzzfeed} from "react-icons/si";
 
 const menuItems = [
     {
@@ -146,24 +145,27 @@ const menuItems = [
             },
             {
                 title: "IEX Data",
-                path: "/dev",
-                icon: <FaFileAlt className="h-6 w-6 text-green-600"/>,
+                path: "/iex/add",
+                icon: <TbSolarElectricity className="h-6 w-6 text-red-600"/>,
             },
             {
                 title: "Plant Data",
-                path: "/dev",
-                icon: <FaFileAlt className="h-6 w-6 text-green-600"/>,
-            },
-            {
-                title: "Open Access Data",
-                path: "/dev",
-                icon: <FaFileAlt className="h-6 w-6 text-green-600"/>,
+                path: "/plant/add",
+                icon: <PiNuclearPlantDuotone className="h-6 w-6 text-red-600"/>,
             },
             {
                 title: "Consumer Data",
                 path: "/feeder-dtr-consumer-table",
                 icon: <MdGroups className="h-6 w-6 text-yellow-600"/>,
-            }
+            }, {
+                title: "Feeder Data",
+                path: "/feeder-dtr-consumer-table",
+                icon: <MdGroups className="h-6 w-6 text-yellow-600"/>,
+            }, {
+                title: "DTR Data",
+                path: "/feeder-dtr-table",
+                icon: <MdGroups className="h-6 w-6 text-yellow-600"/>,
+            },
         ],
     },
     {
