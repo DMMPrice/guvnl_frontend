@@ -42,6 +42,7 @@ import Banking from "./Component/BankingData/Banking/Page.jsx";
 
 // Add Data Components
 import DemandDataAddPage from "@/Component/AddData/Demand Data/Page.jsx"
+import IexDataInputPanel from "@/Component/AddData/IEX Data/Page.jsx";
 import FeederDtrConsumerTable from "@/Component/AddData/Consumer Data/page.jsx"
 import DtrDirectory from "@/Component/AddData/DTR Data/page.jsx";
 import FeederDirectory from "@/Component/AddData/Feeder Data/page.jsx";
@@ -206,6 +207,15 @@ function App() {
                     element={
                         <PrivateRoute
                             Component={DemandDataAddPage}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+                <Route
+                    path="/iex/add"
+                    element={
+                        <PrivateRoute
+                            Component={IexDataInputPanel}
                             isAuthenticated={isAuthenticated}
                         />
                     }

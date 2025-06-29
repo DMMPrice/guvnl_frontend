@@ -154,16 +154,18 @@ const menuItems = [
                 icon: <PiNuclearPlantDuotone className="h-6 w-6 text-red-600"/>,
             },
             {
-                title: "Consumer Data",
-                path: "/feeder-dtr-consumer-table",
-                icon: <MdGroups className="h-6 w-6 text-yellow-600"/>,
-            }, {
                 title: "Feeder Data",
                 path: "/feeder-dtr-consumer-table",
-                icon: <MdGroups className="h-6 w-6 text-yellow-600"/>,
-            }, {
+                icon: <MdElectricMeter className="h-6 w-6 text-orange-600"/>,
+            },
+            {
                 title: "DTR Data",
                 path: "/feeder-dtr-table",
+                icon: <GiSwordsPower className="h-6 w-6 text-cyan-800"/>,
+            },
+            {
+                title: "Consumer Data",
+                path: "/feeder-dtr-consumer-table",
                 icon: <MdGroups className="h-6 w-6 text-yellow-600"/>,
             },
         ],
@@ -182,9 +184,8 @@ const menuItems = [
         icon: <RiUserSettingsLine className="h-10 w-10 text-red-500"/>,
         allowedRoles: ["super-admin", "admin", "guest"],
         submenu: [
-            {title: "Full Profile", path: "/profile", icon: <MdPerson className="h-6 w-6 text-red-500"/>},
-            {title: "Change Password", path: "/change-password", icon: <MdLock className="h-6 w-6 text-red-500"/>},
-            {title: "Logout", action: "logout", icon: <MdLogout className="h-6 w-8 text-black"/>},
+            {title: "Full Profile", path: "/dev", icon: <MdPerson className="h-6 w-6 text-red-500"/>},
+            {title: "Change Password", path: "/dev", icon: <MdLock className="h-6 w-6 text-red-500"/>},
         ],
     },
 ];
