@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import BasicDateTimePicker from '@/Component/Utils/DateTimeBlock.jsx';
 import StatusModal from '@/Component/Utils/ErrorModal.jsx';
 import CustomSelect from '@/Component/Utils/CustomSelect.jsx';   // ← NEW
-import {SAVE_URL} from '@/config.js';
+import {API_URL, SAVE_URL} from '@/config.js';
 
 // ───────────────────────────────────
 // Template for a fresh row
@@ -27,7 +27,7 @@ export default function PlantConsumptionInputPanel() {
     useEffect(() => {
         (async () => {
             try {
-                const res = await fetch('http://127.0.0.1:5000/plant/');
+                const res = await fetch(`${API_URL}plant/`);
                 const json = await res.json();
                 const list = json.must_run || [];
                 setMustRun(list);
