@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import DashboardFilters from "./DashboardFilters.jsx";
 import ProcurementTable from "./ProcurementTable.jsx";
 import CommonComposedChart from "@/Component/Utils/CommonComposedChart.jsx";
+import CSVResponseHandler from "@/Component/Utils/CSVResponseHandler.jsx";  // ← import the CSV handler
 import {API_URL} from "@/config.js";
 
 // 1️⃣ Generation series: stack areas + line
@@ -26,13 +27,14 @@ const costSeries = [
 
 export default function Dashboard() {
     // default range: May 1 → May 2
-    const defaultStart = dayjs("2023-05-01T00:00:00").format("YYYY-MM-DD HH:mm:ss");
-    const defaultEnd = dayjs("2023-05-02T00:00:00").format("YYYY-MM-DD HH:mm:ss");
+    const defaultStart = dayjs("2023-04-01T00:00:00").format("YYYY-MM-DD HH:mm:ss");
+    const defaultEnd = dayjs("2023-04-02T00:00:00").format("YYYY-MM-DD HH:mm:ss");
 
     const [startDate, setStartDate] = useState(defaultStart);
     const [endDate, setEndDate] = useState(defaultEnd);
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [csvResponses, setCsvResponses] = useState(null);  // ← state for CSV download
 
     // single API call
     const fetchData = async () => {
@@ -66,14 +68,12 @@ export default function Dashboard() {
             toast.error("No data to download – please Load first");
             return;
         }
-        // …omitted for brevity (your existing CSV logic)…
+        setCsvResponses(data.procurement);  // ← trigger CSV modal
     };
 
     return (
         <div className="p-6 space-y-6">
-            <h1 className="text-2xl font-bold">
-                Demand Generation Combined Dashboard
-            </h1>
+            <h1 className="text-2xl font-bold">Demand Generation Combined Dashboard</h1>
 
             <DashboardFilters
                 startDate={startDate}
@@ -117,6 +117,14 @@ export default function Dashboard() {
                         userRole={JSON.parse(localStorage.userData || "{}").role}
                     />
                 </>
+            )}
+
+            {/* ─── CSV Download Modal ─────────────────────────────────── */}
+            {csvResponses && (
+                <CSVResponseHandler
+                    responses={csvResponses}
+                    onClose={() => setCsvResponses(null)}
+                />
             )}
         </div>
     );

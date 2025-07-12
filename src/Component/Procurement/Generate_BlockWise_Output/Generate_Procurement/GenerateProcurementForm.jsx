@@ -8,7 +8,7 @@ import BasicDateTimePicker from "@/Component/Utils/DateTimeBlock.jsx";  // updat
 import InputField from "@/Component/Utils/InputField.jsx";
 import ProcurementActions from "./ProcurementActions.jsx";
 import ErrorModal from "@/Component/Utils/ErrorModal.jsx";
-import CSVResponseHandler from "./CSVResponseHandler.jsx";
+import CSVResponseHandler from "@/Component/Utils/CSVResponseHandler.jsx";
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import {Progress} from "@/components/ui/progress";
 import {API_URL, SAVE_URL} from "@/config.js";

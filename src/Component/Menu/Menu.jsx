@@ -154,6 +154,11 @@ const menuItems = [
                 icon: <PiNuclearPlantDuotone className="h-6 w-6 text-red-600"/>,
             },
             {
+                title: "Procurement Data",
+                path: "/dev",
+                icon: <FiShoppingCart className="h-6 w-6 text-red-600"/>,
+            },
+            {
                 title: "Feeder Data",
                 path: "/feeder-dtr-consumer-table",
                 icon: <MdElectricMeter className="h-6 w-6 text-orange-600"/>,
