@@ -6,22 +6,23 @@ import {
 import {TbBrandCarbon, TbSolarElectricity} from "react-icons/tb";
 import {
     GiPowerLightning,
-    GiNuclearPlant,
+    GiNuclearPlant, GiSwordsPower,
 } from "react-icons/gi";
 import {PiNuclearPlantDuotone} from "react-icons/pi";
 import {
     MdArrowBack,
     MdKeyboardArrowRight,
     MdSpaceDashboard,
-    MdAdminPanelSettings,
+    MdPerson, MdLock, MdLogout, MdElectricMeter,
 } from "react-icons/md";
-import {FaFileAlt} from "react-icons/fa";
+import {FaCartArrowDown, FaFileAlt} from "react-icons/fa";
 import {PiPiggyBankDuotone} from "react-icons/pi";
 import CommonConfirmModal from "@/Component/Utils/ConfirmModal";
-import {LuChartNoAxesCombined, LuPiggyBank} from "react-icons/lu";
+import {LuChartNoAxesCombined, LuPiggyBank, LuWallpaper} from "react-icons/lu";
 import {BsDatabaseAdd} from "react-icons/bs";
-import path from "path";
-import { MdGroups } from "react-icons/md";
+import {MdGroups} from "react-icons/md";
+import {RiFontSize2, RiUserSettingsLine} from "react-icons/ri";
+import {FaGears} from "react-icons/fa6";
 
 const menuItems = [
     {
@@ -40,15 +41,32 @@ const menuItems = [
                 icon: <TbSolarElectricity className="h-6 w-6 text-red-600"/>,
             },
             {
+                title: "Plant Wise Procurement Dashboard",
+                path: "/purchase",
+                icon: <FiShoppingCart className="h-6 w-6 text-blue-600"/>,
+                allowedRoles: ["super-admin", "admin", "guest"],
+            },
+            {
                 title: "Consolidated Dashboard",
                 path: "/dashboard",
                 icon: <LuChartNoAxesCombined className="h-6 w-6 text-indigo-600"/>,
+                allowedRoles: ["admin", "guest", "super-admin"],
             },
-             {
-                title: "Power Theft Monitor",
-                path: "/power-theft",
-                icon: <GiPowerLightning className="h-6 w-6 text-red-600"/>,
-                description: "Track and monitor power theft cases",
+            {
+                title: "Substation Feeder Dashboard",
+                path: "/substation-feeder-dashboard",
+                icon: <MdElectricMeter className="h-6 w-6 text-orange-600"/>,
+                allowedRoles: ["admin", "guest", "super-admin"],
+            }, {
+                title: "Feeder DTR Dashboard",
+                path: "/feeder-dtr-dashboard",
+                icon: <GiSwordsPower className="h-6 w-6 text-cyan-800"/>,
+                allowedRoles: ["admin", "guest", "super-admin"],
+            }, {
+                title: "DTR Consumer Dashboard",
+                path: "/dtr-consumer-dashboard",
+                icon: <GiPowerLightning className="h-6 w-6 text-yellow-600"/>,
+                allowedRoles: ["admin", "guest", "super-admin"],
             },
         ],
     },
@@ -70,19 +88,7 @@ const menuItems = [
         allowedRoles: ["admin", "guest", "super-admin"],
         submenu: [
             {
-                title: "BlockWise",
-                path: "/purchase",
-                icon: <FiShoppingCart className="h-6 w-6 text-green-600"/>,
-                allowedRoles: ["super-admin"],
-            },
-            {
-                title: "Block Wise Procurement",
-                path: "/block-purchase",
-                icon: <GiPowerLightning className="h-6 w-6 text-purple-600"/>,
-                allowedRoles: ["admin", "guest", "super-admin"],
-            },
-            {
-                title: "Generate BlockWise Output",
+                title: "Generate Plant-Wise Procurement Output",
                 path: "/mass-plant-output",
                 icon: <FiShoppingCart className="h-6 w-6 text-pink-600"/>,
             },
@@ -108,6 +114,11 @@ const menuItems = [
                 path: "/plant-availability-factor",
                 icon: <PiNuclearPlantDuotone className="h-6 w-6 text-blue-600"/>,
             },
+            {
+                title: "Plant Backdown Rates",
+                path: "/backdown-table",
+                icon: <FaCartArrowDown className="h-6 w-6 text-orange-600"/>,
+            }
         ],
     },
     {
@@ -129,36 +140,57 @@ const menuItems = [
         submenu: [
             {
                 title: "Demand Data",
-                path: "/dev",
+                path: "/demand/add",
                 icon: <GiPowerLightning className="h-6 w-6 text-orange-600"/>,
             },
             {
                 title: "IEX Data",
-                path: "/dev",
-                icon: <FaFileAlt className="h-6 w-6 text-green-600"/>,
+                path: "/iex/add",
+                icon: <TbSolarElectricity className="h-6 w-6 text-red-600"/>,
             },
             {
                 title: "Plant Data",
-                path: "/dev",
-                icon: <FaFileAlt className="h-6 w-6 text-green-600"/>,
+                path: "/plant/add",
+                icon: <PiNuclearPlantDuotone className="h-6 w-6 text-red-600"/>,
             },
             {
-                title: "Open Access Data",
-                path: "/dev",
-                icon: <FaFileAlt className="h-6 w-6 text-green-600"/>,
+                title: "Procurement Data",
+                path: "/procurement-viewer",
+                icon: <FiShoppingCart className="h-6 w-6 text-red-600"/>,
+            },
+            {
+                title: "Feeder Data",
+                path: "/feeder-dtr-consumer-table",
+                icon: <MdElectricMeter className="h-6 w-6 text-orange-600"/>,
+            },
+            {
+                title: "DTR Data",
+                path: "/feeder-dtr-table",
+                icon: <GiSwordsPower className="h-6 w-6 text-cyan-800"/>,
+            },
+            {
+                title: "Consumer Data",
+                path: "/feeder-dtr-consumer-table",
+                icon: <MdGroups className="h-6 w-6 text-yellow-600"/>,
             },
         ],
     },
     {
-        title: "Admin",
-        icon: <MdAdminPanelSettings className="h-10 w-10 text-yellow-600" />,
-        allowedRoles: ["admin", "super-admin"],
+        title: "Settings",
+        icon: <FaGears className="h-10 w-10 text-cyan-500"/>,
+        allowedRoles: ["super-admin", "admin", "guest"],
         submenu: [
-            {
-                title: "Add Users",
-                path: "/add-user",
-                icon: <MdGroups className="h-6 w-6 text-yellow-600" />,
-            }
+            {title: "Change Theme", path: "/theme", icon: <LuWallpaper className="h-6 w-6 text-cyan-600"/>},
+            {title: "Change Font", path: "/dev", icon: <RiFontSize2 className="h-6 w-6 text-indigo-800"/>},
+        ],
+    },
+    {
+        title: "Profile",
+        icon: <RiUserSettingsLine className="h-10 w-10 text-red-500"/>,
+        allowedRoles: ["super-admin", "admin", "guest"],
+        submenu: [
+            {title: "Full Profile", path: "/dev", icon: <MdPerson className="h-6 w-6 text-red-500"/>},
+            {title: "Change Password", path: "/dev", icon: <MdLock className="h-6 w-6 text-red-500"/>},
         ],
     },
 ];

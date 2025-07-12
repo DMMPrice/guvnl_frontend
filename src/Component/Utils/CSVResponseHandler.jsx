@@ -38,8 +38,11 @@ const CSVResponseHandler = ({ responses, onClose }) => {
                 "TimeStamp": resp.TimeStamp,
                 "Demand (Actual) [kWh]": resp["Demand(Actual)"],
                 "Demand (Predicted) [kWh]": resp["Demand(Pred)"],
+                "Backdown_Cost [Rs]": resp.Backdown_Cost,
+                "Backdown_Cost_Min [Rs]": resp.Backdown_Cost_Min,
+                "Backdown_Unit [kWh]": resp.Backdown_Unit,
                 "Banking Unit [kWh]": resp.Banking_Unit,
-                "Demand with Banking [kWh]": resp.Demand_Banked,
+                "Net Demand [kWh]": resp.Demand_Banked,
                 "Total Must Run Generation [kWh]": resp.Must_Run_Total_Gen,
                 "Total Cost Must Run Generation [Rs]": resp.Must_Run_Total_Cost,
                 "Details of Must Run Generation": must.map((p) => ({

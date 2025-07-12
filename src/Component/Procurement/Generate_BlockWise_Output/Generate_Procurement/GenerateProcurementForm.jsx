@@ -8,7 +8,7 @@ import BasicDateTimePicker from "@/Component/Utils/DateTimeBlock.jsx";  // updat
 import InputField from "@/Component/Utils/InputField.jsx";
 import ProcurementActions from "./ProcurementActions.jsx";
 import ErrorModal from "@/Component/Utils/ErrorModal.jsx";
-import CSVResponseHandler from "./CSVResponseHandler.jsx";
+import CSVResponseHandler from "@/Component/Utils/CSVResponseHandler.jsx";
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import {Progress} from "@/components/ui/progress";
 import {API_URL, SAVE_URL} from "@/config.js";
@@ -190,38 +190,33 @@ export default function ProcurementForm() {
     return (
         <>
             <form
-                className="mx-8 p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-md"
+                className="mx-6 p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-md"
                 onSubmit={handleSubmit}
             >
-                <div className="flex flex-col gap-4">
-                    <div className="flex gap-4 items-center">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4 w-full">
+                    <div className="w-full sm:w-1/4">
                         <InputField
-                            label="Enter IEX Price Cap"
+                            label="IEX Price Cap"
                             value={procurementName}
                             onChange={(e) => setProcurementName(e.target.value)}
                         />
+                    </div>
+                    <div className="w-full sm:w-2/4">
                         <BasicDateTimePicker
                             label="Start Date"
                             value={startDate}
                             onChange={setStartDate}
                         />
+                    </div>
+                    <div className="w-full sm:w-2/4">
                         <BasicDateTimePicker
                             label="End Date"
                             value={endDate}
                             onChange={setEndDate}
                         />
-                        <ProcurementActions onClear={handleClear}/>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            id="saveToDb"
-                            checked={saveToDatabase}
-                            onChange={(e) => setSaveToDatabase(e.target.checked)}
-                        />
-                        <label htmlFor="saveToDb" className="text-sm text-gray-700">
-                            Save data to database
-                        </label>
+                    <div className="w-full sm:w-auto flex justify-end">
+                        <ProcurementActions onClear={handleClear}/>
                     </div>
                 </div>
             </form>

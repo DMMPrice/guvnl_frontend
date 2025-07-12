@@ -11,28 +11,47 @@ import "./App.css";
 import NavBar from "./Component/NavBar/NavBar";
 import LandingPage from "./Component/LandingPage/LandingPage";
 import Error404 from "./Component/Utils/error";
+import {ToastContainer} from "react-toastify";
 
 // Protected pages/components
+import Menu from "./Component/Menu/Menu";
+import ComingSoon from "@/Component/Utils/ComingSoon.jsx";
+import ChatbotOverlay from "@/Component/Chatbot/Page.jsx";
+import Settings from "./Component/Settings/Settings.jsx";
+
+// Dashboards Components
 import DemandDashboard from "./Component/Dashboards/Demand Dashboard/Page.jsx";
 import ConsolidateDashboard from "./Component/Dashboards/Consolidated Dashboard/Page.jsx";
 import IEXDashboard from "./Component/Dashboards/IEX Dashboard/dashboard";
-import Procurement from "./Component/Procurement/BlockWise/main";
+import Procurement from "./Component/Dashboards/Plant Wise Procurement Dashboard/main";
+import FeederSubstationDashboard from "./Component/Dashboards/Substation Feeder Dashboard/Page.jsx";
+import FeederDtrDashboard from "./Component/Dashboards/Feeder DTR Dashboard/Page.jsx";
+import DtrConsumerDashboard from "./Component/Dashboards/DTR Consumer Dashboard/Page.jsx";
+
+// Procurement Components
+import MassProcurementOutput from "@/Component/Procurement/Generate_BlockWise_Output/Generate_Procurement/Page.jsx";
+
+// Plant Generator Components
 import Plants from "./Component/PlantGenerator/Plants_List/Page.jsx";
 import GenerationPlant from "./Component/PlantGenerator/Generation_Plant/Page.jsx";
 import PlantAvailabilityFactor from "./Component/PlantGenerator/Plant_Availibility_Factor/Page.jsx";
-import SingleDemand from "./Component/Demand/main";
-import MassProcurementOutput from "@/Component/Procurement/Mass_Procurement/Generate_Procurement/Page.jsx";
+import BackdownPage from "./Component/PlantGenerator/Backdown_Table/Page.jsx";
+
+// Banking Components
 import Banking from "./Component/BankingData/Banking/Page.jsx";
-import Menu from "./Component/Menu/Menu";
-import ComingSoon from "@/Component/Utils/ComingSoon.jsx";
-import {ToastContainer} from "react-toastify";
-import ChatbotOverlay from "@/Component/Chatbot/Page.jsx";
-import PowerTheftDashboard from "./Component/Dashboards/PowerThefting/PowerTheftDashboard.jsx";
-import AddData from "./Component/Admin/addUsers/addUser.jsx";
+
+// Add Data Components
+import DemandDataAddPage from "@/Component/AddData/Demand Data/Page.jsx"
+import IexDataInputPanel from "@/Component/AddData/IEX Data/Page.jsx";
+import FeederDtrConsumerTable from "@/Component/AddData/Consumer Data/page.jsx"
+import DtrDirectory from "@/Component/AddData/DTR Data/page.jsx";
+import FeederDirectory from "@/Component/AddData/Feeder Data/page.jsx";
+import PlantConsumptionInputPanel from "@/Component/AddData/Plant Data/Page.jsx";
+import ProcurementViewer from "@/Component/AddData/Procurement Data/Page.jsx";
 
 // ✅ Updated Private Route wrapper to accept Component (not element)
-function PrivateRoute({ Component, isAuthenticated }) {
-    return isAuthenticated ? <Component /> : <Navigate to="/signin" replace />;
+function PrivateRoute({Component, isAuthenticated}) {
+    return isAuthenticated ? <Component/> : <Navigate to="/signin" replace/>;
 }
 
 function App() {
@@ -65,13 +84,6 @@ function App() {
                 {/* ✅ Private Routes with Component instead of element */}
 
                 {/* Menu Routes */}
-                <Route path="/dashboard"
-                       element={
-                           <PrivateRoute
-                               Component={ConsolidateDashboard}
-                               isAuthenticated={isAuthenticated}
-                           />
-                       }/>
                 <Route
                     path="/menu"
                     element={
@@ -81,6 +93,14 @@ function App() {
                         />
                     }
                 />
+                {/* Dashboards Routes */}
+                <Route path="/dashboard"
+                       element={
+                           <PrivateRoute
+                               Component={ConsolidateDashboard}
+                               isAuthenticated={isAuthenticated}
+                           />
+                       }/>
                 <Route
                     path="/demand-dashboard"
                     element={
@@ -109,14 +129,30 @@ function App() {
                     }
                 />
                 <Route
-                    path="/block-purchase"
+                    path="/substation-feeder-dashboard"
                     element={
                         <PrivateRoute
-                            Component={SingleDemand}
+                            Component={FeederSubstationDashboard}
                             isAuthenticated={isAuthenticated}
                         />
                     }
                 />
+                <Route
+                    path="/feeder-dtr-dashboard"
+                    element={
+                        <PrivateRoute
+                            Component={FeederDtrDashboard}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+
+                <Route path="/dtr-consumer-dashboard"
+                       element={
+                           <PrivateRoute Component={DtrConsumerDashboard} isAuthenticated={isAuthenticated}/>
+                       }
+                />
+
                 <Route
                     path="/plants"
                     element={
@@ -142,15 +178,13 @@ function App() {
                                isAuthenticated={isAuthenticated}
                            />
                        }/>
-                <Route
-                    path="/demand"
-                    element={
-                        <PrivateRoute
-                            Component={SingleDemand}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
+                <Route path="/backdown-table"
+                       element={
+                           <PrivateRoute
+                               Component={BackdownPage}
+                               isAuthenticated={isAuthenticated}
+                           />
+                       }/>
                 <Route
                     path="/banking"
                     element={
@@ -168,31 +202,79 @@ function App() {
                            />
                        }
                 />
+                {/* Add Data */}
+
                 <Route
-                    path="/power-theft"
+                    path="/demand/add"
                     element={
                         <PrivateRoute
-                            Component={PowerTheftDashboard}
+                            Component={DemandDataAddPage}
                             isAuthenticated={isAuthenticated}
                         />
                     }
                 />
-
                 <Route
-                    path="/add-user"
+                    path="/iex/add"
                     element={
                         <PrivateRoute
-                            Component={ AddData }
+                            Component={IexDataInputPanel}
                             isAuthenticated={isAuthenticated}
                         />
                     }
+                />
+                <Route
+                    path="/plant/add"
+                    element={
+                        <PrivateRoute
+                            Component={PlantConsumptionInputPanel}
+                            isAuthenticated={isAuthenticated}
+                        />
+                    }
+                />
+                <Route path="/feeder-dtr-consumer-table"
+                       element={
+                           <PrivateRoute
+                               Component={FeederDtrConsumerTable}
+                               isAuthenticated={isAuthenticated}
+                           />
+                       }
+                />
+                <Route path="/feeder-dtr-table"
+                       element={
+                           <PrivateRoute
+                               Component={DtrDirectory}
+                               isAuthenticated={isAuthenticated}
+                           />
+                       }
+                />
+                <Route path="/feeder-directory"
+                       element={
+                           <PrivateRoute
+                               Component={FeederDirectory}
+                               isAuthenticated={isAuthenticated}
+                           />
+                       }
+                />
+                <Route path="/procurement-viewer"
+                       element={
+                           <PrivateRoute
+                               Component={ProcurementViewer}
+                               isAuthenticated={isAuthenticated}
+                           />
+                       }
+                />
+                {/* Settings */}
+                <Route
+                    path="/theme"
+                    element={<PrivateRoute element={<Settings/>} isAuthenticated={isAuthenticated}/>}
                 />
 
                 {/* Catch-all route */}
                 <Route path="/dev" element={<ComingSoon/>}/>
                 <Route path="*" element={<Error404/>}/>
             </Routes>
-            {/* ToastContainer at app root */}
+            {/* ToastContainer at app root */
+            }
             <ToastContainer
                 position="top-right"
                 autoClose={3000}
@@ -201,10 +283,14 @@ function App() {
                 closeOnClick
                 pauseOnHover
             />
-            {/* Chatbot Overlay */}
-            {isAuthenticated && <ChatbotOverlay/>}
+            {/* Chatbot Overlay */
+            }
+            {
+                isAuthenticated && <ChatbotOverlay/>
+            }
         </Router>
-    );
+    )
+        ;
 }
 
 export default App;
