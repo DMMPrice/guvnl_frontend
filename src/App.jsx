@@ -47,6 +47,7 @@ import FeederDtrConsumerTable from "@/Component/AddData/Consumer Data/page.jsx"
 import DtrDirectory from "@/Component/AddData/DTR Data/page.jsx";
 import FeederDirectory from "@/Component/AddData/Feeder Data/page.jsx";
 import PlantConsumptionInputPanel from "@/Component/AddData/Plant Data/Page.jsx";
+import ProcurementViewer from "@/Component/AddData/Procurement Data/Page.jsx";
 
 // ✅ Updated Private Route wrapper to accept Component (not element)
 function PrivateRoute({Component, isAuthenticated}) {
@@ -250,6 +251,14 @@ function App() {
                        element={
                            <PrivateRoute
                                Component={FeederDirectory}
+                               isAuthenticated={isAuthenticated}
+                           />
+                       }
+                />
+                <Route path="/procurement-viewer"
+                       element={
+                           <PrivateRoute
+                               Component={ProcurementViewer}
                                isAuthenticated={isAuthenticated}
                            />
                        }

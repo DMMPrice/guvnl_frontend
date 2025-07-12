@@ -155,7 +155,7 @@ const menuItems = [
             },
             {
                 title: "Procurement Data",
-                path: "/dev",
+                path: "/procurement-viewer",
                 icon: <FiShoppingCart className="h-6 w-6 text-red-600"/>,
             },
             {
