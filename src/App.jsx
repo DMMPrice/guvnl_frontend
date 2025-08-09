@@ -6,6 +6,7 @@ import {
     Navigate,
 } from "react-router-dom";
 import "./App.css";
+import {refreshAccessToken} from "@/lib/api";
 
 // Components
 import NavBar from "./Component/NavBar/NavBar";
@@ -49,19 +50,56 @@ import FeederDirectory from "@/Component/AddData/Feeder Data/page.jsx";
 import PlantConsumptionInputPanel from "@/Component/AddData/Plant Data/Page.jsx";
 import ProcurementViewer from "@/Component/AddData/Procurement Data/Page.jsx";
 
+// Profile Components
+import FullProfilePage from "@/Component/Profile/Full_Profile/Page.jsx";
+
+
 // ✅ Updated Private Route wrapper to accept Component (not element)
 function PrivateRoute({Component, isAuthenticated}) {
     return isAuthenticated ? <Component/> : <Navigate to="/signin" replace/>;
 }
 
 function App() {
+    // Persistent auth state
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
         const storedAuth = localStorage.getItem("isAuthenticated");
         return storedAuth ? JSON.parse(storedAuth) : false;
     });
 
+    // Save auth state to localStorage whenever it changes
     useEffect(() => {
         localStorage.setItem("isAuthenticated", JSON.stringify(isAuthenticated));
+    }, [isAuthenticated]);
+
+    // Auto-refresh token every 14 mins & also on tab focus
+    useEffect(() => {
+        if (!isAuthenticated) return;
+
+        // Interval refresh
+        const id = setInterval(() => {
+            refreshAccessToken().catch(() => {
+                console.warn("Token refresh failed — forcing logout.");
+                setIsAuthenticated(false);
+            });
+        }, 14 * 60 * 1000); // 14 min
+
+        // Refresh on tab focus/visibility change
+        const onFocus = () => {
+            refreshAccessToken().catch(() => {
+                console.warn("Token refresh failed — forcing logout.");
+                setIsAuthenticated(false);
+            });
+        };
+        window.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") onFocus();
+        });
+        window.addEventListener("focus", onFocus);
+
+        return () => {
+            clearInterval(id);
+            window.removeEventListener("focus", onFocus);
+            window.removeEventListener("visibilitychange", onFocus);
+        };
     }, [isAuthenticated]);
 
     return (
@@ -238,6 +276,7 @@ function App() {
                                isAuthenticated={isAuthenticated}
                            />
                        }
+
                 />
                 <Route path="/feeder-dtr-table"
                        element={
@@ -266,7 +305,13 @@ function App() {
                 {/* Settings */}
                 <Route
                     path="/theme"
-                    element={<PrivateRoute element={<Settings/>} isAuthenticated={isAuthenticated}/>}
+                    element={<PrivateRoute Component={Settings} isAuthenticated={isAuthenticated}/>}
+                />
+
+                {/* Profile */}
+
+                <Route path="/profile/full"
+                       element={<PrivateRoute Component={FullProfilePage} isAuthenticated={isAuthenticated}/>}
                 />
 
                 {/* Catch-all route */}

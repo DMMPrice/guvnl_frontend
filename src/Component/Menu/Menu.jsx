@@ -28,7 +28,7 @@ const menuItems = [
     {
         title: "Dashboards",
         icon: <MdSpaceDashboard className="h-10 w-10 text-cyan-800 rotate-90"/>,
-        allowedRoles: ["admin", "guest", "super-admin"],
+        allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
             {
                 title: "Demand Dashboard",
@@ -44,36 +44,36 @@ const menuItems = [
                 title: "Plant Wise Procurement Dashboard",
                 path: "/purchase",
                 icon: <FiShoppingCart className="h-6 w-6 text-blue-600"/>,
-                allowedRoles: ["super-admin", "admin", "guest"],
+                allowedRoles: ["SUPER-ADMIN", "ADMIN", "GUEST"],
             },
             {
                 title: "Consolidated Dashboard",
                 path: "/dashboard",
                 icon: <LuChartNoAxesCombined className="h-6 w-6 text-indigo-600"/>,
-                allowedRoles: ["admin", "guest", "super-admin"],
+                allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
             },
             {
                 title: "Substation Feeder Dashboard",
                 path: "/substation-feeder-dashboard",
                 icon: <MdElectricMeter className="h-6 w-6 text-orange-600"/>,
-                allowedRoles: ["admin", "guest", "super-admin"],
+                allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
             }, {
                 title: "Feeder DTR Dashboard",
                 path: "/feeder-dtr-dashboard",
                 icon: <GiSwordsPower className="h-6 w-6 text-cyan-800"/>,
-                allowedRoles: ["admin", "guest", "super-admin"],
+                allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
             }, {
                 title: "DTR Consumer Dashboard",
                 path: "/dtr-consumer-dashboard",
                 icon: <GiPowerLightning className="h-6 w-6 text-yellow-600"/>,
-                allowedRoles: ["admin", "guest", "super-admin"],
+                allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
             },
         ],
     },
     {
         title: "Carbon Footprints Section",
         icon: <MdSpaceDashboard className="h-10 w-10 text-orange-600 rotate-90"/>,
-        allowedRoles: ["admin", "guest", "super-admin"],
+        allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
             {
                 title: "Carbon Footprints Page",
@@ -85,7 +85,7 @@ const menuItems = [
     {
         title: "Procurement Section",
         icon: <FiShoppingCart className="h-10 w-10 text-green-600"/>,
-        allowedRoles: ["admin", "guest", "super-admin"],
+        allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
             {
                 title: "Generate Plant-Wise Procurement Output",
@@ -97,7 +97,7 @@ const menuItems = [
     {
         title: "Generator Plant Section",
         icon: <PiNuclearPlantDuotone className="h-10 w-10 text-red-600"/>,
-        allowedRoles: ["admin", "guest", "super-admin"],
+        allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
             {
                 title: "Generator Plant List",
@@ -124,7 +124,7 @@ const menuItems = [
     {
         title: "Banking Data",
         icon: <LuPiggyBank className="h-10 w-10 text-pink-600"/>,
-        allowedRoles: ["admin", "guest", "super-admin"],
+        allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
             {
                 title: "Banking Data",
@@ -136,7 +136,7 @@ const menuItems = [
     {
         title: "Add Data",
         icon: <BsDatabaseAdd className="h-10 w-10 text-blue-600"/>,
-        allowedRoles: ["super-admin"],
+        allowedRoles: ["SUPER-ADMIN"],
         submenu: [
             {
                 title: "Demand Data",
@@ -178,7 +178,7 @@ const menuItems = [
     {
         title: "Settings",
         icon: <FaGears className="h-10 w-10 text-cyan-500"/>,
-        allowedRoles: ["super-admin", "admin", "guest"],
+        allowedRoles: ["SUPER-ADMIN", "ADMIN", "GUEST"],
         submenu: [
             {title: "Change Theme", path: "/theme", icon: <LuWallpaper className="h-6 w-6 text-cyan-600"/>},
             {title: "Change Font", path: "/dev", icon: <RiFontSize2 className="h-6 w-6 text-indigo-800"/>},
@@ -187,9 +187,9 @@ const menuItems = [
     {
         title: "Profile",
         icon: <RiUserSettingsLine className="h-10 w-10 text-red-500"/>,
-        allowedRoles: ["super-admin", "admin", "guest"],
+        allowedRoles: ["SUPER-ADMIN", "ADMIN", "GUEST"],
         submenu: [
-            {title: "Full Profile", path: "/dev", icon: <MdPerson className="h-6 w-6 text-red-500"/>},
+            {title: "Full Profile", path: "/profile/full", icon: <MdPerson className="h-6 w-6 text-red-500"/>},
             {title: "Change Password", path: "/dev", icon: <MdLock className="h-6 w-6 text-red-500"/>},
         ],
     },
@@ -201,7 +201,8 @@ const Menu = () => {
     const menuRef = useRef(null);
     const navigate = useNavigate();
 
-    const role = localStorage.getItem("userType") || "guest";
+    const user = JSON.parse(localStorage.getItem("user")) || {};
+    const role = user.role || "GUEST";
 
     const filteredMenuItems = menuItems.filter(
         (item) => !item.allowedRoles || item.allowedRoles.includes(role)
