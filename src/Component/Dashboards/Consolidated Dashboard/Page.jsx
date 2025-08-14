@@ -27,8 +27,8 @@ const costSeries = [
 
 export default function Dashboard() {
     // default range: May 1 → May 2
-    const defaultStart = dayjs("2023-04-01T00:00:00").format("YYYY-MM-DD HH:mm:ss");
-    const defaultEnd = dayjs("2023-04-02T00:00:00").format("YYYY-MM-DD HH:mm:ss");
+    const defaultStart = dayjs("2021-04-01T00:00:00").format("YYYY-MM-DD HH:mm:ss");
+    const defaultEnd = dayjs("2021-04-02T00:00:00").format("YYYY-MM-DD HH:mm:ss");
 
     const [startDate, setStartDate] = useState(defaultStart);
     const [endDate, setEndDate] = useState(defaultEnd);
@@ -44,7 +44,7 @@ export default function Dashboard() {
         }
         setLoading(true);
         try {
-            const resp = await axios.get(`${API_URL}/dashboard`, {
+            const resp = await axios.get(`${API_URL}dashboard`, {
                 params: {start_date: startDate, end_date: endDate},
             });
             setData(resp.data);
