@@ -6,8 +6,8 @@ import PlantComparisonChart from "./PlantComparisonChart.jsx";
 
 export default function Procurement() {
     // defaults: March 1 → April 1, 2024 at midnight
-    const [startDateTime, setStartDateTime] = useState("2023-04-01 00:00:00");
-    const [endDateTime, setEndDateTime] = useState("2023-04-03 00:00:00");
+    const [startDateTime, setStartDateTime] = useState("2022-04-01 00:00:00");
+    const [endDateTime, setEndDateTime] = useState("2022-04-03 00:00:00");
 
     const [loading, setLoading] = useState(false);
     const [procurementRaw, setProcurementRaw] = useState([]);
