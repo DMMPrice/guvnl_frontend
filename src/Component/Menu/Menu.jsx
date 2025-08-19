@@ -13,7 +13,7 @@ import {
     MdArrowBack,
     MdKeyboardArrowRight,
     MdSpaceDashboard,
-    MdPerson, MdLock, MdLogout, MdElectricMeter,
+    MdPerson, MdLock, MdLogout, MdElectricMeter, MdOutlineElectricBolt,
 } from "react-icons/md";
 import {FaCartArrowDown, FaFileAlt} from "react-icons/fa";
 import {PiPiggyBankDuotone} from "react-icons/pi";
@@ -68,6 +68,18 @@ const menuItems = [
                 icon: <GiPowerLightning className="h-6 w-6 text-yellow-600"/>,
                 allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
             },
+            {
+                title: "Consumer Analytics Dashboard",
+                path: "/consumer-analytics-dashboard",
+                icon: <MdGroups className="h-6 w-6 text-purple-600"/>,
+                allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
+            },
+            {
+                title: "Power Theft Dashboard",
+                path: "/power-theft-dashboard",
+                icon: <MdOutlineElectricBolt className="h-6 w-6 text-red-600"/>,
+                allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
+            }
         ],
     },
     {
