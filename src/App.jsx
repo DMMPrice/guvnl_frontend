@@ -29,6 +29,7 @@ import FeederSubstationDashboard from "./Component/Dashboards/Substation Feeder 
 import FeederDtrDashboard from "./Component/Dashboards/Feeder DTR Dashboard/Page.jsx";
 import DtrConsumerDashboard from "./Component/Dashboards/DTR Consumer Dashboard/Page.jsx";
 import PowerTheftDashboard from "./Component/Dashboards/Power Theft Dashboard/Page.jsx"
+import ConsumerDashboard from "./Component/Dashboards/Consumer Analytics Dashboard/Page.jsx"
 
 // Procurement Components
 import MassProcurementOutput from "@/Component/Procurement/Generate_BlockWise_Output/Generate_Procurement/Page.jsx";
@@ -197,7 +198,11 @@ function App() {
                            <PrivateRoute Component={PowerTheftDashboard} isAuthenticated={isAuthenticated}/>
                        }
                 />
-
+                <Route path="/consumer-analytics-dashboard"
+                       element={
+                           <PrivateRoute Component={ConsumerDashboard} isAuthenticated={isAuthenticated}/>
+                       }
+                />
                 <Route
                     path="/plants"
                     element={
