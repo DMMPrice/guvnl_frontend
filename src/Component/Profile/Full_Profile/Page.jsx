@@ -7,7 +7,7 @@ import {API_URL} from "@/config.js";
 
 /* cookie utils */
 const getCookie = (name) => {
-    const row = document.cookie.split("; ").find(r => r.startsWith(encodeURIComponent(name) + "="));
+    const row = document.cookie.split("; ").find((r) => r.startsWith(encodeURIComponent(name) + "="));
     return row ? decodeURIComponent(row.split("=")[1]) : null;
 };
 const setCookie = (name, value, {maxAge, path = "/", secure, sameSite = "Lax"} = {}) => {
@@ -28,6 +28,28 @@ const getJwtExpirySecondsFromNow = (jwt) => {
         return null;
     }
 };
+/* helpers for tokens */
+const getAccessTokenRaw = () => {
+    // access token is stored as raw JWT in cookie (preferred) or localStorage fallback
+    const cookieJwt = getCookie("access_token");
+    const ls = localStorage.getItem("access_token");
+    const val = cookieJwt || ls || null;
+    if (!val) return null;
+    // strip an accidental "Bearer " prefix if stored that way
+    return val.toLowerCase().startsWith("bearer ") ? val.slice(7) : val;
+};
+const bearer = (jwt) => `Bearer ${jwt}`;
+
+/* SAVE access token consistently to cookie with proper lifetime */
+const saveAccessToken = (accessJwt) => {
+    const maxAge = getJwtExpirySecondsFromNow(accessJwt) ?? 60 * 15; // fallback 15m
+    setCookie("access_token", accessJwt, {
+        maxAge,
+        secure: window.location.protocol === "https:",
+        sameSite: "Lax",
+        path: "/",
+    });
+};
 
 export default function FullProfile() {
     const [data, setData] = useState(null);
@@ -36,37 +58,96 @@ export default function FullProfile() {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const navigate = useNavigate();
 
-    const token = getCookie("access_token") || localStorage.getItem("access_token");
     const base = API_URL.endsWith("/") ? API_URL : API_URL + "/";
 
-    const fetchProfile = useCallback(async () => {
-        if (!token) {
-            navigate("/signin", {replace: true});
-            return;
+    // --- NEW: refresh-on-demand before showing the profile ---
+    const ensureFreshAccessToken = useCallback(async () => {
+        const current = getAccessTokenRaw();
+        const almostExpiredSec = 10; // refresh if <=10s remaining
+        const needsRefresh =
+            !current || (getJwtExpirySecondsFromNow(current) ?? 0) <= almostExpiredSec;
+
+        if (!needsRefresh) return current;
+
+        const refresh_token = localStorage.getItem("refresh_token");
+        if (!refresh_token) return null;
+
+        try {
+            setIsRefreshing(true);
+            const res = await fetch(base + "auth/refresh", {
+                method: "POST",
+                headers: {"Content-Type": "application/json", Accept: "application/json"},
+                body: JSON.stringify({refresh_token}),
+            });
+            if (!res.ok) {
+                // do not throw text parsing error if body empty
+                const txt = await res.text().catch(() => "");
+                throw new Error(txt || `Refresh failed (${res.status})`);
+            }
+            const json = await res.json(); // expect { access_token, refresh_token? }
+            if (json.access_token) {
+                saveAccessToken(json.access_token);
+            }
+            if (json.refresh_token) {
+                localStorage.setItem("refresh_token", json.refresh_token);
+            }
+            return json.access_token || getAccessTokenRaw();
+        } catch (e) {
+            // refresh failed
+            console.error("Token refresh failed:", e);
+            return null;
+        } finally {
+            setIsRefreshing(false);
         }
+    }, [base]);
+
+    const fetchProfile = useCallback(async () => {
         setStatus("loading");
         setError("");
 
-        const url = base + "auth/me";
-        const authHeader = token.toLowerCase().startsWith("bearer ") ? token : `Bearer ${token}`;
+        // 1) ensure we have a fresh token right now (user is trying to view)
+        let jwt = await ensureFreshAccessToken();
+        if (!jwt) {
+            setStatus("error");
+            setError("Session expired. Please sign in again.");
+            setTimeout(() => navigate("/signin", {replace: true}), 900);
+            return;
+        }
 
-        try {
+        const url = base + "auth/me";
+
+        // request function for reuse
+        const doFetch = async (tokenJwt) => {
             const res = await fetch(url, {
                 method: "GET",
                 headers: {
-                    "Authorization": authHeader,
-                    "Accept": "application/json",
+                    Authorization: bearer(tokenJwt),
+                    Accept: "application/json",
                 },
             });
+            return res;
+        };
 
-            if (!res.ok) {
-                const txt = await res.text().catch(() => "");
-                if (res.status === 401) {
+        try {
+            // 2) first try
+            let res = await doFetch(jwt);
+
+            // 3) if 401, try refresh once more then retry
+            if (res.status === 401) {
+                const retryJwt = await ensureFreshAccessToken();
+                if (!retryJwt) {
                     setStatus("error");
+                    const txt = await res.text().catch(() => "");
                     setError(txt || "Session expired. Please sign in again.");
                     setTimeout(() => navigate("/signin", {replace: true}), 900);
                     return;
                 }
+                jwt = retryJwt;
+                res = await doFetch(jwt);
+            }
+
+            if (!res.ok) {
+                const txt = await res.text().catch(() => "");
                 throw new Error(txt || `Request failed with ${res.status}`);
             }
 
@@ -77,9 +158,9 @@ export default function FullProfile() {
             setError(e?.message || "Failed to fetch profile.");
             setStatus("error");
         }
-    }, [token, navigate, base]);
+    }, [base, ensureFreshAccessToken, navigate]);
 
-    // 🔄 Manual refresh token then refetch profile
+    // Manual refresh button (kept)
     const handleManualRefresh = useCallback(async () => {
         setIsRefreshing(true);
         setError("");
@@ -89,7 +170,7 @@ export default function FullProfile() {
 
             const res = await fetch(base + "auth/refresh", {
                 method: "POST",
-                headers: {"Content-Type": "application/json", "Accept": "application/json"},
+                headers: {"Content-Type": "application/json", Accept: "application/json"},
                 body: JSON.stringify({refresh_token}),
             });
 
@@ -98,23 +179,11 @@ export default function FullProfile() {
                 throw new Error(txt || `Refresh failed (${res.status})`);
             }
 
-            const json = await res.json(); // expect { access_token, refresh_token? }
-            if (json.access_token) {
-                // set new access token cookie with exp or 15m fallback
-                const maxAge = getJwtExpirySecondsFromNow(json.access_token) ?? 60 * 15;
-                setCookie("access_token", json.access_token, {
-                    maxAge,
-                    secure: window.location.protocol === "https:",
-                    sameSite: "Lax",
-                    path: "/",
-                });
-            }
-            if (json.refresh_token) {
-                localStorage.setItem("refresh_token", json.refresh_token);
-            }
+            const json = await res.json(); // { access_token, refresh_token? }
+            if (json.access_token) saveAccessToken(json.access_token);
+            if (json.refresh_token) localStorage.setItem("refresh_token", json.refresh_token);
 
-            // now refetch profile
-            await fetchProfile();
+            await fetchProfile(); // show data immediately after refreshing
         } catch (e) {
             setStatus("error");
             setError(e?.message || "Token refresh failed. Please sign in again.");
@@ -124,7 +193,7 @@ export default function FullProfile() {
     }, [base, fetchProfile]);
 
     useEffect(() => {
-        fetchProfile();
+        fetchProfile(); // user opened/visited → fetch with on-demand refresh
     }, [fetchProfile]);
 
     return (

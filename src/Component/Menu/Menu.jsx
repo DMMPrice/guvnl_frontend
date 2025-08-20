@@ -13,7 +13,7 @@ import {
     MdArrowBack,
     MdKeyboardArrowRight,
     MdSpaceDashboard,
-    MdPerson, MdLock, MdLogout, MdElectricMeter, MdOutlineElectricBolt,
+    MdPerson, MdLock, MdLogout, MdElectricMeter, MdOutlineElectricBolt, MdPowerOff,
 } from "react-icons/md";
 import {FaCartArrowDown, FaFileAlt} from "react-icons/fa";
 import {PiPiggyBankDuotone} from "react-icons/pi";
@@ -23,10 +23,13 @@ import {BsDatabaseAdd} from "react-icons/bs";
 import {MdGroups} from "react-icons/md";
 import {RiFontSize2, RiUserSettingsLine} from "react-icons/ri";
 import {FaGears} from "react-icons/fa6";
+import {ArchiveRestore} from 'lucide-react';
+import {BatteryFull} from 'lucide-react';
+import {BiTransfer} from "react-icons/bi";
 
 const menuItems = [
     {
-        title: "Dashboards",
+        title: "Demand & IEX Module",
         icon: <MdSpaceDashboard className="h-10 w-10 text-cyan-800 rotate-90"/>,
         allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
@@ -41,17 +44,18 @@ const menuItems = [
                 icon: <TbSolarElectricity className="h-6 w-6 text-red-600"/>,
             },
             {
-                title: "Plant Wise Procurement Dashboard",
-                path: "/purchase",
-                icon: <FiShoppingCart className="h-6 w-6 text-blue-600"/>,
-                allowedRoles: ["SUPER-ADMIN", "ADMIN", "GUEST"],
-            },
-            {
-                title: "Consolidated Dashboard",
+                title: "Demand Generation Dashboard",
                 path: "/dashboard",
                 icon: <LuChartNoAxesCombined className="h-6 w-6 text-indigo-600"/>,
                 allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
             },
+        ],
+    },
+    {
+        title: "Power Distribution Module",
+        icon: <BiTransfer className="h-10 w-10 text-orange-600 rotate-90"/>,
+        allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
+        submenu: [
             {
                 title: "Substation Feeder Dashboard",
                 path: "/substation-feeder-dashboard",
@@ -68,22 +72,10 @@ const menuItems = [
                 icon: <GiPowerLightning className="h-6 w-6 text-yellow-600"/>,
                 allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
             },
-            {
-                title: "Consumer Analytics Dashboard",
-                path: "/consumer-analytics-dashboard",
-                icon: <MdGroups className="h-6 w-6 text-purple-600"/>,
-                allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
-            },
-            {
-                title: "Power Theft Dashboard",
-                path: "/power-theft-dashboard",
-                icon: <MdOutlineElectricBolt className="h-6 w-6 text-red-600"/>,
-                allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
-            }
         ],
     },
     {
-        title: "Carbon Footprints Section",
+        title: "Carbon Footprints Module",
         icon: <MdSpaceDashboard className="h-10 w-10 text-orange-600 rotate-90"/>,
         allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
@@ -95,10 +87,11 @@ const menuItems = [
         ],
     },
     {
-        title: "Procurement Section",
+        title: "Procurement Module",
         icon: <FiShoppingCart className="h-10 w-10 text-green-600"/>,
         allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
+
             {
                 title: "Generate Plant-Wise Procurement Output",
                 path: "/mass-plant-output",
@@ -107,10 +100,16 @@ const menuItems = [
         ],
     },
     {
-        title: "Generator Plant Section",
+        title: "Power Plant Module",
         icon: <PiNuclearPlantDuotone className="h-10 w-10 text-red-600"/>,
         allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
+            {
+                title: "Plant Wise Procurement Dashboard",
+                path: "/purchase",
+                icon: <PiNuclearPlantDuotone className="h-6 w-6 text-blue-600"/>,
+                allowedRoles: ["SUPER-ADMIN", "ADMIN", "GUEST"],
+            },
             {
                 title: "Generator Plant List",
                 path: "/plants",
@@ -134,19 +133,45 @@ const menuItems = [
         ],
     },
     {
-        title: "Banking Data",
-        icon: <LuPiggyBank className="h-10 w-10 text-pink-600"/>,
+        title: "Theft Module",
+        icon: <MdPowerOff className="h-10 w-10 text-pink-600"/>,
         allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
             {
-                title: "Banking Data",
-                path: "/banking",
-                icon: <PiPiggyBankDuotone className="h-6 w-6 text-pink-600"/>,
+                title: "Power Theft Dashboard",
+                path: "/power-theft-dashboard",
+                icon: <MdOutlineElectricBolt className="h-6 w-6 text-red-600"/>,
+                allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
             },
         ],
     },
     {
-        title: "Add Data",
+        title: "Consumer Module",
+        icon: <MdGroups className="h-10 w-10 text-pink-600"/>,
+        allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
+        submenu: [
+            {
+                title: "Consumer Analytics Dashboard",
+                path: "/consumer-analytics-dashboard",
+                icon: <MdGroups className="h-6 w-6 text-purple-600"/>,
+                allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
+            },
+        ],
+    },
+    {
+        title: "Banking Module",
+        icon: <ArchiveRestore className="h-10 w-10 text-pink-600"/>,
+        allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
+        submenu: [
+            {
+                title: "Generate Banking Data",
+                path: "/banking",
+                icon: <BatteryFull className="h-6 w-6 text-pink-600"/>,
+            },
+        ],
+    },
+    {
+        title: "Data Upload Section",
         icon: <BsDatabaseAdd className="h-10 w-10 text-blue-600"/>,
         allowedRoles: ["SUPER-ADMIN"],
         submenu: [
@@ -259,13 +284,13 @@ const Menu = () => {
                         </button>
                     )}
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 relative">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 relative max-h-vh">
                         {activeMenu === null
                             ? filteredMenuItems.map((item, index) => (
                                 <div key={index} className="relative w-full">
                                     <div
                                         onClick={() => handleMenuClick(index)}
-                                        className="flex flex-col items-center bg-white p-6 border border-gray-200 rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-105 cursor-pointer"
+                                        className="flex flex-col items-center bg-white p-6 border border-gray-200 rounded-2xl shadow-xl hover:shadow-2xl transition-transform hover:scale-105 cursor-pointer"
                                     >
                                         {item.icon}
                                         <p className="mt-2 text-lg font-semibold text-gray-800 text-center flex items-center">
@@ -284,7 +309,7 @@ const Menu = () => {
                                     <div key={subIndex} className="relative w-full">
                                         <Link to={subItem.path} className="block w-full">
                                             <div
-                                                className="flex flex-col items-center bg-white p-6 border border-gray-200 rounded-xl shadow-md hover:shadow-lg transition-transform hover:scale-105">
+                                                className="flex flex-col items-center bg-white p-6 border border-gray-200 rounded-2xl shadow-xl hover:shadow-2xl transition-transform hover:scale-105 cursor-pointer">
                                                 {subItem.icon}
                                                 <p className="mt-2 text-md font-medium text-gray-700 text-center">
                                                     {subItem.title}

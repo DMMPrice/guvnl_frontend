@@ -38,7 +38,7 @@ export default function Page() {
 
                 const [rawRes, statsRes] = await Promise.all([
                     // Use new endpoint
-                    fetch(`${API_URL}demand/data?start_date=${encodeURIComponent(defaultStart)}&end_date=${encodeURIComponent(defaultEnd)}`),
+                    fetch(`${API_URL}demand/range?start_date=${encodeURIComponent(defaultStart)}&end_date=${encodeURIComponent(defaultEnd)}`),
                     fetch(`${API_URL}demand/dashboard`),
                 ]);
 
@@ -120,7 +120,7 @@ export default function Page() {
             const formattedEnd = dayjs(endDate).format("YYYY-MM-DD HH:mm:ss");
             
             const res = await fetch(
-                `${API_URL}demand/data?start_date=${encodeURIComponent(formattedStart)}&end_date=${encodeURIComponent(formattedEnd)}`
+                `${API_URL}demand/range?start_date=${encodeURIComponent(formattedStart)}&end_date=${encodeURIComponent(formattedEnd)}`
             );
             
             if (!res.ok) throw new Error("Failed to fetch filtered data.");

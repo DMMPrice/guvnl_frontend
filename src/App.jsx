@@ -107,229 +107,230 @@ function App() {
     return (
         <Router>
             {isAuthenticated && <NavBar setIsAuthenticated={setIsAuthenticated}/>}
+            <div className="app-content">
+                <Routes>
+                    {/* Public Routes */}
+                    <Route
+                        path="/"
+                        element={isAuthenticated ? <Navigate to="/menu" replace/> :
+                            <LandingPage setIsAuthenticated={setIsAuthenticated}/>}
+                    />
+                    <Route
+                        path="/signin"
+                        element={isAuthenticated ? <Navigate to="/menu" replace/> :
+                            <LandingPage setIsAuthenticated={setIsAuthenticated}/>}
+                    />
 
-            <Routes>
-                {/* Public Routes */}
-                <Route
-                    path="/"
-                    element={isAuthenticated ? <Navigate to="/menu" replace/> :
-                        <LandingPage setIsAuthenticated={setIsAuthenticated}/>}
-                />
-                <Route
-                    path="/signin"
-                    element={isAuthenticated ? <Navigate to="/menu" replace/> :
-                        <LandingPage setIsAuthenticated={setIsAuthenticated}/>}
-                />
+                    {/* ✅ Private Routes with Component instead of element */}
 
-                {/* ✅ Private Routes with Component instead of element */}
+                    {/* Menu Routes */}
+                    <Route
+                        path="/menu"
+                        element={
+                            <PrivateRoute
+                                Component={Menu}
+                                isAuthenticated={isAuthenticated}
+                            />
+                        }
+                    />
+                    {/* Dashboards Routes */}
+                    <Route path="/dashboard"
+                           element={
+                               <PrivateRoute
+                                   Component={ConsolidateDashboard}
+                                   isAuthenticated={isAuthenticated}
+                               />
+                           }/>
+                    <Route
+                        path="/demand-dashboard"
+                        element={
+                            <PrivateRoute
+                                Component={DemandDashboard}
+                                isAuthenticated={isAuthenticated}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/iex-dashboard"
+                        element={
+                            <PrivateRoute
+                                Component={IEXDashboard}
+                                isAuthenticated={isAuthenticated}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/purchase"
+                        element={
+                            <PrivateRoute
+                                Component={Procurement}
+                                isAuthenticated={isAuthenticated}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/substation-feeder-dashboard"
+                        element={
+                            <PrivateRoute
+                                Component={FeederSubstationDashboard}
+                                isAuthenticated={isAuthenticated}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/feeder-dtr-dashboard"
+                        element={
+                            <PrivateRoute
+                                Component={FeederDtrDashboard}
+                                isAuthenticated={isAuthenticated}
+                            />
+                        }
+                    />
 
-                {/* Menu Routes */}
-                <Route
-                    path="/menu"
-                    element={
-                        <PrivateRoute
-                            Component={Menu}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
-                {/* Dashboards Routes */}
-                <Route path="/dashboard"
-                       element={
-                           <PrivateRoute
-                               Component={ConsolidateDashboard}
-                               isAuthenticated={isAuthenticated}
-                           />
-                       }/>
-                <Route
-                    path="/demand-dashboard"
-                    element={
-                        <PrivateRoute
-                            Component={DemandDashboard}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
-                <Route
-                    path="/iex-dashboard"
-                    element={
-                        <PrivateRoute
-                            Component={IEXDashboard}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
-                <Route
-                    path="/purchase"
-                    element={
-                        <PrivateRoute
-                            Component={Procurement}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
-                <Route
-                    path="/substation-feeder-dashboard"
-                    element={
-                        <PrivateRoute
-                            Component={FeederSubstationDashboard}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
-                <Route
-                    path="/feeder-dtr-dashboard"
-                    element={
-                        <PrivateRoute
-                            Component={FeederDtrDashboard}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
+                    <Route path="/dtr-consumer-dashboard"
+                           element={
+                               <PrivateRoute Component={DtrConsumerDashboard} isAuthenticated={isAuthenticated}/>
+                           }
+                    />
 
-                <Route path="/dtr-consumer-dashboard"
-                       element={
-                           <PrivateRoute Component={DtrConsumerDashboard} isAuthenticated={isAuthenticated}/>
-                       }
-                />
+                    <Route path="/power-theft-dashboard"
+                           element={
+                               <PrivateRoute Component={PowerTheftDashboard} isAuthenticated={isAuthenticated}/>
+                           }
+                    />
+                    <Route path="/consumer-analytics-dashboard"
+                           element={
+                               <PrivateRoute Component={ConsumerDashboard} isAuthenticated={isAuthenticated}/>
+                           }
+                    />
+                    <Route
+                        path="/plants"
+                        element={
+                            <PrivateRoute
+                                Component={Plants}
+                                isAuthenticated={isAuthenticated}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/generation-plants"
+                        element={
+                            <PrivateRoute
+                                Component={GenerationPlant}
+                                isAuthenticated={isAuthenticated}
+                            />
+                        }
+                    />
+                    <Route path="/plant-availability-factor"
+                           element={
+                               <PrivateRoute
+                                   Component={PlantAvailabilityFactor}
+                                   isAuthenticated={isAuthenticated}
+                               />
+                           }/>
+                    <Route path="/backdown-table"
+                           element={
+                               <PrivateRoute
+                                   Component={BackdownPage}
+                                   isAuthenticated={isAuthenticated}
+                               />
+                           }/>
+                    <Route
+                        path="/banking"
+                        element={
+                            <PrivateRoute
+                                Component={Banking}
+                                isAuthenticated={isAuthenticated}
+                            />
+                        }
+                    />
+                    <Route path="/mass-plant-output"
+                           element={
+                               <PrivateRoute
+                                   Component={MassProcurementOutput}
+                                   isAuthenticated={isAuthenticated}
+                               />
+                           }
+                    />
+                    {/* Add Data */}
 
-                <Route path="/power-theft-dashboard"
-                       element={
-                           <PrivateRoute Component={PowerTheftDashboard} isAuthenticated={isAuthenticated}/>
-                       }
-                />
-                <Route path="/consumer-analytics-dashboard"
-                       element={
-                           <PrivateRoute Component={ConsumerDashboard} isAuthenticated={isAuthenticated}/>
-                       }
-                />
-                <Route
-                    path="/plants"
-                    element={
-                        <PrivateRoute
-                            Component={Plants}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
-                <Route
-                    path="/generation-plants"
-                    element={
-                        <PrivateRoute
-                            Component={GenerationPlant}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
-                <Route path="/plant-availability-factor"
-                       element={
-                           <PrivateRoute
-                               Component={PlantAvailabilityFactor}
-                               isAuthenticated={isAuthenticated}
-                           />
-                       }/>
-                <Route path="/backdown-table"
-                       element={
-                           <PrivateRoute
-                               Component={BackdownPage}
-                               isAuthenticated={isAuthenticated}
-                           />
-                       }/>
-                <Route
-                    path="/banking"
-                    element={
-                        <PrivateRoute
-                            Component={Banking}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
-                <Route path="/mass-plant-output"
-                       element={
-                           <PrivateRoute
-                               Component={MassProcurementOutput}
-                               isAuthenticated={isAuthenticated}
-                           />
-                       }
-                />
-                {/* Add Data */}
+                    <Route
+                        path="/demand/add"
+                        element={
+                            <PrivateRoute
+                                Component={DemandDataAddPage}
+                                isAuthenticated={isAuthenticated}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/iex/add"
+                        element={
+                            <PrivateRoute
+                                Component={IexDataInputPanel}
+                                isAuthenticated={isAuthenticated}
+                            />
+                        }
+                    />
+                    <Route
+                        path="/plant/add"
+                        element={
+                            <PrivateRoute
+                                Component={PlantConsumptionInputPanel}
+                                isAuthenticated={isAuthenticated}
+                            />
+                        }
+                    />
+                    <Route path="/feeder-dtr-consumer-table"
+                           element={
+                               <PrivateRoute
+                                   Component={FeederDtrConsumerTable}
+                                   isAuthenticated={isAuthenticated}
+                               />
+                           }
 
-                <Route
-                    path="/demand/add"
-                    element={
-                        <PrivateRoute
-                            Component={DemandDataAddPage}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
-                <Route
-                    path="/iex/add"
-                    element={
-                        <PrivateRoute
-                            Component={IexDataInputPanel}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
-                <Route
-                    path="/plant/add"
-                    element={
-                        <PrivateRoute
-                            Component={PlantConsumptionInputPanel}
-                            isAuthenticated={isAuthenticated}
-                        />
-                    }
-                />
-                <Route path="/feeder-dtr-consumer-table"
-                       element={
-                           <PrivateRoute
-                               Component={FeederDtrConsumerTable}
-                               isAuthenticated={isAuthenticated}
-                           />
-                       }
+                    />
+                    <Route path="/feeder-dtr-table"
+                           element={
+                               <PrivateRoute
+                                   Component={DtrDirectory}
+                                   isAuthenticated={isAuthenticated}
+                               />
+                           }
+                    />
+                    <Route path="/feeder-directory"
+                           element={
+                               <PrivateRoute
+                                   Component={FeederDirectory}
+                                   isAuthenticated={isAuthenticated}
+                               />
+                           }
+                    />
+                    <Route path="/procurement-viewer"
+                           element={
+                               <PrivateRoute
+                                   Component={ProcurementViewer}
+                                   isAuthenticated={isAuthenticated}
+                               />
+                           }
+                    />
+                    {/* Settings */}
+                    <Route
+                        path="/theme"
+                        element={<PrivateRoute Component={Settings} isAuthenticated={isAuthenticated}/>}
+                    />
 
-                />
-                <Route path="/feeder-dtr-table"
-                       element={
-                           <PrivateRoute
-                               Component={DtrDirectory}
-                               isAuthenticated={isAuthenticated}
-                           />
-                       }
-                />
-                <Route path="/feeder-directory"
-                       element={
-                           <PrivateRoute
-                               Component={FeederDirectory}
-                               isAuthenticated={isAuthenticated}
-                           />
-                       }
-                />
-                <Route path="/procurement-viewer"
-                       element={
-                           <PrivateRoute
-                               Component={ProcurementViewer}
-                               isAuthenticated={isAuthenticated}
-                           />
-                       }
-                />
-                {/* Settings */}
-                <Route
-                    path="/theme"
-                    element={<PrivateRoute Component={Settings} isAuthenticated={isAuthenticated}/>}
-                />
+                    {/* Profile */}
 
-                {/* Profile */}
+                    <Route path="/profile/full"
+                           element={<PrivateRoute Component={FullProfilePage} isAuthenticated={isAuthenticated}/>}
+                    />
 
-                <Route path="/profile/full"
-                       element={<PrivateRoute Component={FullProfilePage} isAuthenticated={isAuthenticated}/>}
-                />
-
-                {/* Catch-all route */}
-                <Route path="/dev" element={<ComingSoon/>}/>
-                <Route path="*" element={<Error404/>}/>
-            </Routes>
+                    {/* Catch-all route */}
+                    <Route path="/dev" element={<ComingSoon/>}/>
+                    <Route path="*" element={<Error404/>}/>
+                </Routes>
+            </div>
             {/* ToastContainer at app root */
             }
             <ToastContainer
@@ -348,6 +349,7 @@ function App() {
         </Router>
     )
         ;
+
 }
 
 export default App;

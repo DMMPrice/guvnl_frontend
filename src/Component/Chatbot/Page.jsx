@@ -211,7 +211,7 @@ export default function ChatbotPage() {
             <ChatbotSheet triggerOpen={{open, setOpen}} hasNewMessage={hasNewMessage}>
                 <div className="w-full h-full flex flex-col">
                     {/* Header */}
-                    <div className="bg-[#0052cc] text-white px-4 py-2 flex justify-between items-center">
+                    <div className="bg-[#0052cc] text-white px-4 py-2 flex justify-between items-center rounded-t-xl">
                         <div className="flex items-baseline gap-2">
                             <span className="font-semibold text-lg">ARADHYA</span>
                             <span className="text-sm opacity-80">v{ARADHYA_VERSION}</span>
@@ -229,12 +229,13 @@ export default function ChatbotPage() {
                         </div>
                     </div>
 
-                    {/* Body */}
-                    <div className="flex-1 overflow-auto">{renderContent()}</div>
+                    {/* Chat Body */}
+                    <div className="flex-1 overflow-auto p-3">
+                        <ChatPanel chatMessages={chatMessages}/>
+                    </div>
 
                     {/* Footer */}
-                    <div className="p-3 border-t">
-                        <ChatPanel chatMessages={chatMessages}/>
+                    <div className="p-3 border-t bg-white">
                         <ChatInput message={message} setMessage={setMessage} onSend={sendMessage}/>
                         <div className="text-center text-sm text-gray-400 mt-2">
                             Powered by ARADHYA v{ARADHYA_VERSION}
@@ -242,6 +243,7 @@ export default function ChatbotPage() {
                     </div>
                 </div>
             </ChatbotSheet>
+
 
             {/* Info dialog */}
             <Dialog open={infoOpen} onOpenChange={setInfoOpen}>

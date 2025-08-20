@@ -73,7 +73,7 @@ export default function PowerTheft() {
             <div className="w-full max-w-7xl">
                 {/* Header strip */}
                 <div
-                    className="rounded-2xl bg-gradient-to-r from-indigo-50 via-white to-white p-4 border border-indigo-100">
+                    className="mb-6 rounded-2xl bg-gradient-to-r from-indigo-50 via-white to-white p-4 border border-indigo-100">
                     <div className="flex items-center gap-3">
                         <div className="p-2 rounded-xl bg-indigo-100">
                             <TimerReset className="w-5 h-5 text-indigo-700"/>

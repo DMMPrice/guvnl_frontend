@@ -1,7 +1,12 @@
 // GenerateProcurementPage.jsx
 import React from "react";
-import ProcurementForm from "./GenerateProcurementForm.jsx"; // Adjust the import path as necessary
+import ProcurementForm from "./GenerateProcurementForm.jsx";
+import DemandGenerationDashboard from "@/Component/Dashboards/Consolidated Dashboard/Page.jsx";
 
 export default function GenerateProcurementPage() {
-    return <ProcurementForm/>;
+    return <>
+        <ProcurementForm/>;
+        <DemandGenerationDashboard/>
+    </>
+
 }
