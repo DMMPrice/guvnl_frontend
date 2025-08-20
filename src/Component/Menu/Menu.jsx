@@ -209,24 +209,6 @@ const menuItems = [
             },
         ],
     },
-    // {
-    //     title: "Settings",
-    //     icon: <FaGears className="h-10 w-10 text-cyan-500"/>,
-    //     allowedRoles: ["SUPER-ADMIN", "ADMIN", "GUEST"],
-    //     submenu: [
-    //         {title: "Change Theme", path: "/theme", icon: <LuWallpaper className="h-6 w-6 text-cyan-600"/>},
-    //         {title: "Change Font", path: "/dev", icon: <RiFontSize2 className="h-6 w-6 text-indigo-800"/>},
-    //     ],
-    // },
-    // {
-    //     title: "Profile",
-    //     icon: <RiUserSettingsLine className="h-10 w-10 text-red-500"/>,
-    //     allowedRoles: ["SUPER-ADMIN", "ADMIN", "GUEST"],
-    //     submenu: [
-    //         {title: "Full Profile", path: "/profile/full", icon: <MdPerson className="h-6 w-6 text-red-500"/>},
-    //         {title: "Change Password", path: "/dev", icon: <MdLock className="h-6 w-6 text-red-500"/>},
-    //     ],
-    // },
 ];
 
 const Menu = () => {
