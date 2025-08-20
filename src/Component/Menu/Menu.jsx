@@ -13,16 +13,13 @@ import {
     MdArrowBack,
     MdKeyboardArrowRight,
     MdSpaceDashboard,
-    MdPerson, MdLock, MdLogout, MdElectricMeter, MdOutlineElectricBolt, MdPowerOff,
+    MdElectricMeter, MdOutlineElectricBolt, MdPowerOff, MdOutlineCo2,
 } from "react-icons/md";
-import {FaCartArrowDown, FaFileAlt} from "react-icons/fa";
-import {PiPiggyBankDuotone} from "react-icons/pi";
+import {FaCartArrowDown} from "react-icons/fa";
 import CommonConfirmModal from "@/Component/Utils/ConfirmModal";
-import {LuChartNoAxesCombined, LuPiggyBank, LuWallpaper} from "react-icons/lu";
+import {LuChartNoAxesCombined} from "react-icons/lu";
 import {BsDatabaseAdd} from "react-icons/bs";
 import {MdGroups} from "react-icons/md";
-import {RiFontSize2, RiUserSettingsLine} from "react-icons/ri";
-import {FaGears} from "react-icons/fa6";
 import {ArchiveRestore} from 'lucide-react';
 import {BatteryFull} from 'lucide-react';
 import {BiTransfer} from "react-icons/bi";
@@ -31,7 +28,7 @@ const menuItems = [
     {
         title: "Demand & IEX Module",
         icon: <MdSpaceDashboard className="h-10 w-10 text-cyan-800 rotate-90"/>,
-        allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
+        allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN","USER"],
         submenu: [
             {
                 title: "Demand Dashboard",
@@ -76,7 +73,7 @@ const menuItems = [
     },
     {
         title: "Carbon Footprints Module",
-        icon: <MdSpaceDashboard className="h-10 w-10 text-orange-600 rotate-90"/>,
+        icon: <MdOutlineCo2 className="h-10 w-10 text-emerald-600 rotate-0"/>,
         allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
             {
@@ -134,7 +131,7 @@ const menuItems = [
     },
     {
         title: "Theft Module",
-        icon: <MdPowerOff className="h-10 w-10 text-pink-600"/>,
+        icon: <MdPowerOff className="h-10 w-10 text-red-600"/>,
         allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
             {
@@ -147,7 +144,7 @@ const menuItems = [
     },
     {
         title: "Consumer Module",
-        icon: <MdGroups className="h-10 w-10 text-pink-600"/>,
+        icon: <MdGroups className="h-10 w-10 text-purple-600"/>,
         allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
             {
@@ -212,24 +209,24 @@ const menuItems = [
             },
         ],
     },
-    {
-        title: "Settings",
-        icon: <FaGears className="h-10 w-10 text-cyan-500"/>,
-        allowedRoles: ["SUPER-ADMIN", "ADMIN", "GUEST"],
-        submenu: [
-            {title: "Change Theme", path: "/theme", icon: <LuWallpaper className="h-6 w-6 text-cyan-600"/>},
-            {title: "Change Font", path: "/dev", icon: <RiFontSize2 className="h-6 w-6 text-indigo-800"/>},
-        ],
-    },
-    {
-        title: "Profile",
-        icon: <RiUserSettingsLine className="h-10 w-10 text-red-500"/>,
-        allowedRoles: ["SUPER-ADMIN", "ADMIN", "GUEST"],
-        submenu: [
-            {title: "Full Profile", path: "/profile/full", icon: <MdPerson className="h-6 w-6 text-red-500"/>},
-            {title: "Change Password", path: "/dev", icon: <MdLock className="h-6 w-6 text-red-500"/>},
-        ],
-    },
+    // {
+    //     title: "Settings",
+    //     icon: <FaGears className="h-10 w-10 text-cyan-500"/>,
+    //     allowedRoles: ["SUPER-ADMIN", "ADMIN", "GUEST"],
+    //     submenu: [
+    //         {title: "Change Theme", path: "/theme", icon: <LuWallpaper className="h-6 w-6 text-cyan-600"/>},
+    //         {title: "Change Font", path: "/dev", icon: <RiFontSize2 className="h-6 w-6 text-indigo-800"/>},
+    //     ],
+    // },
+    // {
+    //     title: "Profile",
+    //     icon: <RiUserSettingsLine className="h-10 w-10 text-red-500"/>,
+    //     allowedRoles: ["SUPER-ADMIN", "ADMIN", "GUEST"],
+    //     submenu: [
+    //         {title: "Full Profile", path: "/profile/full", icon: <MdPerson className="h-6 w-6 text-red-500"/>},
+    //         {title: "Change Password", path: "/dev", icon: <MdLock className="h-6 w-6 text-red-500"/>},
+    //     ],
+    // },
 ];
 
 const Menu = () => {
@@ -273,7 +270,7 @@ const Menu = () => {
 
     return (
         <>
-            <div className="flex flex-col max-h-screen">
+            <div className="flex flex-col max-h-screen pt-20 pb-20">
                 <div className="flex flex-col items-center flex-grow p-6" ref={menuRef}>
                     {activeMenu !== null && (
                         <button

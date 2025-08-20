@@ -1,12 +1,5 @@
-// File: src/pages/ChatbotSheet.jsx
-
 import React from "react";
-import {
-    Sheet,
-    SheetTrigger,
-    SheetOverlay,
-    SheetContent,
-} from "@/components/ui/sheet";
+import {Sheet, SheetTrigger, SheetOverlay, SheetContent} from "@/components/ui/sheet";
 import {Bot} from "lucide-react";
 
 export function ChatbotSheet({triggerOpen, hasNewMessage, children}) {
@@ -14,11 +7,6 @@ export function ChatbotSheet({triggerOpen, hasNewMessage, children}) {
 
     return (
         <Sheet open={open} onOpenChange={setOpen}>
-
-            {/*
-        1) Only render the bot‐bubble trigger when CLOSED
-        (so you never see a second “×” in the bubble)
-      */}
             {!open && (
                 <SheetTrigger asChild>
                     <button
@@ -44,10 +32,8 @@ export function ChatbotSheet({triggerOpen, hasNewMessage, children}) {
                 </SheetTrigger>
             )}
 
-            {/* 2) Transparent overlay so page isn’t greyed out */}
             <SheetOverlay className="fixed inset-0 bg-transparent"/>
 
-            {/* 3) Slide-in panel */}
             <SheetContent
                 side="right"
                 className="

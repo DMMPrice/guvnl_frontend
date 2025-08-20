@@ -1,5 +1,4 @@
-import React, {useState} from "react";
-import BasicDateTimePicker from "@/Component/Utils/DateTimeBlock.jsx";
+import React, {useMemo, useState} from "react";
 import {Button} from "@/components/ui/button";
 import {
     Dialog,
@@ -10,200 +9,85 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import {Info, Maximize} from "lucide-react";
+
 import {ChatbotSheet} from "./ChatbotSheet.jsx";
 import {ChatPanel} from "./ChatPanel.jsx";
 import {ChatInput} from "./ChatInput.jsx";
-import {API_URL, ARADHYA_VERSION, CHATBOT_URL} from "@/config.js";
-import {GiPowerLightning} from "react-icons/gi";
-import {TbSolarElectricity} from "react-icons/tb";
-import {FiShoppingCart} from "react-icons/fi";
+import {ARADHYA_VERSION, CHATBOT_URL, CONSUMER_CHATBOT_URL} from "@/config.js";
+
+/* -------- shared role helpers (same as Menu) -------- */
+const DEFAULT_ROLE = "GUEST";
+const normalizeRole = (v) => {
+    if (!v) return DEFAULT_ROLE;
+    let r = String(v).trim().replace(/\s+|_/g, "-").toUpperCase();
+    return r === "SUPERADMIN" ? "SUPER-ADMIN" : r;
+};
+const getStoredUser = () => {
+    const raw = localStorage.getItem("userData") || localStorage.getItem("user");
+    return raw ? JSON.parse(raw) : {};
+};
+/* ---------------------------------------------------- */
 
 export default function ChatbotPage() {
-    // Side-sheet & dialogs
+    // Sheet & dialogs
     const [open, setOpen] = useState(false);
     const [fullOpen, setFullOpen] = useState(false);
     const [infoOpen, setInfoOpen] = useState(false);
     const [hasNewMessage, setHasNewMessage] = useState(true);
 
-    // Step + selection state
-    const [step, setStep] = useState(0);
-    const [selectedDemandType, setSelectedDemandType] = useState(null);
-    const [singleDateTemp, setSingleDateTemp] = useState(null);
-    const [rangeStartTemp, setRangeStartTemp] = useState(null);
-    const [rangeEndTemp, setRangeEndTemp] = useState(null);
-    const [isRangeMode, setIsRangeMode] = useState(false);
-    const [data, setData] = useState([]);
-    const [summary, setSummary] = useState({});
-    const [loading, setLoading] = useState(false);
-
-    // Chat history
+    // Chat
     const [message, setMessage] = useState("");
     const [chatMessages, setChatMessages] = useState([]);
 
-    const DEMAND_TYPES = [
-        {label: "Demand", icon: <GiPowerLightning size={24} className="text-green-600"/>},
-        {label: "IEX Price", icon: <TbSolarElectricity size={24} className="text-red-600"/>},
-        {label: "MOD Price", icon: <FiShoppingCart size={24} className="text-blue-600"/>},
-    ];
-
-    function resetAll() {
-        setStep(0);
-        setSelectedDemandType(null);
-        setSingleDateTemp(null);
-        setRangeStartTemp(null);
-        setRangeEndTemp(null);
-        setIsRangeMode(false);
-        setData([]);
-        setSummary({});
-        setLoading(false);
-        setMessage("");
-        setChatMessages([]);
-    }
-
-    async function fetchAPI(type, start, end) {
-        setLoading(true);
-        let endpoint = "";
-        if (type === "Demand")
-            endpoint = `demand/range?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
-        if (type === "IEX Price")
-            endpoint = `iex/range?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
-        if (type === "MOD Price")
-            endpoint = `procurement/range?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
-
-        try {
-            const res = await fetch(`${API_URL}${endpoint}`);
-            const json = await res.json();
-            setData(json.data || []);
-            setSummary(json.summary || {});
-            setStep(2);
-        } catch (err) {
-            console.error("Error fetching data:", err);
-        }
-        setLoading(false);
-    }
+    // user + role
+    const {user, role, isConsumer} = useMemo(() => {
+        const u = getStoredUser();
+        const r = normalizeRole(u?.role);
+        return {user: u, role: r, isConsumer: r === "USER" || r === "GUEST"};
+    }, []);
 
     async function sendMessage() {
-        if (!message.trim()) return;
-        setChatMessages((prev) => [...prev, {sender: "user", text: message}]);
+        const trimmed = message.trim();
+        if (!trimmed) return;
+
+        setChatMessages((prev) => [...prev, {sender: "user", text: trimmed}]);
         setMessage("");
+
         try {
-            const res = await fetch(`${CHATBOT_URL}get?msg=${encodeURIComponent(message)}`);
-            const json = await res.json();
-            setChatMessages((prev) => [...prev, {sender: "bot", text: json.response || "No response"}]);
-        } catch {
-            setChatMessages((prev) => [...prev, {sender: "bot", text: "Error fetching response."}]);
+            if (isConsumer) {
+                // consumer flow → POST { message, customer_id: <full_name> }
+                const customer_id = user?.full_name || "DTR1_USER1";
+                console.log(customer_id)// as requested: use full_name from localStorage
+                const res = await fetch(`${CONSUMER_CHATBOT_URL}msg`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json", Accept: "application/json"},
+                    body: JSON.stringify({message: trimmed, customer_id: customer_id}),
+                });
+                console.log(res)
+                const json = await res.json();
+                const botText = json.response || json.message || "No response";
+                setChatMessages((prev) => [...prev, {sender: "bot", text: botText}]);
+            } else {
+                // internal/admin flow → existing GET
+                const params = new URLSearchParams({msg: trimmed});
+                const token = localStorage.getItem("access_token");
+                const res = await fetch(`${CHATBOT_URL}get?${params.toString()}`, {
+                    method: "GET",
+                    headers: token ? {Authorization: `Bearer ${token}`} : undefined,
+                    credentials: "include",
+                });
+                const json = await res.json();
+                setChatMessages((prev) => [
+                    ...prev,
+                    {sender: "bot", text: json.response || "No response"},
+                ]);
+            }
+        } catch (e) {
+            setChatMessages((prev) => [
+                ...prev,
+                {sender: "bot", text: "Error fetching response."},
+            ]);
         }
-    }
-
-    function renderContent() {
-        if (step === 0) {
-            return (
-                <div className="p-4">
-                    <p className="text-base text-gray-800 mb-3">1. Choose your requirement:</p>
-                    <div className="grid grid-cols-2 gap-3">
-                        {DEMAND_TYPES.map(({label, icon}) => (
-                            <Button
-                                key={label}
-                                onClick={() => {
-                                    setSelectedDemandType(label);
-                                    setStep(1);
-                                }}
-                                className="flex flex-col items-center justify-center h-24 bg-blue-50 hover:bg-blue-100 text-gray-800 rounded-lg shadow"
-                            >
-                                {icon}
-                                <span className="text-sm font-semibold mt-1">{label}</span>
-                            </Button>
-                        ))}
-                    </div>
-                </div>
-            );
-        }
-
-        if (step === 1) {
-            return (
-                <div className="p-4 flex flex-col gap-2">
-                    <p className="text-base text-gray-800">
-                        Select {selectedDemandType === "MOD Price" ? "single" : "single or range"} date/time for{" "}
-                        <strong>{selectedDemandType}</strong>:
-                    </p>
-                    {selectedDemandType !== "MOD Price" && (
-                        <div className="flex gap-2">
-                            <Button
-                                size="sm"
-                                onClick={() => setIsRangeMode(false)}
-                                className={`w-1/2 ${
-                                    !isRangeMode ? "bg-blue-600 text-white" : "bg-blue-100 text-gray-800"
-                                }`}
-                            >
-                                Single
-                            </Button>
-                            <Button
-                                size="sm"
-                                onClick={() => setIsRangeMode(true)}
-                                className={`w-1/2 ${isRangeMode ? "bg-blue-600 text-white" : "bg-blue-100 text-gray-800"}`}
-                            >
-                                Range
-                            </Button>
-                        </div>
-                    )}
-                    {!isRangeMode ? (
-                        <>
-                            <BasicDateTimePicker
-                                label="Select Date & Time"
-                                value={singleDateTemp}
-                                onChange={setSingleDateTemp}
-                            />
-                            <Button
-                                onClick={() => fetchAPI(selectedDemandType, singleDateTemp, singleDateTemp)}
-                                size="sm"
-                                disabled={!singleDateTemp}
-                                className="bg-[#0052cc] text-white hover:bg-[#0041a8]"
-                            >
-                                Confirm
-                            </Button>
-                        </>
-                    ) : (
-                        <>
-                            <BasicDateTimePicker label="Start" value={rangeStartTemp} onChange={setRangeStartTemp}/>
-                            <BasicDateTimePicker label="End" value={rangeEndTemp} onChange={setRangeEndTemp}/>
-                            <Button
-                                onClick={() => fetchAPI(selectedDemandType, rangeStartTemp, rangeEndTemp)}
-                                size="sm"
-                                disabled={!rangeStartTemp || !rangeEndTemp}
-                                className="bg-[#0052cc] text-white hover:bg-[#0041a8]"
-                            >
-                                Confirm Range
-                            </Button>
-                        </>
-                    )}
-                    <Button onClick={resetAll} size="sm" className="bg-red-500 text-white hover:bg-red-600">
-                        Start Over
-                    </Button>
-                </div>
-            );
-        }
-
-        if (step === 2) {
-            return (
-                <div className="p-4 flex flex-col gap-3">
-                    {!loading ? (
-                        <>
-                            <p className="text-base font-semibold">Summary:</p>
-                            <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
-                                Download CSV
-                            </Button>
-                        </>
-                    ) : (
-                        <p className="text-base">Loading data…</p>
-                    )}
-                    <Button onClick={resetAll} size="sm" className="bg-[#0052cc] text-white">
-                        Start Over
-                    </Button>
-                </div>
-            );
-        }
-
-        return null;
     }
 
     return (
@@ -215,15 +99,23 @@ export default function ChatbotPage() {
                         <div className="flex items-baseline gap-2">
                             <span className="font-semibold text-lg">ARADHYA</span>
                             <span className="text-sm opacity-80">v{ARADHYA_VERSION}</span>
+                            <span className="ml-2 text-xs bg-white/20 px-2 py-0.5 rounded">{role || DEFAULT_ROLE}</span>
                         </div>
                         <div className="flex items-center gap-3">
-                            <button onClick={() => setInfoOpen(true)} className="text-white">
+                            <button onClick={() => setInfoOpen(true)} className="text-white" aria-label="About">
                                 <Info className="w-5 h-5"/>
                             </button>
-                            <button onClick={() => setFullOpen(true)} className="text-white">
+                            <button onClick={() => setFullOpen(true)} className="text-white" aria-label="Maximize">
                                 <Maximize className="w-5 h-5"/>
                             </button>
-                            <button onClick={() => setOpen(false)} className="text-2xl leading-none text-white">
+                            <button
+                                onClick={() => {
+                                    setOpen(false);
+                                    setHasNewMessage(false);
+                                }}
+                                className="text-2xl leading-none text-white"
+                                aria-label="Close"
+                            >
                                 ×
                             </button>
                         </div>
@@ -243,7 +135,6 @@ export default function ChatbotPage() {
                     </div>
                 </div>
             </ChatbotSheet>
-
 
             {/* Info dialog */}
             <Dialog open={infoOpen} onOpenChange={setInfoOpen}>
@@ -270,19 +161,18 @@ export default function ChatbotPage() {
             {/* Full-screen dialog */}
             <Dialog open={fullOpen} onOpenChange={setFullOpen}>
                 <DialogContent className="p-0 w-full max-w-[768px] h-[90vh] overflow-hidden flex flex-col">
-                    {/* Header */}
                     <div className="bg-[#0052cc] text-white px-4 py-2 flex justify-between items-center">
                         <div className="flex items-baseline gap-2">
                             <span className="font-semibold text-lg">ARADHYA</span>
                             <span className="text-sm opacity-80">v{ARADHYA_VERSION}</span>
+                            <span className="ml-2 text-xs bg-white/20 px-2 py-0.5 rounded">{role || DEFAULT_ROLE}</span>
                         </div>
-                        <button onClick={() => setFullOpen(false)} className="text-2xl leading-none">
+                        <button onClick={() => setFullOpen(false)} className="text-2xl leading-none"
+                                aria-label="Close fullscreen">
                             ×
                         </button>
                     </div>
-                    {/* Body */}
-                    <div className="flex-1 overflow-auto px-4 py-3">{renderContent()}</div>
-                    {/* Footer */}
+
                     <div className="p-4 border-t">
                         <ChatPanel chatMessages={chatMessages}/>
                         <ChatInput message={message} setMessage={setMessage} onSend={sendMessage}/>
