@@ -149,13 +149,13 @@ export default function PlantComparisonChart({procurementData}) {
                         key: "generated_energy",
                         label: "Generated Energy (kWh)",
                         type: "area",
-                        color: "#82ca9d",
+                        color: "#ce1515",
                     },
                     {
                         key: "max_power",
                         label: "Max Power (kW)",
                         type: "line",
-                        color: "#8884d8",
+                        color: "#f89404",
                     },
                 ]}
                 height={300}

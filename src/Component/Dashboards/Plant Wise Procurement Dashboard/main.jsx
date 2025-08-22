@@ -45,7 +45,7 @@ export default function Procurement() {
 
     return (
         <div className="flex flex-col items-center pt-6">
-            <div className="w-full max-w-4xl">
+            <div className="w-full max-w-7xl">
                 <ProcurementForm
                     loading={loading}
                     startDateTime={startDateTime}

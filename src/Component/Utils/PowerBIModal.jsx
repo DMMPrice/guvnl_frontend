@@ -1,4 +1,4 @@
-// src/Component/Dashboards/Consolidated Dashboard/PowerBIModal.jsx
+// src/Component/Dashboards/Demand & Generation Dashboard/PowerBIModal.jsx
 import React, {useState} from 'react'
 
 const POWERBI_URL = 'https://app.powerbi.com/view?r=eyJrIjoiYzhmMmE0ODItYTRlMy00ZjEzLWE1NjQtMjRhODViMDhiZmMxIiwidCI6IjhlZTQ0MWJkLTBjODQtNDYzNS05YTU2LWVkMWUyNjhkZmU4NSIsImMiOjEwfQ%3D%3D'

@@ -22,7 +22,7 @@ import Settings from "./Component/Settings/Settings.jsx";
 
 // Dashboards Components
 import DemandDashboard from "./Component/Dashboards/Demand Dashboard/Page.jsx";
-import ConsolidateDashboard from "./Component/Dashboards/Consolidated Dashboard/Page.jsx";
+import ConsolidateDashboard from "./Component/Dashboards/Demand & Generation Dashboard/Page.jsx";
 import IEXDashboard from "./Component/Dashboards/IEX Dashboard/dashboard";
 import Procurement from "./Component/Dashboards/Plant Wise Procurement Dashboard/main";
 import FeederSubstationDashboard from "./Component/Dashboards/Substation Feeder Dashboard/Page.jsx";
@@ -331,8 +331,7 @@ function App() {
                     <Route path="*" element={<Error404/>}/>
                 </Routes>
             </div>
-            {/* ToastContainer at app root */
-            }
+            {/* ToastContainer at app root */}
             <ToastContainer
                 position="top-right"
                 autoClose={3000}
@@ -341,8 +340,7 @@ function App() {
                 closeOnClick
                 pauseOnHover
             />
-            {/* Chatbot Overlay */
-            }
+            {/* Chatbot Overlay */}
             {
                 isAuthenticated && <ChatbotOverlay/>
             }

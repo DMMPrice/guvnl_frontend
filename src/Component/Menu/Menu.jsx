@@ -13,7 +13,7 @@ import {
     MdArrowBack,
     MdKeyboardArrowRight,
     MdSpaceDashboard,
-    MdElectricMeter, MdOutlineElectricBolt, MdPowerOff, MdOutlineCo2,
+    MdElectricMeter, MdOutlineElectricBolt, MdOutlineCo2,
 } from "react-icons/md";
 import {FaCartArrowDown} from "react-icons/fa";
 import CommonConfirmModal from "@/Component/Utils/ConfirmModal";
@@ -26,19 +26,14 @@ import {BiTransfer} from "react-icons/bi";
 
 const menuItems = [
     {
-        title: "Demand & IEX Module",
+        title: "Demand Module",
         icon: <MdSpaceDashboard className="h-10 w-10 text-cyan-800 rotate-90"/>,
-        allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN","USER"],
+        allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN", "USER"],
         submenu: [
             {
                 title: "Demand Dashboard",
                 path: "/demand-dashboard",
                 icon: <GiPowerLightning className="h-6 w-6 text-green-600"/>,
-            },
-            {
-                title: "IEX Dashboard",
-                path: "/iex-dashboard",
-                icon: <TbSolarElectricity className="h-6 w-6 text-red-600"/>,
             },
             {
                 title: "Demand Generation Dashboard",
@@ -49,8 +44,20 @@ const menuItems = [
         ],
     },
     {
+        title: "IEX Module",
+        icon: <TbSolarElectricity className="h-10 w-10 text-fuchsia-800"/>,
+        allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN", "USER"],
+        submenu: [
+            {
+                title: "IEX Dashboard",
+                path: "/iex-dashboard",
+                icon: <TbSolarElectricity className="h-6 w-6 text-red-600"/>,
+            }
+        ],
+    },
+    {
         title: "Power Distribution Module",
-        icon: <BiTransfer className="h-10 w-10 text-orange-600 rotate-90"/>,
+        icon: <BiTransfer className="h-10 w-10 text-orange-600"/>,
         allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
             {
@@ -67,6 +74,12 @@ const menuItems = [
                 title: "DTR Consumer Dashboard",
                 path: "/dtr-consumer-dashboard",
                 icon: <GiPowerLightning className="h-6 w-6 text-yellow-600"/>,
+                allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
+            },
+            {
+                title: "Power Theft Dashboard",
+                path: "/power-theft-dashboard",
+                icon: <MdOutlineElectricBolt className="h-6 w-6 text-red-600"/>,
                 allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
             },
         ],
@@ -88,7 +101,6 @@ const menuItems = [
         icon: <FiShoppingCart className="h-10 w-10 text-green-600"/>,
         allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
-
             {
                 title: "Generate Plant-Wise Procurement Output",
                 path: "/mass-plant-output",
@@ -130,19 +142,6 @@ const menuItems = [
         ],
     },
     {
-        title: "Theft Module",
-        icon: <MdPowerOff className="h-10 w-10 text-red-600"/>,
-        allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
-        submenu: [
-            {
-                title: "Power Theft Dashboard",
-                path: "/power-theft-dashboard",
-                icon: <MdOutlineElectricBolt className="h-6 w-6 text-red-600"/>,
-                allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
-            },
-        ],
-    },
-    {
         title: "Consumer Module",
         icon: <MdGroups className="h-10 w-10 text-purple-600"/>,
         allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
@@ -156,7 +155,7 @@ const menuItems = [
         ],
     },
     {
-        title: "Banking Module",
+        title: "Power Banking Module",
         icon: <ArchiveRestore className="h-10 w-10 text-pink-600"/>,
         allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [

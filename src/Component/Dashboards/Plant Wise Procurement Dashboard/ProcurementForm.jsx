@@ -42,7 +42,7 @@ export default function ProcurementForm({
                     />
                 </div>
 
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-4 items-center">
                     {/* Apply */}
                     <button
                         type="submit"

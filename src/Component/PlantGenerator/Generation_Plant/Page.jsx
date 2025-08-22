@@ -73,13 +73,13 @@ export default function CodeDetails() {
         .filter((p) => p.Type === "Must run")
         .map((p) => ({label: `${p.Code} — ${p.name}`, value: p.Code}));
     const COLORS = [
-        "#8884d8", // purple
-        "#82ca9d", // green
         "#ff7300", // orange
-        "#413ea0", // dark purple
+        "#ce1515", // dark purple
+        "#02f8db", // green
         "#d0ed57", // lime
-        "#a4de6c", // light green
+        "#b7f57d", // light green
         "#ffc658", // yellow
+        "#8884d8", // purple
         "#00C49F", // teal
         "#FF6384", // pink
         "#36A2EB", // sky blue
@@ -149,6 +149,7 @@ export default function CodeDetails() {
                             onChange={setPendingCodes}
                             placeholder="Select must-run plant codes"
                             multi
+                            maxSelected={2}                 // ← cap at 2
                             className="flex-1 min-w-[200px]"
                         />
                         <button
