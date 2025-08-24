@@ -147,11 +147,12 @@ select:focus {
 }
 
 html, body, #root {
-    min-height: 100vh;   /* or height:100% on all three */
-    height: 100%;
+    min-height: 100vh; /* or height:100% on all three */
+    height: auto;
+    scroll-behavior: smooth;
 }
 
 body {
-    margin: 0;           /* just in case */
-    background: #cceebb; /* put the bg on the body */
+    margin: 0; /* just in case */
+    background: linear-gradient(to bottom right, #f9fafb, #a3dc68, #b2d2b2);
 }
