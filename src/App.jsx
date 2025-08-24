@@ -21,27 +21,27 @@ import ChatbotOverlay from "@/Component/Chatbot/Page.jsx";
 import Settings from "./Component/Settings/Settings.jsx";
 
 // Dashboards Components
-import DemandDashboard from "./Component/Dashboards/Demand Dashboard/Page.jsx";
-import ConsolidateDashboard from "./Component/Dashboards/Demand & Generation Dashboard/Page.jsx";
-import IEXDashboard from "./Component/Dashboards/IEX Dashboard/dashboard";
-import Procurement from "./Component/Dashboards/Plant Wise Procurement Dashboard/main";
-import FeederSubstationDashboard from "./Component/Dashboards/Substation Feeder Dashboard/Page.jsx";
-import FeederDtrDashboard from "./Component/Dashboards/Feeder DTR Dashboard/Page.jsx";
-import DtrConsumerDashboard from "./Component/Dashboards/DTR Consumer Dashboard/Page.jsx";
-import PowerTheftDashboard from "./Component/Dashboards/Power Theft Dashboard/Page.jsx"
-import ConsumerDashboard from "./Component/Dashboards/Consumer Analytics Dashboard/Page.jsx"
+import DemandDashboard from "./Component/Demand Module/Demand Dashboard/Page.jsx";
+import ConsolidateDashboard from "./Component/Demand Module/Demand & Generation Dashboard/Page.jsx";
+import IEXDashboard from "./Component/IEX Module/IEX Dashboard/dashboard";
+import Procurement from "./Component/Power Plant Module/Plant Wise Procurement Dashboard/main";
+import FeederSubstationDashboard from "./Component/Power Distribution Module/Substation Feeder Dashboard/Page.jsx";
+import FeederDtrDashboard from "./Component/Power Distribution Module/Feeder DTR Dashboard/Page.jsx";
+import DtrConsumerDashboard from "./Component/Power Distribution Module/DTR Consumer Dashboard/Page.jsx";
+import PowerTheftDashboard from "./Component/Power Distribution Module/Power Theft Dashboard/Page.jsx"
+import ConsumerDashboard from "./Component/Consumer Module/Consumer Analytics Dashboard/Page.jsx"
 
-// Procurement Components
-import MassProcurementOutput from "@/Component/Procurement/Generate_BlockWise_Output/Generate_Procurement/Page.jsx";
+// Procurement Module Components
+import MassProcurementOutput from "@/Component/Procurement Module/Generate Plant Wise Procurement Module Output/Page.jsx";
 
 // Plant Generator Components
-import Plants from "./Component/PlantGenerator/Plants_List/Page.jsx";
-import GenerationPlant from "./Component/PlantGenerator/Generation_Plant/Page.jsx";
-import PlantAvailabilityFactor from "./Component/PlantGenerator/Plant_Availibility_Factor/Page.jsx";
-import BackdownPage from "./Component/PlantGenerator/Backdown_Table/Page.jsx";
+import Plants from "./Component/Power Plant Module/Generator Plants List/Page.jsx";
+import GenerationPlant from "./Component/Power Plant Module/Generation Plant List/Page.jsx";
+import PlantAvailabilityFactor from "./Component/Power Plant Module/Plant Availability Factor/Page.jsx";
+import BackdownPage from "./Component/Power Plant Module/Plant Backdown Rates/Page.jsx";
 
-// Banking Components
-import Banking from "./Component/BankingData/Banking/Page.jsx";
+// Generate Banking Data Components
+import Banking from "./Component/Power Banking Module/Generate Banking Data/Page.jsx";
 
 // Add Data Components
 import DemandDataAddPage from "@/Component/AddData/Demand Data/Page.jsx"

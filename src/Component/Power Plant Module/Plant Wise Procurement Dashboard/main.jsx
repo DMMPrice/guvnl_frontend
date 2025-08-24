@@ -1,7 +1,7 @@
-// src/Component/Dashboards/Plant Wise Procurement Dashboard/Procurement.jsx
+// src/Component/Dashboards/Plant Wise Procurement Module Dashboard/Procurement Module.jsx
 import React, {useState, useEffect} from "react";
 import {API_URL} from "@/config.js";
-import ProcurementForm from "./procurementForm.jsx";
+import ProcurementForm from "./ProcurementForm.jsx";
 import PlantComparisonChart from "./PlantComparisonChart.jsx";
 
 export default function Procurement() {

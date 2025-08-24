@@ -21,7 +21,7 @@ export default function DashboardFilters({
     const isDisabled = !startDate || !endDate;
 
     return (
-        <div className="flex flex-wrap items-end gap-4 mb-6">
+        <div className="flex flex-wrap items-end gap-4 mb-6 bg-blue-400 p-8 rounded-lg">
             <BasicDateTimePicker
                 label="Start Date & Time"
                 value={startDate ? dayjs(startDate) : null}

@@ -97,7 +97,7 @@ const menuItems = [
         ],
     },
     {
-        title: "Procurement Module",
+        title: "Procurement Module Module",
         icon: <FiShoppingCart className="h-10 w-10 text-green-600"/>,
         allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
@@ -114,7 +114,7 @@ const menuItems = [
         allowedRoles: ["ADMIN", "GUEST", "SUPER-ADMIN"],
         submenu: [
             {
-                title: "Plant Wise Procurement Dashboard",
+                title: "Plant Wise Dashboard",
                 path: "/purchase",
                 icon: <PiNuclearPlantDuotone className="h-6 w-6 text-blue-600"/>,
                 allowedRoles: ["SUPER-ADMIN", "ADMIN", "GUEST"],
@@ -187,7 +187,7 @@ const menuItems = [
                 icon: <PiNuclearPlantDuotone className="h-6 w-6 text-red-600"/>,
             },
             {
-                title: "Procurement Data",
+                title: "Procurement Module Data",
                 path: "/procurement-viewer",
                 icon: <FiShoppingCart className="h-6 w-6 text-red-600"/>,
             },

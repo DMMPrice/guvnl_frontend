@@ -5,8 +5,8 @@ import CommonComposedChart from "@/Component/Utils/CommonComposedChart.jsx";
 import {Loader2} from "lucide-react";
 import {CSVLink} from "react-csv";
 import BasicDateTimePicker from "../../Utils/DateTimeBlock.jsx";
-import CommonTable from "../../Utils/CommonTable";
-import ErrorModal from "../../Utils/ErrorModal";
+import CommonTable from "../../Utils/CommonTable.jsx";
+import ErrorModal from "../../Utils/ErrorModal.jsx";
 import PowerBIModal from "@/Component/Utils/PowerBIModal.jsx";
 import dayjs from "dayjs";
 

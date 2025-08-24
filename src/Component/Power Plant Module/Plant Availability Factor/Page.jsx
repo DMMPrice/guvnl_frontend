@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import CommonTable from "../../Utils/CommonTable.jsx";
 import AddPAFModal from "./AddPAFModal.jsx";
 import EditPAFModal from "./EditPAFModal.jsx";
-import DeleteConfirmationModal from "../Plants_List/DeleteConfirmationModal.jsx";
+import DeleteConfirmationModal from "../Generator Plants List/DeleteConfirmationModal.jsx";
 import {FaEdit, FaTrash} from "react-icons/fa";
 import {Loader2} from "lucide-react"; // ✅ Import Loader
 import {API_URL} from "@/config.js";

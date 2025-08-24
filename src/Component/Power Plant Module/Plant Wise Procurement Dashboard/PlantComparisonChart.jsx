@@ -1,4 +1,4 @@
-// src/Component/Dashboards/Plant Wise Procurement Dashboard/PlantComparisonChart.jsx
+// src/Component/Dashboards/Plant Wise Procurement Module Dashboard/PlantComparisonChart.jsx
 import React, {useState, useMemo, useEffect} from "react";
 import CommonComposedChart from "@/Component/Utils/CommonComposedChart.jsx";
 import CustomSelect from "@/Component/Utils/CustomSelect.jsx";

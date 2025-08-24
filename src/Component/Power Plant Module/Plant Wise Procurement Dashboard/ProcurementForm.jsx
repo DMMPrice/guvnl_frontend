@@ -1,4 +1,4 @@
-// src/Component/Dashboards/Plant Wise Procurement Dashboard/procurementForm.jsx
+// src/Component/Dashboards/Plant Wise Procurement Module Dashboard/procurementForm.jsx
 import React from 'react';
 import BasicDateTimePicker from '@/Component/Utils/DateTimeBlock.jsx';
 

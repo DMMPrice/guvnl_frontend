@@ -26,7 +26,9 @@ export default function AdvancedTable({
                                           deleteRoles = [],
                                           onEdit = null,
                                           onDelete = null,
-                                          onView = null
+                                          onView = null,
+                                          titleColor = "text-black font-bold",  // ⬅️ heading color (default: black bold)
+                                          cellColor = "text-black font-bold"    // ⬅️ cell color (default: black bold)
                                       }) {
     // ─── Global search, filters, sorting, pagination state ───
     const [searchTerm, setSearchTerm] = useState("");
@@ -92,10 +94,7 @@ export default function AdvancedTable({
     }, [filtered, sortBy, sortDir]);
 
     // ─── 3. Pagination math ──────────────────────────────────
-    const totalPages = Math.max(
-        1,
-        Math.ceil(sorted.length / Number(rowsPerPage))
-    );
+    const totalPages = Math.max(1, Math.ceil(sorted.length / Number(rowsPerPage)));
     useEffect(() => setCurrentPage(1), [
         searchTerm,
         sortBy,
@@ -148,7 +147,7 @@ export default function AdvancedTable({
 
     return (
         <div className="py-4">
-            {title && <h3 className="text-xl font-bold mb-4">{title}</h3>}
+            {title && <h3 className={`text-xl mb-4 ${titleColor}`}>{title}</h3>} {/* heading */}
 
             {/* Toolbar */}
             <div className="flex justify-between mb-4 items-center">
@@ -263,12 +262,15 @@ export default function AdvancedTable({
                                     onClick={() => canView && onView(row)}
                                 >
                                     {columns.map(col => (
-                                        <TableCell key={col.id ?? col.accessor}>
+                                        <TableCell
+                                            key={col.id ?? col.accessor}
+                                            className={cellColor}  // ⬅️ configurable text color
+                                        >
                                             {col.render ? col.render(row) : row[col.accessor] ?? "N/A"}
                                         </TableCell>
                                     ))}
                                     {canView && (
-                                        <TableCell className="text-center">
+                                        <TableCell className={`text-center ${cellColor}`}>
                                             <Button
                                                 size="sm"
                                                 variant="outline"
@@ -282,7 +284,7 @@ export default function AdvancedTable({
                                         </TableCell>
                                     )}
                                     {canEdit && (
-                                        <TableCell className="text-center">
+                                        <TableCell className={`text-center ${cellColor}`}>
                                             <Button
                                                 size="sm"
                                                 variant="outline"
@@ -296,7 +298,7 @@ export default function AdvancedTable({
                                         </TableCell>
                                     )}
                                     {canDelete && (
-                                        <TableCell className="text-center">
+                                        <TableCell className={`text-center ${cellColor}`}>
                                             <Button
                                                 size="sm"
                                                 variant="destructive"
@@ -337,8 +339,8 @@ export default function AdvancedTable({
                     Previous
                 </Button>
                 <span className="text-sm">
-          Page {currentPage} of {totalPages}
-        </span>
+                    Page {currentPage} of {totalPages}
+                </span>
                 <Button
                     variant="outline"
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
